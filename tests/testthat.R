@@ -1,4 +1,4 @@
 library(testthat)
-library(rhdf5server)
+library(rhdf5client)
 
-test_check("rhdf5server")
+test_check("rhdf5client")
