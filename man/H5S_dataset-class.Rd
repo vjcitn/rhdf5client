@@ -39,5 +39,7 @@ rdname H5S_dataset-class
 \item{\code{allatts}}{list of all attributes}
 
 \item{\code{presel}}{string prepared for select operation in GET}
+
+\item{\code{transfermode}}{default "JSON" or "bin" for binary transfer}
 }}
 

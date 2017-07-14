@@ -32,10 +32,11 @@ cat(" Use [[ [dsname] ]]  to get a reference suitable for [i, j] subsetting.\n")
 #' @slot hrefs DataFrame of hrefs as defined in the API
 #' @slot allatts list of all attributes
 #' @slot presel string prepared for select operation in GET
+#' @slot transfermode default "JSON" or "bin" for binary transfer
 #' @exportClass H5S_dataset
 setClass("H5S_dataset", representation(
   source="H5S_source", simpleName="character",
-  shapes="list", hrefs="DataFrame", allatts="list", presel="character"))
+  shapes="list", hrefs="DataFrame", allatts="list", presel="character", transfermode="character"))
 setMethod("show", "H5S_dataset", function(object) {
  cat("H5S_dataset instance:\n")
 # aa = object@allatts
@@ -47,6 +48,19 @@ setMethod("show", "H5S_dataset", function(object) {
      created=object@allatts$created, type.base=object@allatts$type$base))
 #cat("Use [[", object@simplename, "]] to acquire reference amenable to [i,j] subsetting.\n")
 })
+
+#' @export
+setGeneric("transfermode<-", def = function(object, value) { standardGeneric("transfermode<-") })
+setReplaceMethod("transfermode", "H5S_dataset", 
+  function(object, value) {  
+    if ( value == "JSON" | value == "binary" )  {
+      object@transfermode <- value  
+    }  else  {
+      warning(paste("ignoring request for unknown transfer mode ", value))
+    }
+    object
+  }
+)
 
 
 fixtarget = function(x) sub(".*host=(.*).hdfgroup.org", "\\1", x)
@@ -103,7 +117,11 @@ cat(" Use targets([linkset]) to extract target URLs.\n")
 
 transl = function(targ)  {  
   # print(paste("transl: ", targ, sep=""))
-  fromJSON(readBin(GET(targ)$content, what="character"))
+  rsp <- GET(targ)
+  if (rsp$status_code != 200)  
+    stop(paste("error: can't read JSON ", targ, sep=""))
+  jsn <- readBin(rsp$content, what="character")
+  dat <- fromJSON(jsn)
 }
 
 bintransl = function(targ, nele)  {  
@@ -213,12 +231,16 @@ setMethod("[", c("H5S_dataset", "character", "character"), function(x, i, j, ...
  ncol <- (ind2lims[2] - ind2lims[1])
  nele <- nrow*ncol
 
- if ( x@allatts$type$base == "H5T_STD_I32LE" )  {
-   val <- bintransl(uu, nele)
+ if ( x@allatts$type$base == "H5T_STD_I32LE" & x@transfermode == "binary" )  {
+  message(paste("binary transfer", sep=""))
+  val <- bintransl(uu, nele)
  }
  else  {
-   message(paste("Data type is ", x@allatts$type$base, " - doing JSON transfer", sep=""))
-   val <- transl(uu)
+  message(paste("JSON transfer", sep=""))
+  val <- transl(uu)$value
+  if (is.list(val)) {
+    val <- do.call(rbind, val)
+  }
  }
 
  mat <- matrix(val, nrow=nrow, ncol=ncol, byrow = TRUE, dimnames = NULL)
@@ -259,8 +281,9 @@ dataset = function(h5s, tag) {
  prep = sub("\\?host=", "/value?host=", self)
  prep = paste0(prep, "&select=[%%SEL1%%,%%SEL2%%]")
  list(uuid=uuid, hrefs=ans, attrs=attrs)
+ xjson = "JSON"
  new("H5S_dataset", source=h5s, simpleName=fulldsn,
-    shapes=attrs$shape, hrefs=ans, allatts=attrs, presel=prep)
+    shapes=attrs$shape, hrefs=ans, allatts=attrs, presel=prep, transfermode=xjson)
 }
 
 #' acquire internal HDF5 dimension information for matrix
