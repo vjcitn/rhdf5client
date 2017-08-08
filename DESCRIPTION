@@ -2,7 +2,7 @@ Package: rhdf5client
 Title: Access HDF5 content from h5serv 
 Description: Provides functionality for reading data from h5serv server
  from within R.
-Version: 0.0.2
+Version: 0.0.3
 Author: Samuela Pollack <spollack@jimmy.harvard.edu>
 Suggests: knitr, testthat
 Imports: S4Vectors, httr, rjson
@@ -14,3 +14,4 @@ BiocViews: infrastructure
 RoxygenNote: 6.0.1.9000
 Collate: h5serv.R indx.R submatrix.R
 VignetteBuilder: knitr
+biocViews: DataImport, Software
