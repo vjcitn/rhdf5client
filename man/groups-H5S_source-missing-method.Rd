@@ -10,11 +10,18 @@ groups(object, index, ...)
 \arguments{
 \item{object}{H5S_source instance}
 
-\item{index}{numeric, if present, extracts metadata about selected group (sequential ordering of groups as returned by server)
-access for group information for HDF5 server}
+\item{index}{numeric, if present, extracts metadata about selected group (sequential ordering 
+of groups as returned by server) access for group information for HDF5 server}
 
 \item{\dots}{not used}
 }
+\value{
+a data frame with group name and number of links for each group
+}
 \description{
 HDF5 server data groups accessor
+}
+\examples{
+bigec2 = H5S_source("http://54.174.163.77:5000")
+groups(bigec2)
 }

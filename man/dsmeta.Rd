@@ -9,6 +9,15 @@ dsmeta(src)
 \arguments{
 \item{src}{H5S_source instance}
 }
+\value{
+data frame with one row for each group and three columns. The 
+second column has the list of datasets in the group.
+}
 \description{
 list information about datasets available in an H5S_source
+}
+\examples{
+bigec2 = H5S_source("http://54.174.163.77:5000")
+dsm <- dsmeta(bigec2) 
+dst <- unlist(dsm[1,2])    # all dataset candidates in group 1
 }

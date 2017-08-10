@@ -12,9 +12,9 @@
 #' @slot dsmeta DataFrame instance with metadata about content of server
 #' @aliases H5S_source-class
 #' @exportClass H5S_source
-setClass("H5S_source", representation(
-# "host" content
-   serverURL="character", dsmeta="DataFrame"))
+
+setClass("H5S_source", representation(serverURL="character", dsmeta="DataFrame"))
+
 setMethod("show", "H5S_source", function(object) {
 cat("HDF5 server domain: ", object@serverURL, "\n")
 cat(" There are", nrow(object@dsmeta), "groups.\n")
@@ -22,6 +22,164 @@ cat(" Use groups(), links(), ..., to probe and access metadata.\n")
 cat(" Use dsmeta() to get information on datasets within groups.\n")
 cat(" Use [[ [dsname] ]]  to get a reference suitable for [i, j] subsetting.\n")
 })
+
+# private: extract hostname from a file URL (return null for group URL)
+fixtarget = function(x) sub(".*host=(.*).hdfgroup.org", "\\1", x)
+
+#' construct H5S_source
+#' @name H5S_source
+#' @rdname H5S_source-class
+#' @param serverURL a URL for a port for HDF5Server
+#' @param \dots not used
+#' @note The dsmeta slot holds a DataFrame with a column \code{dsnames}
+#' that is a list with ith element a character vector of all dsnames
+#' available for the ith group.  There is no effort at present to
+#' search all groups for candidate datasets.
+#' @return an initialized object of type H5S_source
+#' @examples
+#' bigec2 = H5S_source("http://54.174.163.77:5000")
+#' bigec2
+#' dsmeta(bigec2)[1:2,]       # two groups
+#' dsmeta(bigec2)[1,2][[1]]   # all dataset candidates in group 1
+#' @export
+H5S_source = function(serverURL, ...) {
+  tmp = new("H5S_source", serverURL=serverURL, dsmeta=DataFrame())
+  grps = groups(tmp)
+  message("analyzing groups for their links...")
+  thel = targs = List(targs=lapply( 1:nrow(grps), 
+        function(x) fixtarget(hosts(links(tmp,x)))))
+  message("done")
+  tmp@dsmeta = DataFrame(groupnum=1:nrow(grps), dsnames=thel, grp.uuid=grps$groups)
+  tmp
+}
+
+#' list information about datasets available in an H5S_source
+#' @param src H5S_source instance
+#' @return data frame with one row for each group and three columns. The 
+#' second column has the list of datasets in the group.
+#' @examples
+#' bigec2 = H5S_source("http://54.174.163.77:5000")
+#' dsm <- dsmeta(bigec2) 
+#' dst <- unlist(dsm[1,2])    # all dataset candidates in group 1
+#' @export
+dsmeta = function(src) {
+  src@dsmeta
+}
+
+#' @rdname H5S_source-class
+#' @param x instance of H5S_source
+#' @param i character string intended to identify dataset on server
+#' @param j not used
+#' @exportMethod [[
+setMethod("[[", c("H5S_source", "character", "ANY"), function(x, i, j) {
+  dataset(x, i)
+})
+
+#' HDF5 server data groups accessor
+#' @param object H5S_source instance
+#' @param index numeric, if present, extracts metadata about selected group (sequential ordering 
+#' of groups as returned by server) access for group information for HDF5 server
+#' @rdname groups-H5S_source-missing-method
+#' @param \dots not used
+#' @return a data frame with group name and number of links for each group
+#' @examples
+#' bigec2 = H5S_source("http://54.174.163.77:5000")
+#' groups(bigec2)
+#' @aliases groups,H5S_source,missing-method
+#' @aliases groups
+#' @exportMethod groups
+#' @export groups
+setGeneric("groups", function(object, index, ...) standardGeneric("groups"))
+setMethod("groups", c("H5S_source", "missing"), function(object, index, ...) {
+  target = paste0(.serverURL(object), "/groups")
+  ans = transl(target) # fromJSON(readBin(GET(target)$content, w="character"))
+
+  # find the root group: hh is a matrix with first column "href" and second "rel"
+  # Find the one whose "rel" column is "root" and pull the name out of the "href"
+  hh = t(sapply(ans$hrefs, force))     
+  rootgroup = sub(".*groups.", "", hh[hh[,2]=="root", 1])  
+  grps = c(rootgroup, unlist(ans$groups))   # all groups plus the root group
+
+  # get the link count for each group
+  nl = sapply(1:length(grps), function(x) {
+    gname = grps[x]
+    target = paste0(.serverURL(object), "/groups/", gname, "/links" )
+    ans = transl(target)  # fromJSON(readBin(GET(target)$content, w="character"))
+    length(ans$links)
+  })
+  DataFrame(groups=grps, nlinks=nl)
+})
+
+#' selective group metadata accessor
+#' @rdname groups-H5S_source-numeric-method
+#' @aliases groups,H5S_source,numeric-method
+#' @param object instance of H5S_source
+#' @param index numeric
+#' @return one-row data frame with group name and number of links for the group
+#' @param \dots unused
+setMethod("groups", c("H5S_source", "numeric"), function(object, index, ...) {
+  groups(object)[index,,drop=FALSE]
+})
+
+
+
+setClass("H5S_linkset", representation(links="list", group="character",
+                                       source="H5S_source"))
+setMethod("show", "H5S_linkset", function(object) {
+  cat("HDF5 server link set for group", object@group, "\n")
+  cat(" There are", length(object@links$links), "links.\n")
+  cat(" Use targets([linkset]) to extract target URLs.\n")
+})
+
+#' access for link metadata for HDF5 server groups
+#' @param object H5S_source instance
+#' @param index numeric group index
+#' @param \dots not used
+#' @return an object of type H5S_linkset with the linkset of the group
+#' @examples
+#' bigec2 = H5S_source("http://54.174.163.77:5000")
+#' lks <- links(bigec2, 1)    # linkset for first group (Note: first group is the root group, by construction)
+#' urls <- targets(lks)       # URLs of datasets in linkset
+#' @aliases links,H5S_source,numeric-method
+#' @aliases links
+#' @export links
+#' @exportMethod links
+setGeneric("links", function(object, index, ...) standardGeneric("links"))
+setMethod("links", c("H5S_source", "numeric"), function(object, index, ...) {
+  gname = groups(object, index)[["groups"]][1] # skirt mcols bug
+  target = paste0(.serverURL(object), "/groups/", gname, "/links" )
+  ans = transl(target) # fromJSON(readBin(GET(target)$content, w="character"))
+  new("H5S_linkset", links=ans, source=object, group=gname)
+})
+
+#' provide the full URLs for link members
+#' @param h5linkset instance of H5S_linkset
+#' @param index numeric index into link vector - ignored
+#' @return a vector of dataset tags
+#' @examples
+#' bigec2 = H5S_source("http://54.174.163.77:5000")
+#' lks <- links(bigec2, 1)    # linkset for first group (Note: first group is the root group, by construction)
+#' urls <- targets(lks)       # URLs of datasets in linkset
+#' @export
+targets = function(h5linkset, index) {
+  sapply(h5linkset@links$links, "[[", "target")
+}
+
+# private: return all URLs in the linkset that link to datasets
+# cleanIP: if TRUE, remove the URL up to the host 
+# note: index is ignored in targets(), so ignored in hosts()
+hosts = function(h5linkset, index, cleanIP=TRUE) {
+  ans = targets(h5linkset, index)      #sapply(h5linkset@links$links, "[[", "target")
+  ans = ans[grep("host=", ans)]
+  if (cleanIP) gsub(".*host=", "host=", ans)
+  else ans
+}
+
+# unused private function - returns list of group ids of all groups in linkset
+targetIds = function(h5linkset, index) {
+  sapply(h5linkset@links$links, "[[", "id")
+}
+
 
 #' name H5S_dataset
 #' rdname H5S_dataset-class
@@ -34,89 +192,47 @@ cat(" Use [[ [dsname] ]]  to get a reference suitable for [i, j] subsetting.\n")
 #' @slot presel string prepared for select operation in GET
 #' @slot transfermode default "JSON" or "bin" for binary transfer
 #' @exportClass H5S_dataset
+
 setClass("H5S_dataset", representation(
   source="H5S_source", simpleName="character",
-  shapes="list", hrefs="DataFrame", allatts="list", presel="character", transfermode="character"))
+  shapes="list", hrefs="DataFrame", allatts="list", 
+  presel="character", transfermode="character"))
 setMethod("show", "H5S_dataset", function(object) {
- cat("H5S_dataset instance:\n")
-# aa = object@allatts
-# alld = sapply(aa, function(x) paste(x$shape$dims, collapse=" x "))
-# cr = sapply(aa, function(x) x$created)#, collapse=" x "))
-# ba = sapply(aa, function(x) x$type$base)
- curdim = object@shapes$dims
- print(data.frame(dsname=object@simpleName, intl.dim1=curdim[1], intl.dim2=curdim[2], 
-     created=object@allatts$created, type.base=object@allatts$type$base))
-#cat("Use [[", object@simplename, "]] to acquire reference amenable to [i,j] subsetting.\n")
+  cat("H5S_dataset instance:\n")
+  # aa = object@allatts
+  # alld = sapply(aa, function(x) paste(x$shape$dims, collapse=" x "))
+  # cr = sapply(aa, function(x) x$created)#, collapse=" x "))
+  # ba = sapply(aa, function(x) x$type$base)
+  curdim = object@shapes$dims
+  print(data.frame(dsname=object@simpleName, intl.dim1=curdim[1], intl.dim2=curdim[2], 
+                   created=object@allatts$created, type.base=object@allatts$type$base))
+  #cat("Use [[", object@simplename, "]] to acquire reference amenable to [i,j] subsetting.\n")
 })
 
+#' replace transfer mode
+#' @name transfermode<-
+#' @param object instance of H5S_linkset
+#' @param value either "JSON" (default) or "binary"
+#' @return updated object of type H5S_dataset
+#' @aliases transfermode<-,H5S_dataset-method
+#' @docType methods
+#' @rdname extract-methods
 #' @export
 setGeneric("transfermode<-", def = function(object, value) { standardGeneric("transfermode<-") })
 setReplaceMethod("transfermode", "H5S_dataset", 
-  function(object, value) {  
-    if ( value == "JSON" | value == "binary" )  {
-      object@transfermode <- value  
-    }  else  {
-      warning(paste("ignoring request for unknown transfer mode ", value))
-    }
-    object
-  }
+                 function(object, value) {  
+                   if ( value == "JSON" | value == "binary" )  {
+                     object@transfermode <- value  
+                   }  else  {
+                     warning(paste("ignoring request for unknown transfer mode ", value))
+                   }
+                   object
+                 }
 )
 
-
-fixtarget = function(x) sub(".*host=(.*).hdfgroup.org", "\\1", x)
-
-#' construct H5S_source
-#' @name H5S_source
-#' @rdname H5S_source-class
-#' @param serverURL a URL for a port for HDF5Server
-#' @param \dots not used
-#' @note The dsmeta slot holds a DataFrame with a column \code{dsnames}
-#' that is a list with ith element a character vector of all dsnames
-#' available for the ith group.  There is no effort at present to
-#' search all groups for candidate datasets.
-#' @examples
-#' bigec2 = H5S_source("http://54.174.163.77:5000")
-#' bigec2
-#' dsmeta(bigec2)[1:2,] # two groups
-#' dsmeta(bigec2)[1,2][[1]] # all dataset candidates in group 1
-#' @export
-H5S_source = function(serverURL, ...) {
-  tmp = new("H5S_source", serverURL=serverURL, dsmeta=DataFrame())
-  grps = groups(tmp)
-  message("analyzing groups for their links...")
-  thel = targs=List(targs=lapply( 1:nrow(grps), 
-        function(x) fixtarget(hosts(links(tmp,x)))))
-  message("done")
-  tmp@dsmeta = DataFrame(groupnum=1:nrow(grps), dsnames=thel, grp.uuid=grps$groups)
-  tmp
-}
-#' list information about datasets available in an H5S_source
-#' @param src H5S_source instance
-#' @export
-dsmeta = function(src) {
-  src@dsmeta
-}
-#' @rdname H5S_source-class
-#' @param x instance of H5S_source
-#' @param i character string intended to identify dataset on server
-#' @param j not used
-#' @exportMethod [[
-setMethod("[[", c("H5S_source", "character", "ANY"), function(x, i, j) {
-  dataset(x, i)
-})
-
-
-
-setClass("H5S_linkset", representation(links="list", group="character",
-   source="H5S_source"))
-setMethod("show", "H5S_linkset", function(object) {
-cat("HDF5 server link set for group", object@group, "\n")
-cat(" There are", length(object@links$links), "links.\n")
-cat(" Use targets([linkset]) to extract target URLs.\n")
-})
-
+# private: get content from host
+# param targ is the URL with query
 transl = function(targ)  {  
-  # print(paste("transl: ", targ, sep=""))
   rsp <- GET(targ)
   if (rsp$status_code != 200)  
     stop(paste("error: can't read JSON ", targ, sep=""))
@@ -124,6 +240,9 @@ transl = function(targ)  {
   dat <- fromJSON(jsn)
 }
 
+# private: get numeric content from host by binary transfer
+# param targ is the URL with query
+# param nele is the number of numeric elements expected
 bintransl = function(targ, nele)  {  
   rsp <- GET(targ, add_headers(Accept="application/octet-stream"))
   if (rsp$status_code != 200)  
@@ -134,84 +253,14 @@ bintransl = function(targ, nele)  {
     signed = TRUE, endian = "little")
 }
 
-           
-
-#' HDF5 server data groups accessor
-#' @param object H5S_source instance
-#' @param index numeric, if present, extracts metadata about selected group (sequential ordering of groups as returned by server)
-#' access for group information for HDF5 server
-#' @rdname groups-H5S_source-missing-method
-#' @param \dots not used
-#' @aliases groups,H5S_source,missing-method
-#' @aliases groups
-#' @exportMethod groups
-#' @export groups
-setGeneric("groups", function(object, index, ...) standardGeneric("groups"))
-setMethod("groups", c("H5S_source", "missing"), function(object, index, ...) {
- target = paste0(.serverURL(object), "/groups")
- ans = transl(target) # fromJSON(readBin(GET(target)$content, w="character"))
- # find root group
- hh = t(sapply(ans$hrefs, force))
- rootgroup = sub(".*groups.", "", hh[hh[,2]=="root", 1])
- grps = c(rootgroup, unlist(ans$groups))
- nl = sapply(1:length(grps), function(x) {
-   gname = grps[x]
-   target = paste0(.serverURL(object), "/groups/", gname, "/links" )
-   ans = transl(target) # fromJSON(readBin(GET(target)$content, w="character"))
-   length(ans$links)
-   })
- DataFrame(groups=grps, nlinks=nl)
-})
-#' selective group metadata accessor
-#' @rdname groups-H5S_source-numeric-method
-#' @aliases groups,H5S_source,numeric-method
-#' @param object instance of H5S_source
-#' @param index numeric
-#' @param \dots unused
-setMethod("groups", c("H5S_source", "numeric"), function(object, index, ...) {
- groups(object)[index,,drop=FALSE]
-})
-#' access for link metadata for HDF5 server groups
-#' @param object H5S_source instance
-#' @param index numeric group index
-#' @param \dots not used
-#' @aliases links,H5S_source,numeric-method
-#' @aliases links
-#' @export links
-#' @exportMethod links
-setGeneric("links", function(object, index, ...) standardGeneric("links"))
-setMethod("links", c("H5S_source", "numeric"), function(object, index, ...) {
- gname = groups(object, index)[["groups"]][1] # skirt mcols bug
- target = paste0(.serverURL(object), "/groups/", gname, "/links" )
- ans = transl(target) # fromJSON(readBin(GET(target)$content, w="character"))
- new("H5S_linkset", links=ans, source=object, group=gname)
-})
-#' provide the full URLs for link members
-#' @param h5linkset instance of H5S_linkset
-#' @param index numeric index into link vector
-#' @export
-targets = function(h5linkset, index) {
- sapply(h5linkset@links$links, "[[", "target")
- }
-
-hosts = function(h5linkset, index, cleanIP=TRUE) {
- ans = targets(h5linkset, index) #sapply(h5linkset@links$links, "[[", "target")
- ans = ans[grep("host=", ans)]
- if (cleanIP) gsub(".*host=", "host=", ans)
- else ans
- }
-targetIds = function(h5linkset, index) {
- sapply(h5linkset@links$links, "[[", "id")
- }
-      
-#' @name H5S_dataset
+#' extract elements from H5S_dataset
 #' @rdname H5S_dataset-class
-#' @aliases [,H5S_dataset,character,character,ANY-method
 #' @param x instance of H5S_dataset
 #' @param i character string usable as select option for first matrix index in HDF5 server value API
 #' @param j character string usable as select option for second matrix index in HDF5 server value API
 #' @param \dots unused
 #' @param drop logical defaults to FALSE
+#' @return matrix of data obtained
 #' @exportMethod [
 setMethod("[", c("H5S_dataset", "character", "character"), function(x, i, j, ..., drop=FALSE) {
 #
@@ -227,16 +276,16 @@ setMethod("[", c("H5S_dataset", "character", "character"), function(x, i, j, ...
  if (ind2lims[2] > dims[2]) stop("j exceeds boundary for second index")
  uu = sub("%%SEL1%%", i, uu)
  uu = sub("%%SEL2%%", j, uu)
- nrow <- (ind1lims[2] - ind1lims[1])
- ncol <- (ind2lims[2] - ind2lims[1])
- nele <- nrow*ncol
+ nrow <- (ind1lims[2] - ind1lims[1])  # TODO: divide by stride if present
+ ncol <- (ind2lims[2] - ind2lims[1])  # TODO: divide by stride if present
+ nele <- nrow*ncol    
 
  if ( x@allatts$type$base == "H5T_STD_I32LE" & x@transfermode == "binary" )  {
-  message(paste("binary transfer", sep=""))
+  # message(paste("binary transfer", sep=""))
   val <- bintransl(uu, nele)
  }
  else  {
-  message(paste("JSON transfer", sep=""))
+  # message(paste("JSON transfer", sep=""))
   val <- transl(uu)$value
   if (is.list(val)) {
     val <- do.call(rbind, val)
@@ -281,6 +330,7 @@ dataset = function(h5s, tag) {
  prep = sub("\\?host=", "/value?host=", self)
  prep = paste0(prep, "&select=[%%SEL1%%,%%SEL2%%]")
  list(uuid=uuid, hrefs=ans, attrs=attrs)
+ 
  xjson = "JSON"
  new("H5S_dataset", source=h5s, simpleName=fulldsn,
     shapes=attrs$shape, hrefs=ans, allatts=attrs, presel=prep, transfermode=xjson)
@@ -288,6 +338,11 @@ dataset = function(h5s, tag) {
 
 #' acquire internal HDF5 dimension information for matrix
 #' @param h5d instance of H5S_dataset
+#' @return vector with dimensions of dataset
+#' @examples
+#' bigec2 = H5S_source("http://54.174.163.77:5000")
+#' tex <- bigec2[["tenx_100k_sorted"]]
+#' internalDim(tex)
 #' @export
 internalDim = function(h5d) {
   d = slot(h5d, "shapes")$dims

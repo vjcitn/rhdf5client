@@ -9,8 +9,16 @@ targets(h5linkset, index)
 \arguments{
 \item{h5linkset}{instance of H5S_linkset}
 
-\item{index}{numeric index into link vector}
+\item{index}{numeric index into link vector - ignored}
+}
+\value{
+a vector of dataset tags
 }
 \description{
 provide the full URLs for link members
+}
+\examples{
+bigec2 = H5S_source("http://54.174.163.77:5000")
+lks <- links(bigec2, 1)    # linkset for first group (Note: first group is the root group, by construction)
+urls <- targets(lks)       # URLs of datasets in linkset
 }

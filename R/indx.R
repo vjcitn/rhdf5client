@@ -7,6 +7,7 @@
 #' @rdname sproc
 #' @import methods
 #' @param x a numeric vector (should be integers)
+#' @return list of vectors of integers which can be expressed as initial/final/stride triplets 
 #' @export
 isplit = function(x) {
  if (length(x)==1) return(list(`1`=x))
@@ -21,6 +22,7 @@ isplit = function(x) {
 #' @name sproc
 #' @rdname sproc
 #' @param spl output of isplit
+#' @return list of colon-delimited strings each with initial/final/stride triplet 
 #' @note Very preliminary implementation.
 #' @examples
 #' inds = c(1:10, seq(25,50,2), seq(200,150,-2))
@@ -28,12 +30,12 @@ isplit = function(x) {
 #' @export
 sproc = function(spl) {
 # spl is output of isplit
-ans = lapply(spl, function(x) {
-   if (length(x)==1) return(paste(x-1,":",x,":1", sep=""))
-   d = x[2]-x[1]
-   return(paste(x[1]-1, ":", x[length(x)], ":", as.integer(d),
-     sep=""))
-   })
-ans
+  ans = lapply(spl, function(x) {
+    if (length(x)==1) return(paste(x-1,":",x,":1", sep=""))
+    d = x[2]-x[1]
+    return(paste(x[1]-1, ":", x[length(x)], ":", as.integer(d),
+      sep=""))
+  })
+  ans
 }
 

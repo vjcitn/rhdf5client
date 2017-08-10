@@ -14,6 +14,14 @@ links(object, index, ...)
 
 \item{\dots}{not used}
 }
+\value{
+an object of type H5S_linkset with the linkset of the group
+}
 \description{
 access for link metadata for HDF5 server groups
+}
+\examples{
+bigec2 = H5S_source("http://54.174.163.77:5000")
+lks <- links(bigec2, 1)    # linkset for first group (Note: first group is the root group, by construction)
+urls <- targets(lks)       # URLs of datasets in linkset
 }

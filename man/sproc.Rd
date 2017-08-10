@@ -14,6 +14,11 @@ sproc(spl)
 
 \item{spl}{output of isplit}
 }
+\value{
+list of vectors of integers which can be expressed as initial/final/stride triplets
+
+list of colon-delimited strings each with initial/final/stride triplet
+}
 \description{
 isplit converts a numeric vector into a list of sequences for compact reexpression
 

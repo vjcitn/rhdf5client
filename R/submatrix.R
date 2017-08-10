@@ -5,9 +5,6 @@
 #' @param j A vector of column indices to retrieve
 #'
 #' @return The submatrix defined by the indices from the dataset 
-#'
-#' @export
-
 submatrix <- function(dset, i, j)  {
   ind1 = sproc(isplit(i))  # may need to be double loop
   ind2 = sproc(isplit(j))

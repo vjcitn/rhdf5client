@@ -3,8 +3,7 @@
 \docType{class}
 \name{H5S_dataset-class}
 \alias{H5S_dataset-class}
-\alias{H5S_dataset}
-\alias{[,H5S_dataset,character,character,ANY-method}
+\alias{[,H5S_dataset,character,character-method}
 \title{name H5S_dataset
 rdname H5S_dataset-class}
 \usage{
@@ -21,9 +20,14 @@ rdname H5S_dataset-class}
 
 \item{drop}{logical defaults to FALSE}
 }
+\value{
+matrix of data obtained
+}
 \description{
 name H5S_dataset
 rdname H5S_dataset-class
+
+extract elements from H5S_dataset
 }
 \section{Slots}{
 

@@ -14,6 +14,9 @@
 
 \item{\dots}{unused}
 }
+\value{
+one-row data frame with group name and number of links for the group
+}
 \description{
 selective group metadata accessor
 }
