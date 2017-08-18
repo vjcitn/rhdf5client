@@ -17,10 +17,6 @@ output:
     toc: yes
 ---
 
-# restfulSE
-
-This R package includes proof-of-concept code illustrating access to files stored on remote HDF5 server.
-
 ## HDF5 server 
 
 [HDF Server](https://support.hdfgroup.org/projects/hdfserver/) "extends the HDF5 data model to efficiently store large data objects (e.g. up to multi-TB data arrays) and access them over the web using a RESTful API."  In this package,
