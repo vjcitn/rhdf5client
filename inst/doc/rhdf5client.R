@@ -22,7 +22,7 @@ lks = links(mys,1)
 lks
 
 ## ----dataset-------------------------------------------------------------
-dta = bigec2[["tenx_100k_sorted"]] # arbitrary name assigned long ago
+dta = bigec2[["tenx_100k_sorted"]] 
 dta
 
 ## ----access--------------------------------------------------------------
