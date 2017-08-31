@@ -276,8 +276,11 @@ setMethod("[", c("H5S_dataset", "character", "character"), function(x, i, j, ...
  if (ind2lims[2] > dims[2]) stop("j exceeds boundary for second index")
  uu = sub("%%SEL1%%", i, uu)
  uu = sub("%%SEL2%%", j, uu)
- nrow <- (ind1lims[2] - ind1lims[1])  # TODO: divide by stride if present
- ncol <- (ind2lims[2] - ind2lims[1])  # TODO: divide by stride if present
+
+ ndel <- ifelse(length(ind1lims) >= 3, ind1lims[3], 1)
+ nrow <- ceiling((ind1lims[2] - ind1lims[1])/ndel)  
+ ndel <- ifelse(length(ind2lims) >= 3, ind2lims[3], 1)
+ ncol <- ceiling((ind2lims[2] - ind2lims[1])/ndel)  
  nele <- nrow*ncol    
 
  if ( x@allatts$type$base == "H5T_STD_I32LE" & x@transfermode == "binary" )  {
@@ -292,7 +295,7 @@ setMethod("[", c("H5S_dataset", "character", "character"), function(x, i, j, ...
   }
  }
 
- mat <- matrix(val, nrow=nrow, ncol=ncol, byrow = TRUE, dimnames = NULL)
+ mat <- matrix(val, nrow=nrow, ncol=ncol, byrow = FALSE, dimnames = NULL)
  return(mat)
 })
 
