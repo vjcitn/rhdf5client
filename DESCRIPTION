@@ -2,7 +2,7 @@ Package: rhdf5client
 Title: Access HDF5 content from h5serv 
 Description: Provides functionality for reading data from h5serv server
  from within R.
-Version: 0.99.1
+Version: 0.99.2
 Authors@R: c(
  person("Samuela", "Pollack", role = c("cre", "aut"),email = "spollack@jimmy.harvard.edu"), 
  person("Shweta", "Gopaulakrishnan", role = c("aut"), email = "reshg@channing.harvard.edu"),
