@@ -2,17 +2,15 @@ Package: rhdf5client
 Title: Access HDF5 content from h5serv 
 Description: Provides functionality for reading data from h5serv server
  from within R.
-Version: 0.99.0
-Author: Samuela Pollack <spollack@jimmy.harvard.edu>
+Version: 0.99.1
 Authors@R: c(
-  person("Samuela", "Pollack", email = "spollack@jimmy.harvard.edu", role = c("cre", "aut")),
-  person("Shweta", "Gopaulakrishnan", email = "reshg@channing.harvard.edu, role = c("aut")),
-  person("Vincent", "Carey", email = "stvjc@channing.harvard.edu, role = c("aut")),
-)
+ person("Samuela", "Pollack", role = c("cre", "aut"),email = "spollack@jimmy.harvard.edu"), 
+ person("Shweta", "Gopaulakrishnan", role = c("aut"), email = "reshg@channing.harvard.edu"),
+ person("Vincent", "Carey", role = c("aut"), email = "stvjc@channing.harvard.edu")
+ )
 Suggests: knitr, testthat
 Imports: S4Vectors, httr, rjson
 Depends: R (>= 3.4), methods
-Maintainer: Samuela Pollack <spollack@jimmy.harvard.edu>
 License: Artistic-2.0
 LazyLoad: yes
 BiocViews: infrastructure
