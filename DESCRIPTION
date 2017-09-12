@@ -9,7 +9,7 @@ Authors@R: c(
  person("Vincent", "Carey", role = c("aut"), email = "stvjc@channing.harvard.edu")
  )
 Suggests: knitr, testthat
-Imports: S4Vectors, httr, rjson
+Imports: S4Vectors, httr, rjson, utils
 Depends: R (>= 3.4), methods
 License: Artistic-2.0
 LazyLoad: yes

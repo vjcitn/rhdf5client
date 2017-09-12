@@ -1,6 +1,7 @@
 #' @importFrom httr GET
 #' @importFrom httr add_headers
 #' @importFrom rjson fromJSON
+#' @importFrom utils capture.output
 
 .serverURL = function(x) x@serverURL
 
@@ -16,11 +17,11 @@
 setClass("H5S_source", representation(serverURL="character", dsmeta="DataFrame"))
 
 setMethod("show", "H5S_source", function(object) {
-cat("HDF5 server domain: ", object@serverURL, "\n")
-cat(" There are", nrow(object@dsmeta), "groups.\n")
-cat(" Use groups(), links(), ..., to probe and access metadata.\n")
-cat(" Use dsmeta() to get information on datasets within groups.\n")
-cat(" Use [[ [dsname] ]]  to get a reference suitable for [i, j] subsetting.\n")
+  cat("HDF5 server domain: ", object@serverURL, 
+      "\n There are", nrow(object@dsmeta), "groups.",
+      "\n Use groups(), links(), ..., to probe and access metadata.",
+      "\n Use dsmeta() to get information on datasets within groups.",
+      "\n Use [[ [dsname] ]]  to get a reference suitable for [i, j] subsetting.")
 })
 
 # private: extract hostname from a file URL (return null for group URL)
@@ -43,14 +44,15 @@ fixtarget = function(x) sub(".*host=(.*).hdfgroup.org", "\\1", x)
 #' dsmeta(bigec2)[1,2][[1]]   # all dataset candidates in group 1
 #' @export
 H5S_source = function(serverURL, ...) {
-  tmp = new("H5S_source", serverURL=serverURL, dsmeta=DataFrame())
-  grps = groups(tmp)
+  tmp <- new("H5S_source", serverURL=serverURL, dsmeta=DataFrame())
+  grps <- groups(tmp)
   message("analyzing groups for their links...")
-  thel = targs = List(targs=lapply( 1:nrow(grps), 
-        function(x) fixtarget(hosts(links(tmp,x)))))
+  thel <- targs <- List(targs=lapply( seq_len(nrow(grps)), 
+    function(x) fixtarget(hosts(links(tmp,x)))))
   message("done")
-  tmp@dsmeta = DataFrame(groupnum=1:nrow(grps), dsnames=thel, grp.uuid=grps$groups)
-  tmp
+  dsm <- DataFrame(groupnum=seq_len(nrow(grps)), dsnames=thel, grp.uuid=grps$groups)
+  obj <- new("H5S_source", serverURL=serverURL, dsmeta=dsm)
+  obj
 }
 
 #' list information about datasets available in an H5S_source
@@ -96,17 +98,21 @@ setMethod("groups", c("H5S_source", "missing"), function(object, index, ...) {
 
   # find the root group: hh is a matrix with first column "href" and second "rel"
   # Find the one whose "rel" column is "root" and pull the name out of the "href"
+
+  if (length(ans$hrefs)<1)  { 
+    stop("no group table at server URL")
+  }
   hh = t(sapply(ans$hrefs, force))     
   rootgroup = sub(".*groups.", "", hh[hh[,2]=="root", 1])  
   grps = c(rootgroup, unlist(ans$groups))   # all groups plus the root group
 
   # get the link count for each group
-  nl = sapply(1:length(grps), function(x) {
+  nl = vapply(1:length(grps), function(x) {
     gname = grps[x]
     target = paste0(.serverURL(object), "/groups/", gname, "/links" )
     ans = transl(target)  # fromJSON(readBin(GET(target)$content, w="character"))
     length(ans$links)
-  })
+  }, integer(1))
   DataFrame(groups=grps, nlinks=nl)
 })
 
@@ -152,6 +158,8 @@ setMethod("links", c("H5S_source", "numeric"), function(object, index, ...) {
   new("H5S_linkset", links=ans, source=object, group=gname)
 })
 
+.links <- function(linkset) { linkset@links }    # private accessor
+
 #' provide the full URLs for link members
 #' @param h5linkset instance of H5S_linkset
 #' @param index numeric index into link vector - ignored
@@ -161,23 +169,29 @@ setMethod("links", c("H5S_source", "numeric"), function(object, index, ...) {
 #' lks <- links(bigec2, 1)    # linkset for first group (Note: first group is the root group, by construction)
 #' urls <- targets(lks)       # URLs of datasets in linkset
 #' @export
+
 targets = function(h5linkset, index) {
-  sapply(h5linkset@links$links, "[[", "target")
+  lks <- .links(h5linkset)
+  # sapply(lks$links, "[[", "target")
+  vapply(h5linkset@links$links, function(lk) lk[["target"]], character(1)) 
 }
 
 # private: return all URLs in the linkset that link to datasets
 # cleanIP: if TRUE, remove the URL up to the host 
 # note: index is ignored in targets(), so ignored in hosts()
 hosts = function(h5linkset, index, cleanIP=TRUE) {
-  ans = targets(h5linkset, index)      #sapply(h5linkset@links$links, "[[", "target")
+  ans = targets(h5linkset, index)      #vapply(h5linkset@links$links, "[[", character(), "target")
   ans = ans[grep("host=", ans)]
-  if (cleanIP) gsub(".*host=", "host=", ans)
-  else ans
+  if (cleanIP) {
+    gsub(".*host=", "host=", ans)
+  } else {
+    ans
+  }
 }
 
 # unused private function - returns list of group ids of all groups in linkset
 targetIds = function(h5linkset, index) {
-  sapply(h5linkset@links$links, "[[", "id")
+  sapply(h5linkset@links$links, "[[", character(1), "id")
 }
 
 
@@ -200,9 +214,9 @@ setClass("H5S_dataset", representation(
 setMethod("show", "H5S_dataset", function(object) {
   cat("H5S_dataset instance:\n")
   # aa = object@allatts
-  # alld = sapply(aa, function(x) paste(x$shape$dims, collapse=" x "))
-  # cr = sapply(aa, function(x) x$created)#, collapse=" x "))
-  # ba = sapply(aa, function(x) x$type$base)
+  # alld = vapply(aa, function(x) paste(x$shape$dims, collapse=" x "), character())
+  # cr = vapply(aa, function(x) x$created)#, collapse=" x "), character())
+  # ba = vapply(aa, function(x) x$type$base, class())
   curdim = object@shapes$dims
   print(data.frame(dsname=object@simpleName, intl.dim1=curdim[1], intl.dim2=curdim[2], 
                    created=object@allatts$created, type.base=object@allatts$type$base))
@@ -220,14 +234,14 @@ setMethod("show", "H5S_dataset", function(object) {
 #' @export
 setGeneric("transfermode<-", def = function(object, value) { standardGeneric("transfermode<-") })
 setReplaceMethod("transfermode", "H5S_dataset", 
-                 function(object, value) {  
-                   if ( value == "JSON" | value == "binary" )  {
-                     object@transfermode <- value  
-                   }  else  {
-                     warning(paste("ignoring request for unknown transfer mode ", value))
-                   }
-                   object
-                 }
+  function(object, value) {  
+    if ( value == "JSON" | value == "binary" )  {
+      object@transfermode <- value  
+    }  else  {
+      warning(paste("ignoring request for unknown transfer mode ", value))
+    }
+    object
+  }
 )
 
 # private: get content from host
@@ -266,37 +280,48 @@ setMethod("[", c("H5S_dataset", "character", "character"), function(x, i, j, ...
 #
 # bracket selection passed directly to HDF5 server ... row-major
 #
- uu = x@presel
- dims = x@shapes$dims
- ind1lims = as.numeric(strsplit(i, ":")[[1]])
- if (ind1lims[1] < 0) stop("negative starting index not allowed in i")
- if (ind1lims[2] > dims[1]) stop("i exceeds boundary for first index")
- ind2lims = as.numeric(strsplit(j, ":")[[1]])
- if (ind2lims[1] < 0) stop("negative starting index not allowed in j")
- if (ind2lims[2] > dims[2]) stop("j exceeds boundary for second index")
- uu = sub("%%SEL1%%", i, uu)
- uu = sub("%%SEL2%%", j, uu)
+  uu = x@presel
+  dims = x@shapes$dims
+  ind1lims = as.numeric(strsplit(i, ":")[[1]])
+  if (ind1lims[1] < 0) 
+    stop("negative starting index not allowed in i")
+  if (ind1lims[2] > dims[1]) 
+    stop("i exceeds boundary for first index")
+  ind2lims = as.numeric(strsplit(j, ":")[[1]])
+  if (ind2lims[1] < 0) 
+    stop("negative starting index not allowed in j")
+  if (ind2lims[2] > dims[2]) 
+    stop("j exceeds boundary for second index")
+  uu = sub("%%SEL1%%", i, uu)
+  uu = sub("%%SEL2%%", j, uu)
 
- ndel <- ifelse(length(ind1lims) >= 3, ind1lims[3], 1)
- nrow <- ceiling((ind1lims[2] - ind1lims[1])/ndel)  
- ndel <- ifelse(length(ind2lims) >= 3, ind2lims[3], 1)
- ncol <- ceiling((ind2lims[2] - ind2lims[1])/ndel)  
- nele <- nrow*ncol    
-
- if ( x@allatts$type$base == "H5T_STD_I32LE" & x@transfermode == "binary" )  {
-  # message(paste("binary transfer", sep=""))
-  val <- bintransl(uu, nele)
- }
- else  {
-  # message(paste("JSON transfer", sep=""))
-  val <- transl(uu)$value
-  if (is.list(val)) {
-    val <- do.call(rbind, val)
+  ndel <- 1
+  if ( length(ind1lims) >= 3) {
+    ndel <- ind1lims[3]
   }
- }
+  nrow <- ceiling((ind1lims[2] - ind1lims[1])/ndel)  
 
- mat <- matrix(val, nrow=nrow, ncol=ncol, byrow = FALSE, dimnames = NULL)
- return(mat)
+  ndel <- 1
+  if ( length(ind2lims) >= 3) {
+    ndel <- ind2lims[3]
+  }
+  ncol <- ceiling((ind2lims[2] - ind2lims[1])/ndel)  
+
+  nele <- nrow*ncol    
+
+  if ( x@allatts$type$base == "H5T_STD_I32LE" & x@transfermode == "binary" )  {
+    # message(paste("binary transfer", sep=""))
+    val <- bintransl(uu, nele)
+  }
+  else  {
+    # message(paste("JSON transfer", sep=""))
+    val <- transl(uu)$value
+    if (is.list(val)) {
+      val <- do.call(rbind, val)
+    }
+  }
+
+  mat <- matrix(val, nrow=nrow, ncol=ncol, byrow = FALSE, dimnames = NULL)
 })
 
 
@@ -306,36 +331,40 @@ setMethod("[", c("H5S_dataset", "character", "character"), function(x, i, j, ...
 #' @param tag character string identifying a dataset
 #' @export
 dataset = function(h5s, tag) {
- dsns = dsmeta(h5s)[["dsnames"]] # mcols problem with [,"dsnames"]
-# find row of dsmeta DataFrame where tag is a substring of a dataset name
-# to allow substrings to be used for querying (e.g., "100k" for "neurons100k")
- hits = sapply(dsns, function(x) length(grep(tag, x))>0)
- if (!any(hits)) stop("tag not found in dsmeta(h5s)")
- if (sum(hits)>1) warning("tag occurs in several groups, using first")
- fulldsn = dsns[[which(hits)]] #[[1]] # unlist; which(hits) is relevant group
- fulldsn = fulldsn[ grep(tag, fulldsn) ] # find the actual simple name matching substring in [[]]
- lin = links(h5s, which(hits))
- targs = targets(lin)
- targs = targs[grep(tag,targs)]
- if (length(targs)>1) {
-      warning("dataset tag does not identify a single target.  found:")
-      print(targs)
-      stop("please supply tag to identify single target.")
-      }
- targ = sub(".host", "datasets?host", targs)
- uuid = transl(targ)$datasets # fromJSON(readBin(GET(targ)$content, w="character"))$datasets
- attrs = transl( sub("datasets", paste0("datasets/", uuid), targ ) )
- hrnm = sapply(attrs$hrefs, "[[", 2)
- hrval = sapply(attrs$hrefs, "[[", 1)
- ans = DataFrame(hrefName=hrnm, hrefValue=hrval)
- rownames(ans) = hrnm
- self = ans["self", "hrefValue"]
- prep = sub("\\?host=", "/value?host=", self)
- prep = paste0(prep, "&select=[%%SEL1%%,%%SEL2%%]")
- list(uuid=uuid, hrefs=ans, attrs=attrs)
+  dsns = dsmeta(h5s)[["dsnames"]] # mcols problem with [,"dsnames"]
+  # find row of dsmeta DataFrame where tag is a substring of a dataset name
+  # to allow substrings to be used for querying (e.g., "100k" for "neurons100k")
+  hits = vapply(dsns, function(x) length(grep(tag, x))>0, logical(1))
+  if (!any(hits)) 
+    stop("tag not found in dsmeta(h5s)")
+  if (sum(hits)>1) 
+    warning("tag occurs in several groups, using first")
+  fulldsn = dsns[[which(hits)]] #[[1]] # unlist; which(hits) is relevant group
+  fulldsn = fulldsn[ grep(tag, fulldsn) ] # find the actual simple name matching substring in [[]]
+  lin = links(h5s, which(hits))
+  targs = targets(lin)
+  targs = targs[grep(tag,targs)]
+
+  if (length(targs)>1)  {
+    cat("dataset tag does not identify a unique target. Found:", "\n")
+    cat(targs, sep="\n")
+    stop("please supply tag to identify single target.")
+  }
+
+  targ = sub(".host", "datasets?host", targs)
+  uuid = transl(targ)$datasets # fromJSON(readBin(GET(targ)$content, w="character"))$datasets
+  attrs = transl( sub("datasets", paste0("datasets/", uuid), targ ) )
+  hrnm = vapply(attrs$hrefs, "[[", character(1), 2)
+  hrval = vapply(attrs$hrefs, "[[", character(1), 1)
+  ans = DataFrame(hrefName=hrnm, hrefValue=hrval)
+  rownames(ans) = hrnm
+  self = ans["self", "hrefValue"]
+  prep = sub("\\?host=", "/value?host=", self)
+  prep = paste0(prep, "&select=[%%SEL1%%,%%SEL2%%]")
+  list(uuid=uuid, hrefs=ans, attrs=attrs)
  
- xjson = "JSON"
- new("H5S_dataset", source=h5s, simpleName=fulldsn,
+  xjson = "JSON"
+  new("H5S_dataset", source=h5s, simpleName=fulldsn,
     shapes=attrs$shape, hrefs=ans, allatts=attrs, presel=prep, transfermode=xjson)
 }
 
