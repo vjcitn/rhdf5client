@@ -30,6 +30,12 @@ the server [http://54.174.163.77:5000/](http://54.174.163.77:5000/).  Visit this
 server structure: datasets, groups, and datatypes are high-level elements to be manipulated to work
 with data values from the server.
 
+A key application of the rhdf5client package is support for the
+`r Biocpkg("restfulSE")` package that defines an interface between
+the SummarizedExperiment class and the HDF5 Server.  The server
+provides content for `assay()` requests to `RESTfulSummarizedExperiment`
+instances.
+
 # Some details
 
 ## Motivation
@@ -49,6 +55,10 @@ RESTful API has been prepared and is used in this vignette.
 ## Executive summary
 
 We want to provide rapid read-only access to array-like data.
+To do this, the hierarchy and additional formalities of the
+HDF5 server data architecture are exposed through R functions
+and related classes.  Full details on the HDF5 server
+are available at [the HDFgroup site](https://support.hdfgroup.org/projects/hdfserver/).
 
 ```{r setup, echo=FALSE}
 suppressPackageStartupMessages({

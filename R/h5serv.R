@@ -172,7 +172,6 @@ setMethod("links", c("H5S_source", "numeric"), function(object, index, ...) {
 
 targets = function(h5linkset, index) {
   lks <- .links(h5linkset)
-  # sapply(lks$links, "[[", "target")
   vapply(h5linkset@links$links, function(lk) lk[["target"]], character(1)) 
 }
 
@@ -180,7 +179,7 @@ targets = function(h5linkset, index) {
 # cleanIP: if TRUE, remove the URL up to the host 
 # note: index is ignored in targets(), so ignored in hosts()
 hosts = function(h5linkset, index, cleanIP=TRUE) {
-  ans = targets(h5linkset, index)      #vapply(h5linkset@links$links, "[[", character(), "target")
+  ans = targets(h5linkset, index)      
   ans = ans[grep("host=", ans)]
   if (cleanIP) {
     gsub(".*host=", "host=", ans)
@@ -188,12 +187,6 @@ hosts = function(h5linkset, index, cleanIP=TRUE) {
     ans
   }
 }
-
-# unused private function - returns list of group ids of all groups in linkset
-targetIds = function(h5linkset, index) {
-  sapply(h5linkset@links$links, "[[", character(1), "id")
-}
-
 
 #' name H5S_dataset
 #' rdname H5S_dataset-class
@@ -213,10 +206,6 @@ setClass("H5S_dataset", representation(
   presel="character", transfermode="character"))
 setMethod("show", "H5S_dataset", function(object) {
   cat("H5S_dataset instance:\n")
-  # aa = object@allatts
-  # alld = vapply(aa, function(x) paste(x$shape$dims, collapse=" x "), character())
-  # cr = vapply(aa, function(x) x$created)#, collapse=" x "), character())
-  # ba = vapply(aa, function(x) x$type$base, class())
   curdim = object@shapes$dims
   print(data.frame(dsname=object@simpleName, intl.dim1=curdim[1], intl.dim2=curdim[2], 
                    created=object@allatts$created, type.base=object@allatts$type$base))
