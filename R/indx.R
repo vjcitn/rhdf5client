@@ -32,7 +32,20 @@ sproc = function(spl) {
   ans = lapply(spl, function(x) {
     if (length(x)==1) return(paste(x-1,":",x,":1", sep=""))
     d = x[2]-x[1]
-    paste(x[1]-1, ":", x[length(x)], ":", as.integer(d),sep="")
+    if ( d > 0 )  {
+      paste(x[1]-1, ":", x[length(x)], ":", as.integer(d), sep="")
+    }
+    else  {
+      paste(x[1], ":", x[length(x)]-1, ":", as.integer(d), sep="")
+    }
   })
 }
+
+# Array and range conventions:
+# if isplit sends sproc: [2, 3, 4, 5], sproc returns "3:7:1" because
+# (1) HDF arrays begin at index 0 and R arrays begin at index 1
+# (2) HDF ranges do not include the right endpoint and R ranges do
+# for consistency, if isplit sends sproc [5, 4, 3, 2], sproc should 
+# return "7:3:-1" Then rhdf5client will flip it to "3:7:1", 
+# fetch the data, then flip it back.
 

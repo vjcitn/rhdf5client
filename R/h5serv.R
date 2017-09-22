@@ -272,6 +272,7 @@ setMethod("[", c("H5S_dataset", "character", "character"), function(x, i, j, ...
   uu = x@presel
   dims = x@shapes$dims
   ind1lims = as.numeric(strsplit(i, ":")[[1]])
+
   if (ind1lims[1] < 0) 
     stop("negative starting index not allowed in i")
   if (ind1lims[2] > dims[1]) 
@@ -281,22 +282,32 @@ setMethod("[", c("H5S_dataset", "character", "character"), function(x, i, j, ...
     stop("negative starting index not allowed in j")
   if (ind2lims[2] > dims[2]) 
     stop("j exceeds boundary for second index")
-  uu = sub("%%SEL1%%", i, uu)
-  uu = sub("%%SEL2%%", j, uu)
 
-  ndel <- 1
+  delta1 <- 1
   if ( length(ind1lims) >= 3) {
-    ndel <- ind1lims[3]
+    delta1 <- ind1lims[3]
   }
-  nrow <- ceiling((ind1lims[2] - ind1lims[1])/ndel)  
+  nrow <- ceiling((ind1lims[2] - ind1lims[1])/delta1)  
 
-  ndel <- 1
+  delta2 <- 1
   if ( length(ind2lims) >= 3) {
-    ndel <- ind2lims[3]
+    delta2 <- ind2lims[3]
   }
-  ncol <- ceiling((ind2lims[2] - ind2lims[1])/ndel)  
+  ncol <- ceiling((ind2lims[2] - ind2lims[1])/delta2)  
+
+  # flip negative ranges because HDF5 doesn't allow them
+  if ( delta1 < 0 )  {
+    # TODO: leave delta1 < 0 for flag
+    i <- paste0(ind1lims[2], ":", ind1lims[1], ":", -delta1)
+  }
+  if ( delta2 < 0 )  {
+    # TODO: leave delta2 < 0 for flag
+    j <- paste0(ind2lims[2], ":", ind2lims[1], ":", -delta2)
+  }
 
   nele <- nrow*ncol    
+  uu = sub("%%SEL1%%", i, uu)
+  uu = sub("%%SEL2%%", j, uu)
 
   if ( x@allatts$type$base == "H5T_STD_I32LE" & x@transfermode == "binary" )  {
     # message(paste("binary transfer", sep=""))
@@ -311,6 +322,15 @@ setMethod("[", c("H5S_dataset", "character", "character"), function(x, i, j, ...
   }
 
   mat <- matrix(val, nrow=nrow, ncol=ncol, byrow = FALSE, dimnames = NULL)
+  # flip back negative ranges
+  if (delta1 < 0)  {
+    mat <- mat[c(nrow:1),,drop=FALSE]
+  }
+  if (delta2 < 0)  {
+    mat <- mat[,c(ncol:1),drop=FALSE]
+  }
+  mat
+
 })
 
 
