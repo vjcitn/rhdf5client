@@ -265,18 +265,57 @@ bintransl = function(targ, nele)  {
 #' @param drop logical defaults to FALSE
 #' @return matrix of data obtained
 #' @exportMethod [
-setMethod("[", c("H5S_dataset", "character", "character"), function(x, i, j, ..., drop=FALSE) {
+setMethod("[", c("H5S_dataset", "numeric", "numeric"), function(x, i, j, ..., drop=FALSE) {
 #
 # bracket selection passed directly to HDF5 server ... row-major
 #
+  ii <- as.integer(i)
+  jj <- as.integer(j)
+  if (any(ii != i) | any(jj != j))  {
+    stop("index is non-integral")
+  }
+
+  ind1 <- sproc(isplit(i))
+  ind2 <- sproc(isplit(j))
+
+  if (length(ind1) == 1 & length(ind2) == 1)  {
+    ans <- t(x[ ind1[[1]], ind2[[1]] ])
+  } else if (length(ind2) == 1)  {
+    ansl <- lapply(ind1, function(i1) t(x[i1, ind2[[1]]]))
+    ans <- do.call(cbind, ansl)
+  } else if (length(ind1) == 1)  {
+    ansl <- lapply(ind2, function(i2) t(x[ind1[[1]], i2]))
+    ans <- do.call(rbind, ansl)
+  } else  {
+    ansl <- lapply(ind1, function(i1)  {
+      do.call(rbind, lapply(ind2, function(i2)  {
+        t(x[i1, i2])
+      }))
+    })
+    ans <- do.call(cbind, ansl)
+  }
+  t(ans)
+})
+  
+
+#' extract elements from H5S_dataset
+#' @param x instance of H5S_dataset
+#' @param i character string usable as select option for first matrix index in HDF5 server value API
+#' @param j character string usable as select option for second matrix index in HDF5 server value API
+#' @param \dots unused
+#' @param drop logical defaults to FALSE
+#' @return matrix of data obtained
+setMethod("[", c("H5S_dataset", "character", "character"), function(x, i, j, ..., drop=FALSE) {
+
   uu = x@presel
   dims = x@shapes$dims
-  ind1lims = as.numeric(strsplit(i, ":")[[1]])
 
+  ind1lims = as.numeric(strsplit(i, ":")[[1]])
   if (ind1lims[1] < 0) 
     stop("negative starting index not allowed in i")
   if (ind1lims[2] > dims[1]) 
     stop("i exceeds boundary for first index")
+
   ind2lims = as.numeric(strsplit(j, ":")[[1]])
   if (ind2lims[1] < 0) 
     stop("negative starting index not allowed in j")
@@ -304,11 +343,9 @@ setMethod("[", c("H5S_dataset", "character", "character"), function(x, i, j, ...
     # TODO: leave delta2 < 0 for flag
     j <- paste0(ind2lims[2], ":", ind2lims[1], ":", -delta2)
   }
-
   nele <- nrow*ncol    
   uu = sub("%%SEL1%%", i, uu)
   uu = sub("%%SEL2%%", j, uu)
-
   if ( x@allatts$type$base == "H5T_STD_I32LE" & x@transfermode == "binary" )  {
     # message(paste("binary transfer", sep=""))
     val <- bintransl(uu, nele)
@@ -320,7 +357,6 @@ setMethod("[", c("H5S_dataset", "character", "character"), function(x, i, j, ...
       val <- do.call(rbind, val)
     }
   }
-
   mat <- matrix(val, nrow=nrow, ncol=ncol, byrow = FALSE, dimnames = NULL)
   # flip back negative ranges
   if (delta1 < 0)  {
@@ -330,9 +366,7 @@ setMethod("[", c("H5S_dataset", "character", "character"), function(x, i, j, ...
     mat <- mat[,c(ncol:1),drop=FALSE]
   }
   mat
-
 })
-
 
 #' @name dataset
 #' @rdname H5S_source-class

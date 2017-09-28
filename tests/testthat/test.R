@@ -1,37 +1,5 @@
 library(rhdf5client)
 
-# utility function - for testing
-submatrix <- function(dset, i, j)  {
-  ind1 = sproc(isplit(i))  # may need to be double loop
-  ind2 = sproc(isplit(j))
-  if (length(ind1)==1 & length(ind2)==1) 
-    ans = dset[ ind1[[1]], ind2[[1]] ]
-  else if (length(ind2)==1) {
-    cidx <- ind2[[1]]
-    column.block.list <- lapply(ind1, function(ridx)  {
-      mm <- dset[ridx, cidx]
-    })
-    ans <- do.call(rbind, column.block.list)
-  }
-  else if (length(ind1)==1) {
-    ridx <- ind1[[1]]
-    row.block.list <- lapply(ind2, function(cidx)  {
-      mm <- dset[ridx, cidx]
-    })
-    ans <- do.call(cbind, row.block.list)
-  }
-  else {
-    column.block.list <- lapply(ind1, function(ridx) {
-       row.block.list <- lapply(ind2, function(cidx) {
-         mm <- dset[ridx, cidx]
-       })
-       do.call(cbind, row.block.list)
-    })
-    ans = do.call(rbind, column.block.list)
-  }
-  ans
-}
-
 context("connection")
 
 test_that("H5S_source completes", {
@@ -75,7 +43,7 @@ context("retrieving data with binary transfer")
 test_that("binary transfer works", {
  bigec2 <- H5S_source("http://54.174.163.77:5000")
  txdat <- bigec2[["tenx_100k_sorted"]]
- M <- submatrix(txdat, 15:20, 1905:1906)
+ M <- txdat[ 15:20, 1905:1906 ]
  N <- matrix(c(40, 35, 13, 118, 25, 26, 1, 0, 1, 2, 1, 1), nrow=6, ncol=2, byrow=FALSE)
  expect_true(all(M == N))
 })

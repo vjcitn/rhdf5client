@@ -31,7 +31,7 @@ server structure: datasets, groups, and datatypes are high-level elements to be 
 with data values from the server.
 
 A key application of the rhdf5client package is support for the
-`r Biocpkg("restfulSE")` package that defines an interface between
+`r BiocStyle::Biocpkg("restfulSE")` package that defines an interface between
 the SummarizedExperiment class and the HDF5 Server.  The server
 provides content for `assay()` requests to `RESTfulSummarizedExperiment`
 instances.
@@ -108,7 +108,8 @@ lks
 ### Dataset access
 
 We use double-bracket subscripting to grab a reference to a
-dataset from an H5S source.
+dataset from an H5S source. A dataset must be two-dimensional, 
+i.e., accessible with two subscripts.
 ```{r dataset}
 dta = bigec2[["tenx_100k_sorted"]] 
 dta
@@ -116,10 +117,17 @@ dta
 
 ### Data
 
-Data are accessed by subscripting. The subscripts are colon-delimited character 
-with initial, final and optional stride.
+Data are accessed by subscripting. The subscripts are arrays of increasing, 
+positive integers.
 
 ```{r access}
+x = dta[ 15:20, 1905:1906 ]
+x
+```
+(Obsolete) The subscripts are colon-delimited character 
+with initial, final and optional stride.
+
+```{r access-obs}
 x = dta["15:20", "1904:1906"]
 x
 ```

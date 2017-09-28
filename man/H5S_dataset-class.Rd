@@ -3,11 +3,11 @@
 \docType{class}
 \name{H5S_dataset-class}
 \alias{H5S_dataset-class}
-\alias{[,H5S_dataset,character,character-method}
+\alias{[,H5S_dataset,numeric,numeric-method}
 \title{name H5S_dataset
 rdname H5S_dataset-class}
 \usage{
-\S4method{[}{H5S_dataset,character,character}(x, i, j, ..., drop = FALSE)
+\S4method{[}{H5S_dataset,numeric,numeric}(x, i, j, ..., drop = FALSE)
 }
 \arguments{
 \item{x}{instance of H5S_dataset}
