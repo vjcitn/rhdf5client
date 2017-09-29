@@ -8,36 +8,58 @@
 #' @param x a numeric vector (should be integers)
 #' @return list of vectors of integers which can be expressed as initial/final/stride triplets 
 #' @export
-isplit = function(x) {
- if (length(x)==1) return(list(`1`=x))
- dx = diff(x)
- rdx = rle(dx)
- if (all(rdx$lengths==1)) return(split(x,x)[as.character(x)])
- grps = c(1, rep(seq_along(rdx$length), rdx$length))
- split(x, grps)
+isplit = function(x)  {
+  if (length(x)==1) return(list(`1`=x))
+  y <- rep(0,length(x))
+  i <- 3
+  while (i <= length(x))  {
+    if (x[i]-x[i-1] == x[i-1]-x[i-2])  { 
+      i <- i + 1
+    } else  {
+      y[i] <- 1
+      i <- i + 2
+    }
+  }
+  grps <- cumsum(y)+1
+  split(x, grps)
 }
 
-#' sproc massages output of isplit into HDF5 select candidates
+#' sproc makes vector of type character of triplets initial:final:stride in R-conventions
 #' @name sproc
 #' @rdname sproc
 #' @param spl output of isplit
 #' @return list of colon-delimited strings each with initial/final/stride triplet 
-#' @note Very preliminary implementation.
 #' @examples
 #' inds = c(1:10, seq(25,50,2), seq(200,150,-2))
 #' sproc(isplit(inds))
 #' @export
-sproc = function(spl) {
-# spl is output of isplit
-   ans = lapply(spl, function(x) {
-   if (length(x)==1) return(paste(x-1,":",x,":1", sep=""))
-   d = x[2]-x[1]
-   if ( d > 0 )  {
-     paste(x[1]-1, ":", x[length(x)], ":", as.integer(d), sep="")
-   }
-   else  {
-     paste(x[1], ":", x[length(x)]-1, ":", as.integer(d), sep="")
-   }
- })
- ans
+sproc = function(spl)  {
+  ans <- lapply(spl, function(x) {
+    if (length(x) == 1) return(paste(x, ":", x, ":1", sep=""))
+    d <- x[2]-x[1]
+    paste(x[1],":",x[length(x)],":",d, sep="")
+  })
+  ans <- r2py(ans)
+  ans
+}
+
+# r2py makes R-convention strings into python-convention strings
+# HDF5 server uses python conventions
+# R conventions: array indices begin at 1, and ranges include last element
+# python conventions: array indices begin at 0 and ranges exclude last element
+# 
+# HDF5 server does not allow decreasing index ranges. Consistency requires 
+# the range c(7, 6, 5, 4, 3) should have the same elements as c(3, 4, 5, 6, 7)
+# except flipped. r2py maps "3:7:1" to "2:7:1", so it maps "7:3:-1" to 
+# "7:2:-1". rhdf5client will flip this to "3:7:1", fetch the data, then flip it back. 
+r2py <- function(spr)  {
+  ans <- lapply(spr, function(x)  {
+    v <- as.numeric(unlist(strsplit(x, ":")))
+    if (v[3] > 0)  {
+      paste(v[1]-1, ":", v[2], ":", v[3], sep="")
+    } else  {
+      paste(v[1], ":", v[2]-1, ":", v[3], sep="")
+    }
+  })
+  ans 
 }

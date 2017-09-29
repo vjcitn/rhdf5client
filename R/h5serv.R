@@ -144,7 +144,7 @@ setMethod("show", "H5S_linkset", function(object) {
 #' @return an object of type H5S_linkset with the linkset of the group
 #' @examples
 #' bigec2 = H5S_source("http://54.174.163.77:5000")
-#' lks <- links(bigec2, 1)    # linkset for first group (Note: first group is the root group, by construction)
+#' lks <- links(bigec2, 1)    # linkset for root group 
 #' urls <- targets(lks)       # URLs of datasets in linkset
 #' @aliases links,H5S_source,numeric-method
 #' @aliases links
@@ -304,6 +304,7 @@ setMethod("[", c("H5S_dataset", "numeric", "numeric"), function(x, i, j, ..., dr
 #' @param j character string usable as select option for second matrix index in HDF5 server value API
 #' @param \dots unused
 #' @param drop logical defaults to FALSE
+#' @aliases H5S_dataset,[,character,character-method
 #' @return matrix of data obtained
 setMethod("[", c("H5S_dataset", "character", "character"), function(x, i, j, ..., drop=FALSE) {
 

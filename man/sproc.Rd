@@ -22,10 +22,7 @@ list of colon-delimited strings each with initial/final/stride triplet
 \description{
 isplit converts a numeric vector into a list of sequences for compact reexpression
 
-sproc massages output of isplit into HDF5 select candidates
-}
-\note{
-Very preliminary implementation.
+sproc makes vector of type character of triplets initial:final:stride in R-conventions
 }
 \examples{
 inds = c(1:10, seq(25,50,2), seq(200,150,-2))
