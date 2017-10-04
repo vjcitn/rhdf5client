@@ -24,6 +24,8 @@ isplit = function(x)  {
   split(x, grps)
 }
 
+nosci <- function(x) format(x, scientific=FALSE)
+
 #' sproc makes vector of type character of triplets initial:final:stride in R-conventions
 #' @name sproc
 #' @rdname sproc
@@ -35,9 +37,9 @@ isplit = function(x)  {
 #' @export
 sproc = function(spl)  {
   ans <- lapply(spl, function(x) {
-    if (length(x) == 1) return(paste(x, ":", x, ":1", sep=""))
+    if (length(x) == 1) return(paste(nosci(x), ":", nosci(x), ":1", sep=""))
     d <- x[2]-x[1]
-    paste(x[1],":",x[length(x)],":",d, sep="")
+    paste(nosci(x[1]),":",nosci(x[length(x)]),":",d, sep="")
   })
   ans <- r2py(ans)
   ans
@@ -56,9 +58,9 @@ r2py <- function(spr)  {
   ans <- lapply(spr, function(x)  {
     v <- as.numeric(unlist(strsplit(x, ":")))
     if (v[3] > 0)  {
-      paste(v[1]-1, ":", v[2], ":", v[3], sep="")
+      paste(nosci(v[1]-1), ":", nosci(v[2]), ":", nosci(v[3]), sep="")
     } else  {
-      paste(v[1], ":", v[2]-1, ":", v[3], sep="")
+      paste(nosci(v[1]), ":", nosci(v[2]-1), ":", nosci(v[3]), sep="")
     }
   })
   ans 
