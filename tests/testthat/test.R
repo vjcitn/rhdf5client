@@ -34,6 +34,7 @@ test_that("sproc/isplit work", {
  ss = structure(c("0:5:2", "199999:300000:100000"), 
    .Names = c("1", "2"))
  expect_true(identical(ss, unlist(sproc(ii))))
+
 })
 
 context("targets generation")
@@ -53,4 +54,14 @@ test_that("binary transfer works", {
  M <- txdat[ 15:20, 1905:1906 ]
  N <- matrix(c(40, 35, 13, 118, 25, 26, 1, 0, 1, 2, 1, 1), nrow=6, ncol=2, byrow=FALSE)
  expect_true(all(M == N))
+
+ M <- txdat[ c(-(1:79999),-(80500:100000)), 4000:4500 ]
+ im <- which(M > 200)
+ N <- c(378, 271, 255, 204, 1188, 280, 1458, 884, 947)
+ expect_true(all(M[im] == N))
 })
+
+
+
+
+

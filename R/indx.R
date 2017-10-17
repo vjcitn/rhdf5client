@@ -65,3 +65,27 @@ r2py <- function(spr)  {
   })
   ans 
 }
+
+#' ivindx reverses a vector of negative indices into a vector of positive indices
+#' @name ivindx
+#' @rdname ivindx
+#' @param iidx vector of negative indices to invert
+#' @param didx dimension of vector to invert to
+#' @return numeric vector of positive indices
+#' @examples
+#' ii <- ivindx(-c(2, 4, 8), 10)    # c(1, 3, 5, 6, 7, 8, 9)
+#' @export
+ivindx <- function(iidx, didx)  {
+  ii <- -iidx
+  v <- 1:didx
+  v[ !(v %in% ii) ]
+}
+
+
+
+
+
+
+
+
+

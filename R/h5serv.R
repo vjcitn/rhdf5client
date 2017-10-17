@@ -275,6 +275,19 @@ setMethod("[", c("H5S_dataset", "numeric", "numeric"), function(x, i, j, ..., dr
     stop("index is non-integral")
   }
 
+  if (all(i < 0)) {
+    i <- ivindx(i, internalDim(x)[1]) 
+  }
+  if (all(j < 0)) {
+    j <- ivindx(j, internalDim(x)[2]) 
+  }
+  if (any(i) <= 0 | any(j) <= 0)  {
+    stop("index is negative")
+  }
+  if (any(i) > internalDim(x)[1] | any(j) > internalDim(x)[2])  {
+    stop("index is negative")
+  }
+
   ind1 <- sproc(isplit(i))
   ind2 <- sproc(isplit(j))
 
