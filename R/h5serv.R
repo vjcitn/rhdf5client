@@ -418,7 +418,6 @@ dataset = function(h5s, tag) {
   self = ans["self", "hrefValue"]
   prep = sub("\\?host=", "/value?host=", self)
   prep = paste0(prep, "&select=[%%SEL1%%,%%SEL2%%]")
-  list(uuid=uuid, hrefs=ans, attrs=attrs)
  
   xjson = "JSON"
   new("H5S_dataset", source=h5s, simpleName=fulldsn,
