@@ -240,7 +240,7 @@ transl = function(targ)  {
   if (rsp$status_code != 200)  
     stop(paste("error: can't read JSON ", targ, sep=""))
   jsn <- readBin(rsp$content, what="character")
-  dat <- fromJSON(jsn)
+  fromJSON(jsn)
 }
 
 # private: get numeric content from host by binary transfer
@@ -252,7 +252,7 @@ bintransl = function(targ, nele)  {
     stop(paste("error: can't read binary ", targ, sep=""))
 
   # TODO: need to check the HDF5 class for size and byte order
-  dat <- readBin(rsp$content, what="integer", n = nele, size = NA_integer_, 
+  readBin(rsp$content, what="integer", n = nele, size = NA_integer_, 
     signed = TRUE, endian = "little")
 }
 
