@@ -197,7 +197,7 @@ hosts = function(h5linkset, index, cleanIP=TRUE) {
 #' @slot hrefs DataFrame of hrefs as defined in the API
 #' @slot allatts list of all attributes
 #' @slot presel string prepared for select operation in GET
-#' @slot transfermode default "JSON" or "bin" for binary transfer
+#' @slot transfermode default "JSON" or "binary" for binary transfer
 #' @exportClass H5S_dataset
 
 setClass("H5S_dataset", representation(
@@ -256,6 +256,14 @@ bintransl = function(targ, nele)  {
     signed = TRUE, endian = "little")
 }
 
+# private: get numeric content from host by JSON transfer
+# param targ is the URL with query
+# param nele is the number of numeric elements expected (ignored)
+jsontransl = function(uu, nele)  {  
+  val <- transl(uu)$value
+  do.call(c, val)
+}
+
 #' extract elements from H5S_dataset
 #' @rdname H5S_dataset-class
 #' @param x instance of H5S_dataset
@@ -281,10 +289,10 @@ setMethod("[", c("H5S_dataset", "numeric", "numeric"), function(x, i, j, ..., dr
   if (all(j < 0)) {
     j <- ivindx(j, internalDim(x)[2]) 
   }
-  if (any(i) <= 0 | any(j) <= 0)  {
+  if (any(i <= 0) | any(j <= 0) )  {
     stop("index is negative")
   }
-  if (any(i) > internalDim(x)[1] | any(j) > internalDim(x)[2])  {
+  if (any(i > internalDim(x)[1]) | any(j > internalDim(x)[2]))  {
     stop("index is negative")
   }
 
@@ -366,12 +374,9 @@ setMethod("[", c("H5S_dataset", "character", "character"), function(x, i, j, ...
   }
   else  {
     # message(paste("JSON transfer", sep=""))
-    val <- transl(uu)$value
-    if (is.list(val)) {
-      val <- do.call(rbind, val)
-    }
+    val <- jsontransl(uu, nele)
   }
-  mat <- matrix(val, nrow=nrow, ncol=ncol, byrow = FALSE, dimnames = NULL)
+  mat <- matrix(val, nrow=nrow, ncol=ncol, byrow = TRUE, dimnames = NULL)
   # flip back negative ranges
   if (delta1 < 0)  {
     mat <- mat[c(nrow:1),,drop=FALSE]

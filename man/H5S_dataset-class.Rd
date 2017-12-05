@@ -44,6 +44,6 @@ extract elements from H5S_dataset
 
 \item{\code{presel}}{string prepared for select operation in GET}
 
-\item{\code{transfermode}}{default "JSON" or "bin" for binary transfer}
+\item{\code{transfermode}}{default "JSON" or "binary" for binary transfer}
 }}
 

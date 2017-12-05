@@ -51,9 +51,15 @@ context("retrieving data with binary transfer")
 test_that("binary transfer works", {
  bigec2 <- H5S_source("http://54.174.163.77:5000")
  txdat <- bigec2[["tenx_100k_sorted"]]
- M <- txdat[ 15:20, 1905:1906 ]
+
+ transfermode(txdat) <- "JSON"
+ J <- txdat[15:20, 1905:1906]
+ transfermode(txdat) <- "binary"
+ B <- txdat[15:20, 1905:1906]
+ expect_true(all(J == B))
+
  N <- matrix(c(40, 35, 13, 118, 25, 26, 1, 0, 1, 2, 1, 1), nrow=6, ncol=2, byrow=FALSE)
- expect_true(all(M == N))
+ expect_true(all(J == N))
 
  M <- txdat[ c(-(1:79999),-(80500:100000)), 4000:4500 ]
  im <- which(M > 200)
