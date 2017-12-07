@@ -261,7 +261,11 @@ bintransl = function(targ, nele)  {
 # param nele is the number of numeric elements expected (ignored)
 jsontransl = function(uu, nele)  {  
   val <- transl(uu)$value
-  do.call(c, val)
+  if (is.list(val))  {
+    result <- do.call(c, val)
+  } else {
+    result <- val
+  }
 }
 
 #' extract elements from H5S_dataset
