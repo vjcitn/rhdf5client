@@ -42,8 +42,8 @@ context("targets generation")
 test_that("targets method works", {
  bigec2 = H5S_source("http://54.174.163.77:5000")
  tt = targets(links(bigec2, 1))
- expect_true(length(tt)==10)     # increased from 7 because tenx_400k added
- expect_true(length(grep("host", tt))==8) 
+ expect_true(length(tt)>=10)     # increased from 7 because tenx_400k added
+ expect_true(length(grep("host", tt))>=8) 
 })
 
 context("retrieving data with binary transfer")
