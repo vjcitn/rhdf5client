@@ -21,7 +21,7 @@ an object of type H5S_linkset with the linkset of the group
 access for link metadata for HDF5 server groups
 }
 \examples{
-bigec2 = H5S_source("http://54.174.163.77:5000")
+bigec2 = H5S_source("http://h5s.channingremotedata.org:5000")
 lks <- links(bigec2, 1)    # linkset for root group 
 urls <- targets(lks)       # URLs of datasets in linkset
 }
