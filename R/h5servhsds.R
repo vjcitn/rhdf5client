@@ -2,26 +2,39 @@
 #' @importFrom httr add_headers
 #' @importFrom rjson fromJSON
 #' @importFrom utils capture.output
-
 .serverURL = function(x) x@serverURL
 
-#' H5S_source identifies an HDF5 server and manages some metadata about contents
-#' 
+
+#' H5S_source identifies an HDF5/HSDS server and manages some metadata about contents
 #' @name H5S_source
 #' @rdname H5S_source-class
 #' @slot serverURL character string with a URL
-#' @slot dsmeta DataFrame instance with metadata about content of server
+#' @slot dsmeta DataFrame instance with metadata about content of h5serv server
+#' @slot dmains DataFrame instance with metadata about the content of hsds server
+#' @slot getReq DataFrame
+#' @slot folderPath character string with path to user's folder on hsds server
 #' @aliases H5S_source-class
 #' @exportClass H5S_source
 
-setClass("H5S_source", representation(serverURL="character", dsmeta="DataFrame"))
+setClass("H5S_source", representation(serverURL="character", dsmeta="DataFrame", getReq = "DataFrame",dmains= "DataFrame", folderPath = "character", username="character", password="character"))
 
 setMethod("show", "H5S_source", function(object) {
-  cat("HDF5 server domain: ", object@serverURL, 
+  if(nrow(object@dsmeta)>1){
+  cat("H5serv server url : ", object@serverURL, 
       "\n There are", nrow(object@dsmeta), "groups.",
       "\n Use groups(), links(), ..., to probe and access metadata.",
       "\n Use dsmeta() to get information on datasets within groups.",
       "\n Use [[ [dsname] ]]  to get a reference suitable for [i, j] subsetting.")
+  }
+  else{
+    cat("HSDS server url :", object@serverURL,
+        #"Set HSDS host path : ", object@hostPath, 
+        "\n Use getReq() to get information on the server",
+        "\n To look at specific domains(folder content), set the folderPath using setCredentials and call domains() on the updated object",
+        "\n To use utilities like hsls, hsload, hsget, hstouch, hsdel set user credentials using setCredentials()",
+        #also look at /org/?
+        "\n")
+    }
 })
 
 # private: extract hostname from a file URL (return null for group URL)
@@ -38,21 +51,36 @@ fixtarget = function(x) sub(".*host=(.*).h5s.channingremotedata.org", "\\1", x)
 #' search all groups for candidate datasets.
 #' @return an initialized object of type H5S_source
 #' @examples
-#' bigec2 = H5S_source("http://h5s.channingremotedata.org:5000")
+#' bigec2 = H5S_source("http://h5s.channingremotedata.org:5000") # h5serv 
 #' bigec2
 #' dsmeta(bigec2)[1:2,]       # two groups
 #' dsmeta(bigec2)[1,2][[1]]   # all dataset candidates in group 1
+#' bigec2_hsds = H5S_source("http://149.165.156.12:5101") # hsds server
+#' bigec2_hsds
+#' getReq(bigec2_hsds)
 #' @export
 H5S_source = function(serverURL, ...) {
-  tmp <- new("H5S_source", serverURL=serverURL, dsmeta=DataFrame())
-  grps <- groups(tmp)
-  message("analyzing groups for their links...")
-  thel <- targs <- List(targs=lapply( seq_len(nrow(grps)), 
-    function(x) fixtarget(hosts(links(tmp,x)))))
-  message("done")
-  dsm <- DataFrame(groupnum=seq_len(nrow(grps)), dsnames=thel, grp.uuid=grps$groups)
-  obj <- new("H5S_source", serverURL=serverURL, dsmeta=dsm)
-  obj
+  #tmp <- new("H5S_source", serverURL=serverURL, dsmeta=DataFrame())
+  serverCheck = serverVersion(serverURL)
+  if(serverCheck == 1){
+    tmp <- new("H5S_source", serverURL=serverURL, dsmeta=DataFrame())
+    grps <- groups(tmp)
+    message("analyzing groups for their links...")
+    thel <- targs <- List(targs=lapply( seq_len(nrow(grps)), 
+                                        function(x) fixtarget(hosts(links(tmp,x)))))
+    message("done")
+    dsm <- DataFrame(groupnum=seq_len(nrow(grps)), dsnames=thel, grp.uuid=grps$groups)
+    obj <- new("H5S_source", serverURL=serverURL, dsmeta=dsm)
+    obj
+  }
+  else{
+    tmp <- new("H5S_source", serverURL=serverURL, getReq=DataFrame())
+    get <- getReq(tmp)
+    get.df <- DataFrame(get)
+    obj <- new("H5S_source", serverURL=serverURL, getReq=get.df )
+    obj
+    
+  }
 }
 
 #' list information about datasets available in an H5S_source
@@ -68,6 +96,16 @@ dsmeta = function(src) {
   src@dsmeta
 }
 
+#' list information about server content available in an H5S_source hsds instance
+#' @param src H5S_source instance
+#' @return data frame with 5 columns for one row for each user's data
+#' @export
+getReq = function(src) {
+  src@getReq
+}
+
+
+
 #' @rdname H5S_source-class
 #' @param x instance of H5S_source
 #' @param i character string intended to identify dataset on server
@@ -76,6 +114,7 @@ dsmeta = function(src) {
 setMethod("[[", c("H5S_source", "character", "ANY"), function(x, i, j) {
   dataset(x, i)
 })
+
 
 #' HDF5 server data groups accessor
 #' @param object H5S_source instance
@@ -126,8 +165,6 @@ setMethod("groups", c("H5S_source", "missing"), function(object, index, ...) {
 setMethod("groups", c("H5S_source", "numeric"), function(object, index, ...) {
   groups(object)[index,,drop=FALSE]
 })
-
-
 
 setClass("H5S_linkset", representation(links="list", group="character",
                                        source="H5S_source"))
@@ -233,6 +270,7 @@ setReplaceMethod("transfermode", "H5S_dataset",
   }
 )
 
+
 # private: get content from host
 # param targ is the URL with query
 transl = function(targ)  {  
@@ -266,6 +304,21 @@ jsontransl = function(uu, nele)  {
   } else {
     result <- val
   }
+}
+
+
+#private : to check if the server being called is hsds or h5serv
+serverVersion <- function(serverURL = serverURL){
+  serverResponse = fromJSON(file=serverURL)
+  if("root" %in% attributes(serverResponse)$names){
+    flag = 1   ### This is a h5serv
+    return(flag)
+  }
+  else{ 
+    flag = 2   ### This is a hsds server
+    return(flag)
+  }
+  
 }
 
 #' extract elements from H5S_dataset
@@ -446,3 +499,256 @@ internalDim = function(h5d) {
   c(intl.dim1=d[1], intl.dim2=d[2])
 }
 
+#' HSDS server get request accessor
+#' @param object H5S_source instance
+#' @rdname getReq-H5S_source-missing-method
+#' @param \dots not used
+#' @return a data frame with response
+#' @aliases getReq
+#' @aliases getReq
+#' @exportMethod getReq
+#' @export getReq
+setGeneric("getReq", function(object) standardGeneric("getReq"))
+setMethod("getReq", c("H5S_source"), function(object) {
+  target = paste0(.serverURL(object))
+  ans = transl(target) # fromJSON(readBin(GET(target)$content, w="character"))
+  
+  if (length(ans$domains)<1)  { 
+    stop("no domains at server URL")
+  }
+  hh = t(sapply(ans$domains, force)) 
+  DataFrame(hh)
+  #domains in the home folder
+  #target = paste0(.serverURL(object), "/domains?domain=/home/")
+  #ans = transl(target)
+  #hd = t(sapply(ans$domains, force))
+  #DataFrame(hd)
+  
+})
+
+
+#' HSDS server domains accessor
+#' @param object H5S_source instance
+#' @rdname domains-H5S_source-missing-method
+#' @param \dots not used
+#' @return a data frame with domains name
+#' @aliases domains
+#' @aliases domains
+#' @examples 
+#' require(rhdf5client)
+#' bigec2 = H5S_source("http://149.165.156.12:5101") # a hsds server
+#' setCredentials(bigec2,username="username",password="password",folderPath="/home/reshg/") -> new_bigec2
+#' domains(new_bigec2)
+#' @exportMethod domains
+#' @export domains
+setGeneric("domains", function(object) standardGeneric("domains"))
+setMethod("domains", c("H5S_source"), function(object) {
+  target = paste0(.serverURL(object),"/domains?domain=", object@folderPath)
+  #target = paste0(.serverURL(object))
+  ans = transl(target) # fromJSON(readBin(GET(target)$content, w="character"))
+  
+  if (length(ans$domains)<1)  { 
+    stop("no domains at server URL")
+  }
+  hh = t(sapply(ans$domains, force)) 
+  DataFrame(hh)
+  #domains in the home folder
+  #target = paste0(.serverURL(object), "/domains?domain=/home/")
+  #ans = transl(target)
+  #hd = t(sapply(ans$domains, force))
+  #DataFrame(hd)
+  
+})
+
+#' set credentials for H5S_source instance
+#' @param object instance of H5S_source
+#' @param username username on hsds server
+#' @param password password on hsds server
+#' @param folderPath path to user's folder on hsds server 
+#' @return updated object of type H5S_source
+#' @rdname setCredentials-H5S_source-missing-method
+#' @aliases setCredentials
+#' @examples 
+#' require(rhdf5client)
+#' bigec2 = H5S_source("http://149.165.156.12:5101") # a hsds server
+#' setCredentials(bigec2,username="username",password="password",folderPath="/home/reshg/") -> new_bigec2
+#' new_bigec2
+#' @export
+setGeneric("setCredentials", def = function(object,username,password,folderPath) { standardGeneric("setCredentials") })
+setMethod("setCredentials", c("H5S_source"), 
+                 function(object,username,password,folderPath) {
+                   object@username = username
+                   object@password = password
+                   object@folderPath = folderPath
+                   
+                   return(object)
+                 }
+)
+
+## Command line utilities with h5pyd
+
+#' hsls - View datasets on hsds server 
+#' @param object instance of H5S_source(updated object with credentials set)
+#' @examples 
+#' require(rhdf5client)
+#' bigec2 = H5S_source("http://149.165.156.12:5101") # a hsds server
+#' setCredentials(bigec2,username="username",password="password",folderPath="/home/reshg/") -> new_bigec2
+#' hsls(new_bigec2)
+#' @export
+hsls <- function(object){
+  mycmd_hsls = paste0("hsls -e ",object@serverURL," -u ",object@username," -p ",object@password," ",object@folderPath)
+  system(mycmd_hsls, intern = TRUE)
+}
+
+
+#' hsload - Load datasets to hsds server (hsload version 0.0.1) / Copy HDF5 file to Domain or multiple files to a Domain folder
+#' @param object instance of H5S_source(updated object with credentials set)
+#' @param source HDF5 file or multiple files if copying to folder - source file path/name
+#' @param domain HDF Server domain (Unix or DNS style) - destination path/name
+#' @examples 
+#' require(rhdf5client)
+#' bigec2 = H5S_source("http://149.165.156.12:5101") # a hsds server
+#' setCredentials(bigec2,username="username",password="password",folderPath="/home/reshg/") -> new_bigec2
+#' hsload(new_bigec2, source, domain)
+#' @export
+hsload <- function(object, source, domain){
+  
+  mycmd_hsload = paste0("hsload -e ",object@serverURL," -u ",object@username," -p ",object@password," --loglevel debug ",source," ",domain)
+  system(mycmd_hsload, intern = TRUE)
+}
+
+#' hsdel - Delete hdf5 file on hsds server 
+#' @param object instance of H5S_source (updated object with credentials set)
+#' @param domain HDF Server domain (Unix or DNS style) - path to hdf5 file to be deleted
+#' @examples 
+#' require(rhdf5client)
+#' bigec2 = H5S_source("http://149.165.156.12:5101") # a hsds server
+#' setCredentials(bigec2,username="username",password="password",folderPath="/home/reshg/") -> new_bigec2
+#' hsdel(new_bigec2, domain)
+#' @export
+hsdel <- function(object, domain){
+  
+  mycmd_hsdel = paste0("hsdel -e ",object@serverURL," -u ",object@username," -p ",object@password," --loglevel debug ",domain)
+  system(mycmd_hsdel, intern = TRUE)
+  
+}
+
+#' hsget - Copy server domain to local HDF5 file( get content from HSDS server to local destination) 
+#' @param object instance of H5S_source (updated object with credentials set)
+#' @param domain HDF Server domain (Unix or DNS style) - path to hdf5 file to be copied
+#' @param des local destination path where the hsds hdf5 file should be copied to
+#' @examples 
+#' require(rhdf5client)
+#' bigec2 = H5S_source("http://149.165.156.12:5101") # a hsds server
+#' setCredentials(bigec2,username="username",password="password",folderPath="/home/reshg/") -> new_bigec2
+#' hsget(new_bigec2, domain, des)
+#' @export
+hsget <- function(object, domain, des){
+  
+  mycmd_hsget = paste0("hsget -e ",object@serverURL," -u ",object@username," -p ",object@password," --loglevel debug ",domain,des)
+  system(mycmd_hsget, intern = TRUE)
+  
+}
+
+#' hstouch - Create a domain on HSDS server 
+#' @param object instance of H5S_source (updated object with credentials set)
+#' @param domain HDF Server domain (Unix or DNS style) - domain to be created
+#' @examples 
+#' require(rhdf5client)
+#' bigec2 = H5S_source("http://149.165.156.12:5101") # a hsds server
+#' setCredentials(bigec2,username="username",password="password",folderPath="/home/reshg/") -> new_bigec2
+#' hstouch(new_bigec2, domain)
+#' @export
+hstouch <- function(object, domain){
+  
+  mycmd_hstouch = paste0("hstouch -e ",object@serverURL," -u ",object@username," -p ",object@password," --loglevel debug ",domain)
+  system(mycmd_hstouch, intern = TRUE)
+  
+}
+
+#' getDatasetUUIDs from hsds server
+#' @param object instance of H5S_source(updated object with credentials set)
+#' @export
+getDatasetUUIDs <- function(object) {
+  query = sprintf("%s/datasets?host=%s", object@serverURL, object@folderPath)
+  ans = try(GET(query))
+  if (inherits(ans, "try-error")) stop("could not resolve datasets query")
+  cont = fromJSON(readBin( ans$content, what="character"))
+  cont$datasets
+}
+
+#'getDatasetAttrs from hsds server
+#'@param object instance of H5S_source(updated object with credentials set)
+#'@export
+getDatasetAttrs <- function(object) {
+  uu = getDatasetUUIDs(object)
+  query = sprintf("%s/datasets/%s?host=%s", object@serverURL, uu, object@folderPath)
+  ans = try(GET(query))   ## is this going to do GET request only for one url? what if the there are multiple datasets in the file?
+  if (inherits(ans, "try-error")) stop("could not resolve datasets query")
+  cont = fromJSON(readBin( ans$content, what="character"))
+  cont
+}
+
+#'getDims from hsds server
+#'@param object instance of H5S_source(updated object with credentials set)
+#'@export
+getDims <- function(object) {
+  stopifnot(is(object, "H5S_source"))
+  getDatasetAttrs(object)$shape$dims
+}
+
+#'getHRDF from hsds server
+#'@param object instance of H5S_source(updated object with credentials set)
+#'@export
+getHRDF <- function(object) {
+  stopifnot(is(object, "H5S_source"))
+  atts = getDatasetAttrs(object)
+  nms = sapply(atts$hrefs, "[[", "rel")
+  vals = sapply(atts$hrefs, "[[", "href")
+  DataFrame(hrefName=nms, hrefValue=vals)
+}
+
+#'H5S_dataset2 for datasets in hsds server
+#'@param object instance of H5S_source(updated object with credentials set)
+#'@export
+H5S_dataset2 = function(object) {
+  src = new("H5S_source", serverURL=object@serverURL, dsmeta=DataFrame())
+  atts = getDatasetAttrs(object)
+  ans = getHRDF(object)
+  rownames(ans) = ans[,1]
+  self = ans["self", "hrefValue"]
+  prep = sub("\\?host=", "/value?host=", self)
+  prep = paste0(prep, "&select=[%%SEL1%%,%%SEL2%%]")
+  new("H5S_dataset", source=src, simpleName=object@folderPath, shapes=atts$shape,
+      hrefs = ans, allatts=atts, presel=prep, transfermode="JSON")
+}
+
+setClass("HSOS_dataset", representation(  
+  source_os="H5S_source"), contains="H5S_dataset")
+HSOS_dataset = function(object) {
+  simpleName = object@folderPath
+  atts = getDatasetAttrs(object)
+  allatts = atts
+  shapes = atts$shape
+  ans = hrefs = getHRDF(object)
+  rownames(ans) = hrefs[,1]
+  self = ans["self", "hrefValue"]
+  prep = sub("\\?host=", "/value?host=", self)
+  prep = paste0(prep, "&select=[%%SEL1%%,%%SEL2%%]")
+  list(ans=ans, prep=prep)
+}
+
+#'getDatasetSlice from hsds server
+#'@param object instance of H5S_source(updated object with credentials set)
+#'@param dsindex dataset index
+#'@param selectionsString character with selectionString
+#'@export
+getDatasetSlice <- function(object, dsindex=1, selectionString, ...) {
+  requireNamespace("httr")
+  requireNamespace("rjson")
+  uuid = getDatasetUUIDs(object)[dsindex]
+  query = sprintf("%s/datasets/%s/value?host=%s&select=%s", object@serverURL, uuid, object@folderPath, selectionString)
+  ans = try(GET(query, add_headers(Accept="application/json")))
+  if (inherits(ans, "try-error")) stop("could not resolve select query")
+  fromJSON(readBin( ans$content, what="character"))
+}
