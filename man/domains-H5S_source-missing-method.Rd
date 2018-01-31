@@ -17,9 +17,3 @@ a data frame with domains name
 \description{
 HSDS server domains accessor
 }
-\examples{
-require(rhdf5client)
-bigec2 = H5S_source("http://149.165.156.12:5101") # a hsds server
-setCredentials(bigec2,username="username",password="password",folderPath="/home/reshg/") -> new_bigec2
-domains(new_bigec2)
-}

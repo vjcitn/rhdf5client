@@ -47,9 +47,9 @@ construct H5S_source
 
 \item{\code{dmains}}{DataFrame instance with metadata about the content of hsds server}
 
-\item{\code{getReq}}{DataFrame}
+\item{\code{getReq}}{DataFrame instance with metadata about hsds server}
 
-\item{\code{folderPath}}{character string with path to user's folder on hsds server}
+\item{\code{folderPath}}{character string with path to user's folder/file on hsds server}
 }}
 
 \note{

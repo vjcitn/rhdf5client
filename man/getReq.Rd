@@ -4,7 +4,7 @@
 \alias{getReq}
 \title{list information about server content available in an H5S_source hsds instance}
 \usage{
-getReq(object)
+getReq(src)
 }
 \arguments{
 \item{src}{H5S_source instance}
