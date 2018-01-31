@@ -28,7 +28,7 @@ setMethod("show", "H5S_source", function(object) {
   else{
     cat("HSDS server url :", object@serverURL,
         "\n Use getReq() to get information on the server",
-        "\n To look at specific domains(folder content), set the folderPath and call domains() on the updated object",
+        "\n To look at specific domains(folder content), set folder path with setPath() and call domains() on the updated object",
         #"\n To use utilities like hsls, hsload, hsget, hstouch, hsdel set user credentials using setCredentials()",
         #also look at /org/?
         "\n")
@@ -101,8 +101,6 @@ getReq = function(src) {
   src@getReq
 }
 
-
-
 #' @rdname H5S_source-class
 #' @param x instance of H5S_source
 #' @param i character string intended to identify dataset on server
@@ -111,7 +109,6 @@ getReq = function(src) {
 setMethod("[[", c("H5S_source", "character", "ANY"), function(x, i, j) {
   dataset(x, i)
 })
-
 
 #' HDF5 server data groups accessor
 #' @param object H5S_source instance
@@ -495,6 +492,19 @@ internalDim = function(h5d) {
   d = slot(h5d, "shapes")$dims
   c(intl.dim1=d[1], intl.dim2=d[2])
 }
+
+#'set path for hsds server resource
+#'@param object H5S_source instance
+#'@param folderPath character string with path to user's folder on hsds server
+#'@aliases setPath,H5S_source,missing-method
+#'@exportMethod setPath
+#'@export setPath
+setGeneric("setPath", function(object,folderPath, ...) standardGeneric("setPath"))
+setMethod("setPath", c("H5S_source"), function(object, folderPath, ...) {
+  object@folderPath = folderPath
+  object
+})
+
 
 #' HSDS server get request accessor
 #' @name hsdsInfo
