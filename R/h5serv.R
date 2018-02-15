@@ -26,12 +26,9 @@ setMethod("show", "H5S_source", function(object) {
       "\n Use [[ [dsname] ]]  to get a reference suitable for [i, j] subsetting.")
   }
   else{
-    cat("HSDS server url :", object@serverURL,
-        "\n Use getReq() to get information on the server",
-        "\n To look at specific domains(folder content), set folder path with setPath() and call domains() on the updated object",
-        #"\n To use utilities like hsls, hsload, hsget, hstouch, hsdel set user credentials using setCredentials()",
-        #also look at /org/?
-        "\n")
+  cat("HSDS server url :", object@serverURL,
+      "\n Use getReq() to get information on the server",
+      "\n To look at specific domains(folder content), set folder path with setPath() and call domains() on the updated object")
     }
 })
 
@@ -666,7 +663,8 @@ H5S_dataset2 = function(object) {
 #'@param selectionsString character with selectionString
 #'@param \dots unused
 #'@return list of data obtained
-#'hsdsCom = H5S_source("http://149.165.156.12:5101") # hsds server
+#'@examples
+#'hsdsCon = H5S_source("http://149.165.156.12:5101") # hsds server
 #'setPath(hsdsCon, "/home/reshg/tenx_full2.h5")-> hsds
 #'getDatasetSlice(hsds,dsindex=1,selectionString="[1:10,1:50]")
 #'@export
