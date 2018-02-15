@@ -7,8 +7,16 @@
 H5S_dataset2(object)
 }
 \arguments{
-\item{object}{instance of H5S_source(updated object with credentials set)}
+\item{object}{instance of H5S_source(updated object with path to file set)}
+}
+\value{
+H5S_dataset object
 }
 \description{
 H5S_dataset2 for datasets in hsds server
+}
+\examples{
+hsdsCon = H5S_source("http://149.165.156.12:5101") # hsds server
+setPath(hsdsCon, "/home/reshg/tenx_full2.h5")-> hsds
+H5S_dataset2(hsds)
 }

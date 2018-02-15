@@ -63,7 +63,7 @@ bigec2 = H5S_source("http://h5s.channingremotedata.org:5000") # h5serv
 bigec2
 dsmeta(bigec2)[1:2,]       # two groups
 dsmeta(bigec2)[1,2][[1]]   # all dataset candidates in group 1
-bigec2_hsds = H5S_source("http://149.165.156.12:5101") # hsds server
-bigec2_hsds
-getReq(bigec2_hsds)
+hsdsCon = H5S_source("http://149.165.156.12:5101") # hsds server connection
+hsdsCon
+getReq(hsdsCon)
 }

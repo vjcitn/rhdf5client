@@ -7,11 +7,19 @@
 getDatasetSlice(object, dsindex = 1, selectionString, ...)
 }
 \arguments{
-\item{object}{instance of H5S_source(updated object with credentials set)}
+\item{object}{instance of H5S_source(updated object with path to file set)}
 
 \item{dsindex}{dataset index}
 
+\item{\dots}{unused}
+
 \item{selectionsString}{character with selectionString}
+}
+\value{
+list of data obtained
+hsdsCom = H5S_source("http://149.165.156.12:5101") # hsds server
+setPath(hsdsCon, "/home/reshg/tenx_full2.h5")-> hsds
+getDatasetSlice(hsds,dsindex=1,selectionString="[1:10,1:50]")
 }
 \description{
 getDatasetSlice from hsds server

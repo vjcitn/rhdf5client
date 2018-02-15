@@ -53,9 +53,9 @@ fixtarget = function(x) sub(".*host=(.*).h5s.channingremotedata.org", "\\1", x)
 #' bigec2
 #' dsmeta(bigec2)[1:2,]       # two groups
 #' dsmeta(bigec2)[1,2][[1]]   # all dataset candidates in group 1
-#' bigec2_hsds = H5S_source("http://149.165.156.12:5101") # hsds server
-#' bigec2_hsds
-#' getReq(bigec2_hsds)
+#' hsdsCon = H5S_source("http://149.165.156.12:5101") # hsds server connection
+#' hsdsCon
+#' getReq(hsdsCon)
 #' @export
 H5S_source = function(serverURL, ...) {
   serverCheck = serverVersion(serverURL)
@@ -166,6 +166,26 @@ setMethod("show", "H5S_linkset", function(object) {
   cat("HDF5 server link set for group", object@group, "\n")
   cat(" There are", length(object@links$links), "links.\n")
   cat(" Use targets([linkset]) to extract target URLs.\n")
+})
+
+#'set path for hsds server resource
+#'@param object H5S_source instance
+#'@param folderPath character string with path to user's folder on hsds server
+#'@param \dots not used
+#'@return an updated object with folderPath set
+#'@examples
+#'hsdsCon = H5S_source("http://149.165.156.12:5101") # hsds server connection
+#'setPath(hsdsCon, "/home/reshg/tenx_full2.h5")-> hsds
+#'@docType methods
+#'@rdname setPath-methods
+#'@aliases setPath,H5S_source,character-method
+#'@aliases setPath
+#'@export setPath
+#'@exportMethod setPath
+setGeneric("setPath", function(object,folderPath, ...) standardGeneric("setPath"))
+setMethod("setPath", c("H5S_source","character"), function(object, folderPath, ...) {
+  object@folderPath = folderPath
+  object
 })
 
 #' access for link metadata for HDF5 server groups
@@ -493,28 +513,19 @@ internalDim = function(h5d) {
   c(intl.dim1=d[1], intl.dim2=d[2])
 }
 
-#'set path for hsds server resource
-#'@param object H5S_source instance
-#'@param folderPath character string with path to user's folder on hsds server
-#'@aliases setPath,H5S_source,missing-method
-#'@exportMethod setPath
-#'@export setPath
-setGeneric("setPath", function(object,folderPath, ...) standardGeneric("setPath"))
-setMethod("setPath", c("H5S_source"), function(object, folderPath, ...) {
-  object@folderPath = folderPath
-  object
-})
-
 
 #' HSDS server get request accessor
-#' @name hsdsInfo
-#' @rdname hsdsInfo-H5S_source-missing-method
 #' @param object H5S_source instance
-#' @param \dots not used
 #' @return a data frame with response
+#' @examples 
+#' hsdsCon = H5S_source("http://149.165.156.12:5101") # hsds server connection
+#' hsdsInfo(hsdsCon)
+#' @aliases hsdsInfo,H5S_source
 #' @aliases hsdsInfo
-#' @exportMethod hsdsInfo
+#' @docType methods
+#' @rdname hsdsInfo-methods
 #' @export hsdsInfo
+#' @exportMethod hsdsInfo
 setGeneric("hsdsInfo", function(object) standardGeneric("hsdsInfo"))
 setMethod("hsdsInfo", c("H5S_source"), function(object) {
   target = paste0(.serverURL(object))
@@ -535,18 +546,22 @@ setMethod("hsdsInfo", c("H5S_source"), function(object) {
 
 
 #' HSDS server domains accessor
-#' @name domains
-#' @rdname domains-H5S_source-missing-method
 #' @param object H5S_source instance
 #' @param \dots not used
 #' @return a data frame with domains name
+#' @examples 
+#' hsdsCon = H5S_source("http://149.165.156.12:5101") # hsds server connection
+#' setPath(hsdsCon, "/home/reshg/")-> hsds
+#' domains(hsds)
+#' @docType methods
+#' @aliases domains,H5S_source
 #' @aliases domains
-#' @aliases domains,H5S_source,missing-method
-#' @exportMethod domains
+#' @rdname domains-methods
 #' @export domains
-setGeneric("domains", function(object) standardGeneric("domains"))
-setMethod("domains", c("H5S_source"), function(object) {
-  target = paste0(.serverURL(object),"/domains?domain=", object@folderPath)
+#' @exportMethod domains
+setGeneric("domains", function(object, ...) standardGeneric("domains"))
+setMethod("domains", c("H5S_source"), function(object, ...) {
+  target = paste0(.serverURL(object, ...),"/domains?domain=", object@folderPath)
   #target = paste0(.serverURL(object))
   ans = transl(target) # fromJSON(readBin(GET(target)$content, w="character"))
   
@@ -564,7 +579,12 @@ setMethod("domains", c("H5S_source"), function(object) {
 })
 
 #'getDatasetUUIDs from hsds server
-#'@param object instance of H5S_source(updated object with credentials set)
+#'@param object instance of H5S_source(updated object with path to file set)
+#'@return character of dataset uuid obtained 
+#'@examples
+#'hsdsCon = H5S_source("http://149.165.156.12:5101") # hsds server
+#'setPath(hsdsCon, "/home/reshg/tenx_full2.h5")-> hsds
+#'getDatasetUUIDs(hsds)
 #'@export
 getDatasetUUIDs <- function(object) {
   query = sprintf("%s/datasets?host=%s", object@serverURL, object@folderPath)
@@ -575,7 +595,12 @@ getDatasetUUIDs <- function(object) {
 }
 
 #'getDatasetAttrs from hsds server
-#'@param object instance of H5S_source(updated object with credentials set)
+#'@param object instance of H5S_source(updated object with path to file set)
+#'@return list of data obtained
+#'@examples
+#'hsdsCon = H5S_source("http://149.165.156.12:5101") # hsds server
+#'setPath(hsdsCon, "/home/reshg/tenx_full2.h5")-> hsds
+#'getDatasetAttrs(hsds)
 #'@export
 getDatasetAttrs <- function(object) {
   uu = getDatasetUUIDs(object)
@@ -587,7 +612,12 @@ getDatasetAttrs <- function(object) {
 }
 
 #'getDims from hsds server
-#'@param object instance of H5S_source(updated object with credentials set)
+#'@param object instance of H5S_source(updated object with path to file set)
+#'@return numeric content of dimensions
+#'@examples
+#'hsdsCon = H5S_source("http://149.165.156.12:5101") # hsds server
+#'setPath(hsdsCon, "/home/reshg/tenx_full2.h5")-> hsds
+#'getDims(hsds)
 #'@export
 getDims <- function(object) {
   stopifnot(is(object, "H5S_source"))
@@ -595,7 +625,12 @@ getDims <- function(object) {
 }
 
 #'getHRDF from hsds server
-#'@param object instance of H5S_source(updated object with credentials set)
+#'@param object instance of H5S_source(updated object with path to file set)
+#'@return DataFrame of data obtained
+#'@examples
+#'hsdsCon = H5S_source("http://149.165.156.12:5101") # hsds server
+#'setPath(hsdsCon, "/home/reshg/tenx_full2.h5")-> hsds
+#'getHRDF(hsds)
 #'@export
 getHRDF <- function(object) {
   stopifnot(is(object, "H5S_source"))
@@ -606,7 +641,12 @@ getHRDF <- function(object) {
 }
 
 #'H5S_dataset2 for datasets in hsds server
-#'@param object instance of H5S_source(updated object with credentials set)
+#'@param object instance of H5S_source(updated object with path to file set)
+#'@return H5S_dataset object
+#'@examples
+#'hsdsCon = H5S_source("http://149.165.156.12:5101") # hsds server
+#'setPath(hsdsCon, "/home/reshg/tenx_full2.h5")-> hsds
+#'H5S_dataset2(hsds)
 #'@export
 H5S_dataset2 = function(object) {
   src = new("H5S_source", serverURL=object@serverURL, dsmeta=DataFrame())
@@ -620,25 +660,15 @@ H5S_dataset2 = function(object) {
       hrefs = ans, allatts=atts, presel=prep, transfermode="JSON")
 }
 
-setClass("HSDS_dataset", representation(  
-  source_os="H5S_source"), contains="H5S_dataset")
-HSDS_dataset = function(object) {
-  simpleName = object@folderPath
-  atts = getDatasetAttrs(object)
-  allatts = atts
-  shapes = atts$shape
-  ans = hrefs = getHRDF(object)
-  rownames(ans) = hrefs[,1]
-  self = ans["self", "hrefValue"]
-  prep = sub("\\?host=", "/value?host=", self)
-  prep = paste0(prep, "&select=[%%SEL1%%,%%SEL2%%]")
-  list(ans=ans, prep=prep)
-}
-
 #'getDatasetSlice from hsds server
-#'@param object instance of H5S_source(updated object with credentials set)
+#'@param object instance of H5S_source(updated object with path to file set)
 #'@param dsindex dataset index
 #'@param selectionsString character with selectionString
+#'@param \dots unused
+#'@return list of data obtained
+#'hsdsCom = H5S_source("http://149.165.156.12:5101") # hsds server
+#'setPath(hsdsCon, "/home/reshg/tenx_full2.h5")-> hsds
+#'getDatasetSlice(hsds,dsindex=1,selectionString="[1:10,1:50]")
 #'@export
 getDatasetSlice <- function(object, dsindex=1, selectionString, ...) {
   requireNamespace("httr")
