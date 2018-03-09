@@ -39,6 +39,7 @@ fixtarget = function(x) sub(".*host=(.*).h5s.channingremotedata.org", "\\1", x)
 #' @name H5S_source
 #' @rdname H5S_source-class
 #' @param serverURL a URL for a port for HDF5Server
+#' @param domain character string with path to file for HSDS 
 #' @param \dots not used
 #' @note The dsmeta slot holds a DataFrame with a column \code{dsnames}
 #' that is a list with ith element a character vector of all dsnames
@@ -54,26 +55,33 @@ fixtarget = function(x) sub(".*host=(.*).h5s.channingremotedata.org", "\\1", x)
 #' hsdsCon
 #' getReq(hsdsCon)
 #' @export
-H5S_source = function(serverURL, ...) {
-  serverCheck = serverVersion(serverURL)
-  if(serverCheck == 1){
-    tmp <- new("H5S_source", serverURL=serverURL, dsmeta=DataFrame())
-    grps <- groups(tmp)
-    message("analyzing groups for their links...")
-    thel <- targs <- List(targs=lapply( seq_len(nrow(grps)), 
-                                        function(x) fixtarget(hosts(links(tmp,x)))))
-    message("done")
-    dsm <- DataFrame(groupnum=seq_len(nrow(grps)), dsnames=thel, grp.uuid=grps$groups)
-    obj <- new("H5S_source", serverURL=serverURL, dsmeta=dsm)
-    obj
+H5S_source = function(serverURL,domain, ...) {
+  if(missing(domain)){
+    serverCheck = serverVersion(serverURL)
+    if(serverCheck == 1){
+      tmp <- new("H5S_source", serverURL=serverURL, dsmeta=DataFrame())
+      grps <- groups(tmp)
+      message("analyzing groups for their links...")
+      thel <- targs <- List(targs=lapply( seq_len(nrow(grps)), 
+                                          function(x) fixtarget(hosts(links(tmp,x)))))
+      message("done")
+      dsm <- DataFrame(groupnum=seq_len(nrow(grps)), dsnames=thel, grp.uuid=grps$groups)
+      obj <- new("H5S_source", serverURL=serverURL, dsmeta=dsm)
+      obj
+    }
+    else{
+      tmp <- new("H5S_source", serverURL=serverURL, getReq=DataFrame())
+      get <- hsdsInfo(tmp)
+      get.df <- DataFrame(get)
+      obj <- new("H5S_source", serverURL=serverURL, getReq=get.df )
+    }
   }
   else{
     tmp <- new("H5S_source", serverURL=serverURL, getReq=DataFrame())
     get <- hsdsInfo(tmp)
     get.df <- DataFrame(get)
-    obj <- new("H5S_source", serverURL=serverURL, getReq=get.df )
-    obj
-    
+    obj <- new("H5S_source",serverURL=serverURL, getReq=get.df, folderPath=domain)
+    H5S_dataset2(obj)
   }
 }
 
