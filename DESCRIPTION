@@ -9,12 +9,12 @@ Authors@R: c(
  person("Vincent", "Carey", role = c("aut"), email = "stvjc@channing.harvard.edu")
  )
 Suggests: knitr, testthat, BiocStyle
-Imports: S4Vectors, httr, rjson, utils
+Imports: S4Vectors, httr, rjson, utils, DelayedArray
 Depends: R (>= 3.4), methods
 License: Artistic-2.0
 LazyLoad: yes
 BiocViews: infrastructure
 RoxygenNote: 6.0.1.9000
-Collate: h5serv.R indx.R 
+Collate: H5S_Array.R h5serv.R indx.R 
 VignetteBuilder: knitr
 biocViews: DataImport, Software

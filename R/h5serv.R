@@ -256,6 +256,7 @@ hosts = function(h5linkset, index, cleanIP=TRUE) {
 #' @slot allatts list of all attributes
 #' @slot presel string prepared for select operation in GET
 #' @slot transfermode default "JSON" or "binary" for binary transfer
+#' @aliases H5S_dataset-class
 #' @exportClass H5S_dataset
 
 setClass("H5S_dataset", representation(
@@ -527,10 +528,10 @@ internalDim = function(h5d) {
 #' @examples 
 #' hsdsCon = H5S_source("http://149.165.156.12:5101") # hsds server connection
 #' hsdsInfo(hsdsCon)
-#' @aliases hsdsInfo,H5S_source
+#' @aliases hsdsInfo,H5S_source-method
 #' @aliases hsdsInfo
 #' @docType methods
-#' @rdname hsdsInfo-methods
+#' @rdname hsdsInfo-method
 #' @export hsdsInfo
 #' @exportMethod hsdsInfo
 setGeneric("hsdsInfo", function(object) standardGeneric("hsdsInfo"))
@@ -561,9 +562,9 @@ setMethod("hsdsInfo", c("H5S_source"), function(object) {
 #' setPath(hsdsCon, "/home/reshg/")-> hsds
 #' domains(hsds)
 #' @docType methods
-#' @aliases domains,H5S_source
+#' @aliases domains,H5S_source-method
 #' @aliases domains
-#' @rdname domains-methods
+#' @rdname domains-method
 #' @export domains
 #' @exportMethod domains
 setGeneric("domains", function(object, ...) standardGeneric("domains"))
@@ -670,7 +671,7 @@ H5S_dataset2 = function(object) {
 #'getDatasetSlice from hsds server
 #'@param object instance of H5S_source(updated object with path to file set)
 #'@param dsindex dataset index
-#'@param selectionsString character with selectionString
+#'@param selectionString character with selectionString
 #'@param \dots unused
 #'@return list of data obtained
 #'@examples
