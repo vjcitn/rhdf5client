@@ -21,7 +21,6 @@ library(BiocSklearn)
 library(rhdf5client)
 library(DT)
 library(DelayedArray)
-library(restfulSE)
 })
 })
 ```

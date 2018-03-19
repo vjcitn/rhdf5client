@@ -3,7 +3,7 @@
 \docType{methods}
 \name{domains}
 \alias{domains}
-\alias{domains,H5S_source}
+\alias{domains,H5S_source-method}
 \title{HSDS server domains accessor}
 \usage{
 domains(object, ...)
