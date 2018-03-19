@@ -28,7 +28,8 @@ setMethod("show", "H5S_source", function(object) {
   else{
   cat("HSDS server url :", object@serverURL,
       "\n Use getReq() to get information on the server",
-      "\n To look at specific domains(folder content), set folder path with setPath() and call domains() on the updated object")
+      "\n To look at specific domains(folder content), set folder path with setPath() and call domains() on the updated object"
+      )
     }
 })
 
@@ -39,41 +40,50 @@ fixtarget = function(x) sub(".*host=(.*).h5s.channingremotedata.org", "\\1", x)
 #' @name H5S_source
 #' @rdname H5S_source-class
 #' @param serverURL a URL for a port for HDF5Server
+#' @param domain character string with path to file for HSDS 
 #' @param \dots not used
 #' @note The dsmeta slot holds a DataFrame with a column \code{dsnames}
 #' that is a list with ith element a character vector of all dsnames
 #' available for the ith group.  There is no effort at present to
 #' search all groups for candidate datasets.
+#' @note If the domain for the HSDS server is known, pass the domain path as a character string along with ther serverURL
 #' @return an initialized object of type H5S_source
 #' @examples
 #' bigec2 = H5S_source("http://h5s.channingremotedata.org:5000") # h5serv 
 #' bigec2
 #' dsmeta(bigec2)[1:2,]       # two groups
 #' dsmeta(bigec2)[1,2][[1]]   # all dataset candidates in group 1
-#' hsdsCon = H5S_source("http://149.165.156.12:5101") # hsds server connection
+#' hsdsCon = H5S_source("http://149.165.156.12:5101") # hsds server connection, note : if the domain is known, pass as character string
 #' hsdsCon
 #' getReq(hsdsCon)
 #' @export
-H5S_source = function(serverURL, ...) {
-  serverCheck = serverVersion(serverURL)
-  if(serverCheck == 1){
-    tmp <- new("H5S_source", serverURL=serverURL, dsmeta=DataFrame())
-    grps <- groups(tmp)
-    message("analyzing groups for their links...")
-    thel <- targs <- List(targs=lapply( seq_len(nrow(grps)), 
-                                        function(x) fixtarget(hosts(links(tmp,x)))))
-    message("done")
-    dsm <- DataFrame(groupnum=seq_len(nrow(grps)), dsnames=thel, grp.uuid=grps$groups)
-    obj <- new("H5S_source", serverURL=serverURL, dsmeta=dsm)
-    obj
+H5S_source = function(serverURL, domain, ...) {
+  if(missing(domain)){
+    serverCheck = serverVersion(serverURL)
+    if(serverCheck == 1){
+      tmp <- new("H5S_source", serverURL=serverURL, dsmeta=DataFrame())
+      grps <- groups(tmp)
+      message("analyzing groups for their links...")
+      thel <- targs <- List(targs=lapply( seq_len(nrow(grps)), 
+                                          function(x) fixtarget(hosts(links(tmp,x)))))
+      message("done")
+      dsm <- DataFrame(groupnum=seq_len(nrow(grps)), dsnames=thel, grp.uuid=grps$groups)
+      obj <- new("H5S_source", serverURL=serverURL, dsmeta=dsm)
+      obj
+    }
+    else{
+      tmp <- new("H5S_source", serverURL=serverURL, getReq=DataFrame())
+      get <- hsdsInfo(tmp)
+      get.df <- DataFrame(get)
+      obj <- new("H5S_source", serverURL=serverURL, getReq=get.df )
+    }
   }
   else{
     tmp <- new("H5S_source", serverURL=serverURL, getReq=DataFrame())
     get <- hsdsInfo(tmp)
     get.df <- DataFrame(get)
-    obj <- new("H5S_source", serverURL=serverURL, getReq=get.df )
-    obj
-    
+    obj <- new("H5S_source",serverURL=serverURL, getReq=get.df, folderPath=domain)
+    H5S_dataset2(obj)
   }
 }
 
