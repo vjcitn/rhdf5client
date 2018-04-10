@@ -245,6 +245,7 @@ attributes and retrieve slices from R using `h5dsref`.
 ### Creating HDF5 datasets from R
 
 ```{r lkcr}
+if (.Platform$OS.type != "windows")  {
 tf = tempfile()
 nf = h5py$File(tf, "w")
 irmat = data.matrix(iris[,1:4])
@@ -253,6 +254,7 @@ chk = h5dsref(tf, "irisH5")
 ta(chk, 0:4, 0L)
 nf$file$close() # no more reading, but
 try(ta(chk, 0:4, 0L)) # is the close operation working?
+}
 ```
 
 Details on the `File` interface
@@ -274,12 +276,14 @@ for local HDF5.  For the following to succeed you would
 need credentials for the HDF Object Store instance noted in the endpoint
 used below.
 ```{r getpd}
+if (.Platform$OS.type != "windows")  {
 Rh5pyd = import("h5pyd", as="h5py", convert=FALSE)
 tenx_remote = Rh5pyd$File("/home/stvjc/tenx_full.h5", "r",
      endpoint="http://52.4.181.237:5101")
 tenx_remote
 tenx_remote$keys() # only python
 py_to_r(tenx_remote$keys()) # the strings of interest
+}
 ```
 
 The following function obtains a slice from a dataset
@@ -289,6 +293,7 @@ convention for h5pyd: `start:end:stride` for each dimension,
 with `[:end]` and `[:stride]` optional.
 
 ```{r lkgs}
+if (.Platform$OS.type != "windows")  {
 getslice = function(endpoint, mode, domain, dsname, indexstring="[0,0]") {
    py_run_string("import h5pyd", convert=FALSE)
    py_run_string(paste0("f = h5pyd.File(domain=", sQuote(domain), 
@@ -298,6 +303,7 @@ getslice = function(endpoint, mode, domain, dsname, indexstring="[0,0]") {
 mr = getslice("http://52.4.181.237:5101", "r", 
    "/home/stvjc/tenx_full.h5", "newassay001", "[0:4, 0:27998]")
 apply(mr,1,sum)
+}
 ```
 
 ## Working with HDF Server
@@ -309,10 +315,12 @@ the two getslice commands are isolated and run in a single
 R session, no problem arises.
 
 ```{r dosl2, eval=FALSE}
+if (.Platform$OS.type != "windows")  {
 hh = import("h5pyd", as="h5py") # avoid auth problem?
 mr = getslice("http://h5s.channingremotedata.org:5000", "r",
    "tenx_full.h5s.channingremotedata.org", "newassay001", "[0:4, 0:27998]")
 apply(mr,1,sum)
+}
 ```
 
 ## Towards a comprehensive interface
@@ -322,7 +330,9 @@ We'll focus on the object store.  After importing
 infrastructure.
 
 ```{r lkrr}
+if (.Platform$OS.type != "windows")  {
 names(Rh5pyd)
+}
 ```
 With `py_help(Rh5pyd$Dataset)`, we obtain extensive
 documentation in our R session.
@@ -386,17 +396,23 @@ and we make use of the `create_dataset` method.  (Following code
 is unevaluated, just for illustration, as it was tested and created the
 persistent content.)
 ```{r lkcr2,eval=FALSE}
+if (.Platform$OS.type != "windows")  {
 nf = Rh5pyd$File(endpoint="http://52.4.181.237:5101", mode="w", 
    domain="/home/stvjc/iris_demo.h5")
 nf$create_dataset('irisH5', data=r_to_py(irmat))
+}
 ```
 We can read back with:
 ```{r lkrrrr}
+if (.Platform$OS.type != "windows")  {
 getslice("http://52.4.181.237:5101", mode="r",
    domain="/home/stvjc/iris_demo.h5", "irisH5", "[0:3, 0:3]")
+}
 ```
 
 We can run `create_group` as well.  See
 ```{r lknnnaaa}
+if (.Platform$OS.type != "windows")  {
 sort(names(Rh5pyd$File))
+}
 ```
