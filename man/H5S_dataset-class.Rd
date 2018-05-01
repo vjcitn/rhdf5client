@@ -3,6 +3,7 @@
 \docType{class}
 \name{H5S_dataset}
 \alias{H5S_dataset}
+\alias{H5S_dataset-class}
 \alias{[,H5S_dataset,numeric,numeric-method}
 \title{extract elements from H5S_dataset}
 \usage{

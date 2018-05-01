@@ -11,9 +11,9 @@ getDatasetSlice(object, dsindex = 1, selectionString, ...)
 
 \item{dsindex}{dataset index}
 
-\item{\dots}{unused}
+\item{selectionString}{character with selectionString}
 
-\item{selectionsString}{character with selectionString}
+\item{\dots}{unused}
 }
 \value{
 list of data obtained

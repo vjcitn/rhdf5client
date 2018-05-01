@@ -3,7 +3,7 @@
 \docType{methods}
 \name{hsdsInfo}
 \alias{hsdsInfo}
-\alias{hsdsInfo,H5S_source}
+\alias{hsdsInfo,H5S_source-method}
 \title{HSDS server get request accessor}
 \usage{
 hsdsInfo(object)
