@@ -20,7 +20,7 @@ a data frame with domains name
 HSDS server domains accessor
 }
 \examples{
-hsdsCon = H5S_source("http://149.165.156.12:5101") # hsds server connection
-setPath(hsdsCon, "/home/reshg/")-> hsds
+hsdsCon = H5S_source(URL_hsds()) # hsds server connection
+setPath(hsdsCon, "/home/stvjc/")-> hsds
 domains(hsds)
 }
