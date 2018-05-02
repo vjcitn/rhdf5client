@@ -2,14 +2,14 @@ library(rhdf5client)
 context("connection")
 
 test_that("H5S_source completes", {
- bigec2 = H5S_source("http://h5s.channingremotedata.org:5000")
+ bigec2 = H5S_source(URL_h5serv())
  expect_true(is(bigec2, "H5S_source"))
 })
 
 context("content wrapper structure") 
 
 test_that("H5S_source processes", {
- bigec2 = H5S_source("http://h5s.channingremotedata.org:5000")
+ bigec2 = H5S_source(URL_h5serv())
  expect_true(all(dim(groups(bigec2))==c(10,2))) 
  expect_true(is(links(bigec2,1), "H5S_linkset"))
  expect_true(is(dataset(bigec2, "tenx_100k"), "H5S_dataset"))
@@ -40,7 +40,7 @@ test_that("sproc/isplit work", {
 context("targets generation")
 
 test_that("targets method works", {
- bigec2 = H5S_source("http://h5s.channingremotedata.org:5000")
+ bigec2 = H5S_source(URL_h5serv())
  tt = targets(links(bigec2, 1))
  expect_true(length(tt)>=10)     # increased from 7 because tenx_400k added
  expect_true(length(grep("host", tt))>=8) 
@@ -49,7 +49,7 @@ test_that("targets method works", {
 context("retrieving data with binary transfer")
 
 test_that("binary transfer works", {
- bigec2 <- H5S_source("http://h5s.channingremotedata.org:5000")
+ bigec2 <- H5S_source(URL_h5serv())
  txdat <- bigec2[["tenx_100k_sorted"]]
 
  transfermode(txdat) <- "JSON"

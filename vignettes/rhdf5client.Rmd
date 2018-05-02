@@ -70,7 +70,7 @@ The dsmeta function returns top-level groups and datasets.
 
 ```{r dsmeta}
 library(rhdf5client)
-bigec2 = H5S_source("http://h5s.channingremotedata.org:5000")
+bigec2 = H5S_source(URL_h5serv())
 bigec2
 dsmeta(bigec2)[1:2,]      # two groups
 dsmeta(bigec2)[1,2][[1]]  # all dataset candidates in group 1
@@ -85,7 +85,7 @@ dsmeta(bigec2)[1,2][[1]]  # all dataset candidates in group 1
 Given the URL of a server running HDF5 server, we create
 an instance of `H5S_source`:
 ```{r doso}
-mys = H5S_source(serverURL="http://h5s.channingremotedata.org:5000")
+mys = H5S_source(serverURL=URL_h5serv())
 mys
 ```
 
