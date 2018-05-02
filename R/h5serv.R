@@ -65,11 +65,7 @@ fixtarget = function(x) sub(".*host=(.*).h5s.channingremotedata.org", "\\1", x)
 #' bigec2
 #' dsmeta(bigec2)[1:2,]       # two groups
 #' dsmeta(bigec2)[1,2][[1]]   # all dataset candidates in group 1
-<<<<<<< HEAD
-#' hsdsCon = H5S_source("http://52.4.181.237:5101") # hsds server connection, note : if the domain is known, pass as character string
-=======
 #' hsdsCon = H5S_source(URL_hsds()) # hsds server connection, note : if the domain is known, pass as character string
->>>>>>> c18f6e2c50cf28f11725fa4b8ce6ba192dbe64ce
 #' hsdsCon
 #' getReq(hsdsCon)
 #' @export
@@ -197,13 +193,8 @@ setMethod("show", "H5S_linkset", function(object) {
 #'@param \dots not used
 #'@return an updated object with folderPath set
 #'@examples
-<<<<<<< HEAD
-#'hsdsCon = H5S_source("http://52.4.181.237:5101") # hsds server connection
-#'setPath(hsdsCon, "/home/reshg/tenx_full2.h5")-> hsds
-=======
 #'hsdsCon = H5S_source(URL_hsds()) # hsds server connection
 #'setPath(hsdsCon, "/home/stvjc/tenx_full.h5")-> hsds
->>>>>>> c18f6e2c50cf28f11725fa4b8ce6ba192dbe64ce
 #'@docType methods
 #'@rdname setPath-methods
 #'@aliases setPath,H5S_source,character-method
@@ -547,11 +538,7 @@ internalDim = function(h5d) {
 #' @param object H5S_source instance
 #' @return a data frame with response
 #' @examples 
-<<<<<<< HEAD
-#' hsdsCon = H5S_source("http://52.4.181.237:5101") # hsds server connection
-=======
 #' hsdsCon = H5S_source(URL_hsds()) # hsds server connection
->>>>>>> c18f6e2c50cf28f11725fa4b8ce6ba192dbe64ce
 #' hsdsInfo(hsdsCon)
 #' @aliases hsdsInfo,H5S_source-method
 #' @aliases hsdsInfo
@@ -583,13 +570,8 @@ setMethod("hsdsInfo", c("H5S_source"), function(object) {
 #' @param \dots not used
 #' @return a data frame with domains name
 #' @examples 
-<<<<<<< HEAD
-#' hsdsCon = H5S_source("http://52.4.181.237:5101") # hsds server connection
-#' setPath(hsdsCon, "/home/reshg/")-> hsds
-=======
 #' hsdsCon = H5S_source(URL_hsds()) # hsds server connection
 #' setPath(hsdsCon, "/home/stvjc/")-> hsds
->>>>>>> c18f6e2c50cf28f11725fa4b8ce6ba192dbe64ce
 #' domains(hsds)
 #' @docType methods
 #' @aliases domains,H5S_source-method
@@ -620,13 +602,8 @@ setMethod("domains", c("H5S_source"), function(object, ...) {
 #'@param object instance of H5S_source(updated object with path to file set)
 #'@return character of dataset uuid obtained 
 #'@examples
-<<<<<<< HEAD
-#'hsdsCon = H5S_source("http://52.4.181.237:5101") # hsds server
-#'setPath(hsdsCon, "/home/reshg/tenx_full2.h5")-> hsds
-=======
 #'hsdsCon = H5S_source(URL_hsds()) # hsds server
 #'setPath(hsdsCon, "/home/stvjc/tenx_full.h5")-> hsds
->>>>>>> c18f6e2c50cf28f11725fa4b8ce6ba192dbe64ce
 #'getDatasetUUIDs(hsds)
 #'@export
 getDatasetUUIDs <- function(object) {
@@ -641,13 +618,8 @@ getDatasetUUIDs <- function(object) {
 #'@param object instance of H5S_source(updated object with path to file set)
 #'@return list of data obtained
 #'@examples
-<<<<<<< HEAD
-#'hsdsCon = H5S_source("http://52.4.181.237:5101") # hsds server
-#'setPath(hsdsCon, "/home/reshg/tenx_full2.h5")-> hsds
-=======
 #'hsdsCon = H5S_source(URL_hsds()) # hsds server
 #'setPath(hsdsCon, "/home/stvjc/tenx_full.h5")-> hsds
->>>>>>> c18f6e2c50cf28f11725fa4b8ce6ba192dbe64ce
 #'getDatasetAttrs(hsds)
 #'@export
 getDatasetAttrs <- function(object) {
@@ -663,13 +635,8 @@ getDatasetAttrs <- function(object) {
 #'@param object instance of H5S_source(updated object with path to file set)
 #'@return numeric content of dimensions
 #'@examples
-<<<<<<< HEAD
-#'hsdsCon = H5S_source("http://52.4.181.237:5101") # hsds server
-#'setPath(hsdsCon, "/home/reshg/tenx_full2.h5")-> hsds
-=======
 #'hsdsCon = H5S_source(URL_hsds()) # hsds server
 #'setPath(hsdsCon, "/home/stvjc/tenx_full.h5")-> hsds
->>>>>>> c18f6e2c50cf28f11725fa4b8ce6ba192dbe64ce
 #'getDims(hsds)
 #'@export
 getDims <- function(object) {
@@ -681,13 +648,8 @@ getDims <- function(object) {
 #'@param object instance of H5S_source(updated object with path to file set)
 #'@return DataFrame of data obtained
 #'@examples
-<<<<<<< HEAD
-#'hsdsCon = H5S_source("http://52.4.181.237:5101") # hsds server
-#'setPath(hsdsCon, "/home/reshg/tenx_full2.h5")-> hsds
-=======
 #'hsdsCon = H5S_source(URL_hsds()) # hsds server
 #'setPath(hsdsCon, "/home/stvjc/tenx_full.h5")-> hsds
->>>>>>> c18f6e2c50cf28f11725fa4b8ce6ba192dbe64ce
 #'getHRDF(hsds)
 #'@export
 getHRDF <- function(object) {
@@ -702,13 +664,8 @@ getHRDF <- function(object) {
 #'@param object instance of H5S_source(updated object with path to file set)
 #'@return H5S_dataset object
 #'@examples
-<<<<<<< HEAD
-#'hsdsCon = H5S_source("http://52.4.181.237:5101") # hsds server
-#'setPath(hsdsCon, "/home/reshg/tenx_full2.h5")-> hsds
-=======
 #'hsdsCon = H5S_source(URL_hsds()) # hsds server
 #'setPath(hsdsCon, "/home/stvjc/tenx_full.h5")-> hsds
->>>>>>> c18f6e2c50cf28f11725fa4b8ce6ba192dbe64ce
 #'H5S_dataset2(hsds)
 #'@export
 H5S_dataset2 = function(object) {
