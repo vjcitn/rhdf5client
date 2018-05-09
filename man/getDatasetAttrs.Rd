@@ -16,7 +16,7 @@ list of data obtained
 getDatasetAttrs from hsds server
 }
 \examples{
-hsdsCon = H5S_source("http://149.165.156.12:5101") # hsds server
-setPath(hsdsCon, "/home/reshg/tenx_full2.h5")-> hsds
+hsdsCon = H5S_source(URL_hsds()) # hsds server
+setPath(hsdsCon, "/home/stvjc/tenx_full.h5")-> hsds
 getDatasetAttrs(hsds)
 }
