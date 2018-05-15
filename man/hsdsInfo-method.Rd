@@ -18,6 +18,6 @@ a data frame with response
 HSDS server get request accessor
 }
 \examples{
-hsdsCon = H5S_source("http://149.165.156.12:5101") # hsds server connection
+hsdsCon = H5S_source(URL_hsds()) # hsds server connection
 hsdsInfo(hsdsCon)
 }
