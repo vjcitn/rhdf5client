@@ -94,13 +94,14 @@ setMethod("matrixClass", "H5S_Array", function(x) "H5S_Matrix")
 
 #' coercion for remote array to remote matrix
 #' @rdname H5S_Array-class
+#' @importFrom DelayedArray new_DelayedArray
 #' @aliases coerce,H5S_Array,H5S_Matrix-method
 #' @export
 setAs("H5S_Array", "H5S_Matrix", function(from)
    new("H5S_Matrix", from))
 
 setMethod("DelayedArray", "H5S_ArraySeed",
-   function(seed) DelayedArray:::new_DelayedArray(seed, Class="H5S_Array"))
+   function(seed) new_DelayedArray(seed, Class="H5S_Array"))
 
 #' create H5S_Array instance given url (filepath) and entity (host) name
 #' @param filepath a character(1) URL to port for HDF Server
