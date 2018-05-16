@@ -18,6 +18,7 @@ output:
 suppressPackageStartupMessages({
 suppressMessages({
 library(rhdf5client)
+library(BiocStyle)
 library(DT)
 library(DelayedArray)
 })
