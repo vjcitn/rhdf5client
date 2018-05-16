@@ -159,7 +159,6 @@ a paged high-level document on numpy to the session.
 We'll start with imports of key R and python packages.
 ```{r initcomp}
 library(reticulate)
-skl = import("sklearn", convert=FALSE)
 np = import("numpy", convert=FALSE)
 h5py = import("h5py", convert=FALSE)
 ```
@@ -184,7 +183,7 @@ facilitate manipulation of an HDF5 _dataset_ in R via numpy.
 h5file = function( file )
   Rh5py$files$File( file )
 
-fn = system.file("ban_6_17/assays.h5", package="BiocSklearn")
+fn = system.file("hdf5/numiris.h5", package="rhdf5client")
 m1 = h5file(fn)
 m1
 class(m1)
@@ -199,7 +198,7 @@ m1$keys()
 The `h5dsref` function was devised to give convenient
 access to a dataset representing a matrix.
 ```{r domr}
-h5dsref = function(filename, dsname="assay001") {
+h5dsref = function(filename, dsname="numiris") {
   py_run_string("import h5py", convert=FALSE)
   py_run_string(paste0("f = h5py.File('", filename, "')"))
   mref = py_run_string(paste0("g = f['", dsname, "']"))
@@ -211,22 +210,22 @@ We'll focus on the `h5dsref` approach for now.
 We can get slices of the target array using
 numpy's `take`.
 ```{r mkref}
-ban = h5dsref(fn)
+numir = h5dsref(fn)
 ta = np$take  # can't use `$` on the fly
-bansli = ta(ban, 0:20, 0L)
-class(bansli)
-bansli
+numirsli = ta(numir, 0:2, 1L)
+class(numirsli)
+numirsli
 ```
 
-So `bansli` is a submatrix of the Banovich excerpt
+So `numirsli` is a submatrix of the iris data
 in `r fn`, with class `numpy.ndarray`.  We
 can learn about available methods using `names`,
 and try some out.
 ```{r reflec}
-names(bansli)
-bansli$ndim
-bansli$shape
-bansli$T$shape
+names(numirsli)
+numirsli$ndim
+numirsli$shape
+numirsli$T$shape
 ```
 
 Furthermore, we can create an R matrix with the
@@ -234,7 +233,7 @@ HDF5 numerical content as sliced via `take` using
 `py_to_r` from reticulate:
 
 ```{r tx}
-dim(py_to_r(bansli)) # all in R
+dim(py_to_r(numirsli)) # all in R
 ```
 
 Thus, given an HDF5 dataset that can
