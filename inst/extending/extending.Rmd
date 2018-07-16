@@ -1,0 +1,168 @@
+---
+title: "Extending rhdf5client to cope with more HDF5 details"
+author: "Vincent J. Carey, stvjc at channing.harvard.edu"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Extending rhdf5client to cope with more HDF5 details}
+  %\VignetteEncoding{UTF-8}
+output:
+  BiocStyle::html_document:
+    highlight: pygments
+    number_sections: yes
+    theme: united
+    toc: yes
+---
+
+```{r setup,echo=FALSE,results="hide"}
+suppressPackageStartupMessages({
+suppressMessages({
+library(rhdf5client)
+library(BiocStyle)
+})
+})
+```
+
+# Introduction
+
+Access to HSDS in AWS will end Aug 1 2018.  HDFlab must be
+used.  I am focusing for the moment on HDF Server that we
+have control over.  HSDS will become open source at the end
+of 2018. 
+
+In its current form `r Biocpkg("rhdf5client")` is focused on
+providing access to HDF5 datasets corresponding to R matrices.
+The test data, provided by HDF Group, for HDF Server illustrates many
+aspects of data structure, data type, and server operations,
+that rhdf5client does not address.  
+
+We do not have to be comprehensive in our client design but
+it would be good to address a few more functionalities.  For
+example I do not think we have code that allows management of
+a vector as opposed to a matrix.  And our code is not cleanly
+factored into server operations, data access, and R interfacing.
+
+```{r basic, echo=FALSE, results="hide"}
+library(httr)
+library(rjson)
+
+setClass("H5S_dsattrs", representation(attrs="list",
+   src="H5S_source", hrefVec="character", theCall="ANY"))
+setMethod("show", "H5S_dsattrs", function(object) {
+ cat("H5S_dsattrs instance:\n")
+ cat("shape.dims:\n ")
+ print(object@attrs$shape$dims)
+ hrnames = names(object@hrefVec)
+ if ("preview" %in% hrnames) cat("A preview URL string is available with prevURL().\n")
+})
+
+prevURL = function(x) {
+  hr = slot(x, "hrefVec")
+  if (!("preview" %in% names(hr))) return(NA)
+  hr["preview"]
+}
+
+H5S_attr_for_host = function(h5src, pattern, prefix="", postfix="") {
+  meta = dsmeta(h5src) # acquires all "host" names in all groups
+  dsn = meta[,2] # CharacterList
+  ans = lapply(dsn, function(x) grep(pattern, x))
+  lens = sapply(ans, length)
+  nfi = sum(lens>0)
+  if (nfi==0) stop("pattern not found")
+  if (nfi>1) {
+     message("pattern found in multiple hosts")
+     print(grep(pattern, unlist(dsn[which(lens>0)]), value=TRUE))
+     message("please refine the pattern used to select the host of interest")
+     message("returning NULL")
+     return(NULL)
+     }
+  ind = which(lens>0)
+  hostn = dsn[[ind]][ans[[ind]]]
+  if (nchar(postfix)>0 | nchar(prefix)>0) hostn=paste0(prefix, hostn, postfix)
+  dsreq = sprintf("%s/datasets?%s", .serverURL(h5src), hostn)
+  c1 = transl(dsreq)
+  dsuuid = c1$datasets
+  if (length(dsuuid)!=1) {
+   message("there are multiple dataset UUIDs for this request")
+   message("returning a list of H5S_dsattrs instances")
+   return(lapply(dsuuid, function(x) try(.uuidProc(h5src, hostn, x))))
+   }
+  .uuidProc(h5src=h5src, hostn=hostn, dsuuid=dsuuid)
+}
+.uuidProc = function(h5src, hostn, dsuuid) {
+  attreq = sprintf("%s/datasets/%s?%s", .serverURL(h5src), dsuuid, hostn)
+  a1 = transl(attreq)
+  hrefs = sapply(a1$hrefs, "[[", "href")
+  names(hrefs) = sapply(a1$hrefs, "[[", "rel")
+#  list(atts=a1, src=h5src, theCall=match.call(), hrefs=hrefs)
+  new("H5S_dsattrs", attrs=a1, src=h5src, theCall=match.call(),
+     hrefVec=hrefs)
+}
+
+setGeneric("getSlice", function(h5src, pattern, indxExpr)
+   standardGeneric("getSlice"))
+
+setMethod("getSlice", c("H5S_source", "character", "character"),
+  function(h5src, pattern, indxExpr) {
+   atts = H5S_attr_for_host(h5src, pattern)
+   if (is(atts, "list")) {
+    message("pattern does not identify unique dataset, returning list of attribute sets")
+    return(atts)
+    }
+   prev = prevURL(atts)
+   req = sub("select=..*", paste0("select=", indxExpr), prev)
+   transl(req)$value
+  })
+ 
+setMethod("getSlice", c("H5S_dsattrs", "missing", "character"),
+  function(h5src, pattern, indxExpr) {
+   atts = h5src 
+   prev = prevURL(atts)
+   if (is.na(prev)) {
+     if ("data" %in% names(slot(atts, "hrefVec")))
+       req = paste0(slot(atts, "hrefVec")["data"], "&select=", 
+              indxExpr)
+     else stop("no preview URL or 'data' href in this dataset attrs set")
+    }
+   else req = sub("select=..*", paste0("select=", indxExpr), prev)
+   transl(req)$value
+  })
+ 
+
+#> pp[[1]]@attrs$type$base
+#[1] "H5T_STD_I16LE"
+#> pp[[2]]@attrs$type$base
+#[1] "H5T_IEEE_F64BE"
+#> pp[[3]]@attrs$type$base
+#[1] "H5T_IEEE_F32LE"
+```
+
+# A new class that 'simplifies' some additional tasks
+
+This document defines a class that manages dataset attributes
+as defined by HDF Server.
+```{r lkcl}
+getClass("H5S_dsattrs")
+```
+
+We can generate an instance of this class for the GTEx data,
+and take a relatively unprocessed slice of the content.
+```{r dotiss}
+tissatt = H5S_attr_for_host( ss, "tissues", 
+    prefix="host=", postfix=".h5s.channingremotedata.org")
+tissatt
+getSlice(tissatt,,"[0:5:1,0:3:1]")
+```
+
+This would seem to be a step backwards.  However, we
+can get access to more complicated HDF5 data in
+this way.
+
+```{r doattdt}
+lkdt = H5S_attr_for_host( ss, "datatypes.datasettest.test", prefix="host=", postfix=".h5s.channingremotedata.org")
+t(sapply(lkdt, function(x) x@attrs$type))
+```
+
+We can also take slices of vectors.
+
+
