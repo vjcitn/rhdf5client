@@ -318,14 +318,20 @@ transl = function(targ)  {
 # private: get numeric content from host by binary transfer
 # param targ is the URL with query
 # param nele is the number of numeric elements expected
-bintransl = function(targ, nele)  {  
+bintransl = function(targ, nele, h5typ)  {  
   rsp <- GET(targ, add_headers(Accept="application/octet-stream"))
   if (rsp$status_code != 200)  
     stop(paste("error: can't read binary ", targ, sep=""))
 
-  # TODO: need to check the HDF5 class for size and byte order
-  readBin(rsp$content, what="integer", n = nele, size = NA_integer_, 
-    signed = TRUE, endian = "little")
+  if (h5typ == "H5T_IEEE_I32LE")  {
+    readBin(rsp$content, what="integer", n = nele, size = NA_integer_, 
+      signed = TRUE, endian = "little")
+  } else if (h5typ == "H5T_IEEE_F64LE")  {
+    readBin(rsp$content, what="double", n = nele, size = 8, 
+      signed = TRUE, endian = "little")
+  } else  {
+    stop(paste0("error: unrecognized data type in binary transfer: ", h5typ))
+  }
 }
 
 # private: get numeric content from host by JSON transfer
@@ -459,9 +465,11 @@ setMethod("[", c("H5S_dataset", "character", "character"), function(x, i, j, ...
   nele <- nrow*ncol    
   uu = sub("%%SEL1%%", i, uu)
   uu = sub("%%SEL2%%", j, uu)
-  if ( x@allatts$type$base == "H5T_STD_I32LE" & x@transfermode == "binary" )  {
+  h5typ <- x@allatts$type$base
+  if ( ( h5typ == "H5T_IEEE_I32LE" | h5typ == "H5T_IEEE_F64LE" ) & 
+         x@transfermode == "binary" )  {
     # message(paste("binary transfer", sep=""))
-    val <- bintransl(uu, nele)
+    val <- bintransl(uu, nele, h5typ)
   }
   else  {
     # message(paste("JSON transfer", sep=""))
