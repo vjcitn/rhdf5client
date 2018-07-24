@@ -349,14 +349,21 @@ jsontransl = function(uu, nele)  {
 
 #private : to check if the server being called is hsds or h5serv
 serverVersion <- function(serverURL = serverURL){
-  serverResponse = fromJSON(file=serverURL)
-  if("root" %in% attributes(serverResponse)$names){
-    flag = 1   ### This is a h5serv
-    return(flag)
+  #validURL = url.exists(serverURL)
+  if(httr::http_status(GET(serverURL))$reason == "OK"){
+    serverResponse = fromJSON(file=serverURL)
+    if("root" %in% attributes(serverResponse)$names){
+      flag = 1   ### This is a h5serv
+      return(flag)
+    }
+    else{ 
+      flag = 2   ### This is a hsds server
+      return(flag)
+    }
   }
-  else{ 
-    flag = 2   ### This is a hsds server
-    return(flag)
+  else{
+    flag = 2
+    return(flag) # this is the new hsds server
   }
   
 }
@@ -556,7 +563,8 @@ internalDim = function(h5d) {
 #' @exportMethod hsdsInfo
 setGeneric("hsdsInfo", function(object) standardGeneric("hsdsInfo"))
 setMethod("hsdsInfo", c("H5S_source"), function(object) {
-  target = paste0(.serverURL(object))
+  #target = paste0(.serverURL(object))
+  target = paste0(.serverURL(object),"/domains")
   ans = transl(target) # fromJSON(readBin(GET(target)$content, w="character"))
   
   if (length(ans$domains)<1)  { 
