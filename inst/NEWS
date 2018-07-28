@@ -1,1 +1,2 @@
 Things new in version 0.99.0:
+Functionality to access HSDS datasets using rhdf5client
