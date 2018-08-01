@@ -60,14 +60,15 @@ that is a list with ith element a character vector of all dsnames
 available for the ith group.  There is no effort at present to
 search all groups for candidate datasets.
 
-If the domain for the HSDS server is known, pass the domain path as a character string along with ther serverURL
+If the domain for the HSDS server is known, 
+pass the domain path as a character string along with ther serverURL
 }
 \examples{
 bigec2 = H5S_source(URL_h5serv()) # h5serv 
 bigec2
 dsmeta(bigec2)[1:2,]       # two groups
 dsmeta(bigec2)[1,2][[1]]   # all dataset candidates in group 1
-hsdsCon = H5S_source(URL_hsds()) # hsds server connection, note : if the domain is known, pass as character string
+hsdsCon = H5S_source(URL_hsds()) # hsds server connection
 hsdsCon
 getReq(hsdsCon)
 }
