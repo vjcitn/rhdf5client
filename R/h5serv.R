@@ -626,14 +626,18 @@ getDatasetUUIDs <- function(object) {
 
 #'getDatasetAttrs from hsds server
 #'@param object instance of H5S_source(updated object with path to file set)
+#'@param duid character string with dataset uuid
 #'@return list of data obtained
 #'@examples
 #'hsdsCon = H5S_source(URL_hsds()) # hsds server
-#'setPath(hsdsCon, "/home/stvjc/hdf5_mat.h5")-> hsds
-#'getDatasetAttrs(hsds)
+#'hsdsCon@folderPath="/home/stvjc/hdf5_mat.h5"
+#'ds = fetchDatasets(hsdsCon)
+#'ds$datasets # Pick the ID of the dataset you are interested in
+#'getDatasetAttrs(hsdsCon, "d-a9e4b71c-8ea2-11e8-9306-0242ac120022")
 #'@export
-getDatasetAttrs <- function(object) {
-  uu = getDatasetUUIDs(object)
+getDatasetAttrs <- function(object, duid) {
+  #uu = getDatasetUUIDs(object)
+  uu = duid
   query = sprintf("%s/datasets/%s?host=%s", object@serverURL, uu, object@folderPath)
   ans = try(GET(query))   ## is this going to do GET request only for one url? what if the there are multiple datasets in the file?
   if (inherits(ans, "try-error")) stop("could not resolve datasets query")
@@ -656,15 +660,18 @@ getDims <- function(object) {
 
 #'getHRDF from hsds server
 #'@param object instance of H5S_source(updated object with path to file set)
+#'@param duid character string with dataset uuid
 #'@return DataFrame of data obtained
 #'@examples
 #'hsdsCon = H5S_source(URL_hsds()) # hsds server
-#'setPath(hsdsCon, "/home/stvjc/hdf5_mat.h5")-> hsds
-#'getHRDF(hsds)
+#'hsdsCon@folderPath="/home/stvjc/hdf5_mat.h5"
+#'ds = fetchDatasets(hsdsCon)
+#'ds$datasets # Pick the ID of the dataset you are interested in
+#'getHRDF(hsdsCon, "d-a9e4b71c-8ea2-11e8-9306-0242ac120022")
 #'@export
-getHRDF <- function(object) {
+getHRDF <- function(object, duid) {
   stopifnot(is(object, "H5S_source"))
-  atts = getDatasetAttrs(object)
+  atts = getDatasetAttrs(object, duid)
   nms = sapply(atts$hrefs, "[[", "rel")
   vals = sapply(atts$hrefs, "[[", "href")
   DataFrame(hrefName=nms, hrefValue=vals)
@@ -672,21 +679,26 @@ getHRDF <- function(object) {
 
 #'H5S_dataset2 for datasets in hsds server
 #'@param object instance of H5S_source(updated object with path to file set)
+#'@param duid character vector with dataset uuid of interest
 #'@return H5S_dataset object
 #'@examples
 #'hsdsCon = H5S_source(URL_hsds()) # hsds server
-#'setPath(hsdsCon, "/home/stvjc/hdf5_mat.h5")-> hsds
-#'H5S_dataset2(hsds)
+#'hsdsCon@folderPath="/home/stvjc/hdf5_mat.h5"
+#'ds = fetchDatasets(hsdsCon)
+#'ds$datasets # Pick the ID of the dataset you are interested in
+#'H5S_dataset2(hsdsCon, "d-a9e4b71c-8ea2-11e8-9306-0242ac120022")
 #'@export
-H5S_dataset2 = function(object) {
+H5S_dataset2 = function(object, duid) {
   src = new("H5S_source", serverURL=object@serverURL, dsmeta=DataFrame())
-  atts = getDatasetAttrs(object)
-  ans = getHRDF(object)
+  atts = getDatasetAttrs(object, duid)
+  ans = getHRDF(object, duid)
   rownames(ans) = ans[,1]
   self = ans["self", "hrefValue"]
   prep = sub("\\?host=", "/value?host=", self)
   prep = paste0(prep, "&select=[%%SEL1%%,%%SEL2%%]")
-  new("H5S_dataset", source=src, simpleName=object@folderPath, shapes=atts$shape,
+  #url = paste0(object@serverURL,"datasets/",duid,"?host=",object@folderPath)
+  #res = fromJSON(content(GET(url,"text")))
+  new("H5S_dataset", source=src, simpleName=object@folderPath, shapes=res$shape,
       hrefs = ans, allatts=atts, presel=prep, transfermode="JSON")
 }
 
@@ -710,3 +722,47 @@ getDatasetSlice <- function(object, dsindex=1, selectionString, ...) {
   if (inherits(ans, "try-error")) stop("could not resolve select query")
   fromJSON(readBin( ans$content, what="character"))
 }
+
+#'fetch datasets of a hdf5 file from the hsds server
+#'@param object instance of H5S_source
+#'@examples
+#'hsdsCon = H5S_source(URL_hsds()) # hsds server
+#'hsdsCon@folderPath="/home/stvjc/hdf5_mat.h5"
+#'ds = fetchDatasets(hsdsCon)
+#'ds$datasets
+#'@export
+fetchDatasets <- function(object){
+  hdf5DataStore <- R6Class("hdf5DataStore", list(
+    serverURL="",
+    domain="",
+    rootgroup="",
+    initialize=function(serverURL=NA, domain=NA){
+      self$serverURL=serverURL;
+      self$domain=domain;
+      temp=fromJSON(content(GET(paste0(serverURL,"/domains?domain=",domain)),"text"))
+      self$rootgroup=temp$domains[[1]]$root
+      self$updateDatasets(temp$domains[[1]]$root, domain)
+    },
+    datasets=data.frame(),
+    updateDatasets=function(group, domain){
+      url=paste0(self$serverURL,"/groups/",group,"/links?domain=",domain)
+      a=fromJSON(content(GET(url),"text"))$links
+      for(i in 1:length(a)){
+        a[[i]]$domain=domain
+        if("collection" %in% names(a[[i]])){
+          if(a[[i]]$collection=="datasets"){
+            if(nrow(self$datasets)<1){
+              self$datasets=as.data.frame(a[[i]],stringsAsFactors=FALSE)}else{
+                self$datasets=rbind(self$datasets,
+                                    as.data.frame(a[[i]],stringsAsFactors=FALSE))}
+          }else{
+            self$updateDatasets(a[[i]]$id,domain)
+          }
+        }
+      }
+    }
+  ))
+  myDS=hdf5DataStore$new(object@serverURL, object@folderPath)
+  myDS
+}
+
