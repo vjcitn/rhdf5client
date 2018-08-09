@@ -97,7 +97,7 @@ H5S_source = function(serverURL, domain, ...) {
     get <- hsdsInfo(tmp)
     get.df <- DataFrame(get)
     obj <- new("H5S_source",serverURL=serverURL, getReq=get.df, folderPath=domain)
-    H5S_dataset2(obj)
+    #H5S_dataset2(obj)
   }
 }
 
@@ -574,7 +574,6 @@ setMethod("hsdsInfo", c("H5S_source"), function(object) {
   
 })
 
-
 #' HSDS server domains accessor
 #' @param object H5S_source instance
 #' @param \dots not used
@@ -631,8 +630,7 @@ getDatasetUUIDs <- function(object) {
 #'@examples
 #'hsdsCon = H5S_source(URL_hsds()) # hsds server
 #'hsdsCon@folderPath="/home/stvjc/hdf5_mat.h5"
-#'ds = fetchDatasets(hsdsCon)
-#'ds$datasets # Pick the ID of the dataset you are interested in
+#'ds = fetchDatasets(hsdsCon)# Pick the ID of the dataset you are interested in
 #'getDatasetAttrs(hsdsCon, "d-a9e4b71c-8ea2-11e8-9306-0242ac120022")
 #'@export
 getDatasetAttrs <- function(object, duid) {
@@ -665,8 +663,7 @@ getDims <- function(object) {
 #'@examples
 #'hsdsCon = H5S_source(URL_hsds()) # hsds server
 #'hsdsCon@folderPath="/home/stvjc/hdf5_mat.h5"
-#'ds = fetchDatasets(hsdsCon)
-#'ds$datasets # Pick the ID of the dataset you are interested in
+#'ds = fetchDatasets(hsdsCon) #Pick the ID of the dataset you are interested in
 #'getHRDF(hsdsCon, "d-a9e4b71c-8ea2-11e8-9306-0242ac120022")
 #'@export
 getHRDF <- function(object, duid) {
@@ -684,8 +681,7 @@ getHRDF <- function(object, duid) {
 #'@examples
 #'hsdsCon = H5S_source(URL_hsds()) # hsds server
 #'hsdsCon@folderPath="/home/stvjc/hdf5_mat.h5"
-#'ds = fetchDatasets(hsdsCon)
-#'ds$datasets # Pick the ID of the dataset you are interested in
+#'ds = fetchDatasets(hsdsCon) #Pick the dataset id of interest
 #'H5S_dataset2(hsdsCon, "d-a9e4b71c-8ea2-11e8-9306-0242ac120022")
 #'@export
 H5S_dataset2 = function(object, duid) {
@@ -696,8 +692,8 @@ H5S_dataset2 = function(object, duid) {
   self = ans["self", "hrefValue"]
   prep = sub("\\?host=", "/value?host=", self)
   prep = paste0(prep, "&select=[%%SEL1%%,%%SEL2%%]")
-  #url = paste0(object@serverURL,"datasets/",duid,"?host=",object@folderPath)
-  #res = fromJSON(content(GET(url,"text")))
+  url = paste0(object@serverURL,"/datasets/",duid,"?host=",object@folderPath)
+  res = fromJSON(content(GET(url),"text"))
   new("H5S_dataset", source=src, simpleName=object@folderPath, shapes=res$shape,
       hrefs = ans, allatts=atts, presel=prep, transfermode="JSON")
 }
@@ -724,6 +720,8 @@ getDatasetSlice <- function(object, dsindex=1, selectionString, ...) {
 }
 
 #'fetch datasets of a hdf5 file from the hsds server
+#'@import R6
+#'@import httr
 #'@param object instance of H5S_source
 #'@examples
 #'hsdsCon = H5S_source(URL_hsds()) # hsds server
@@ -763,6 +761,6 @@ fetchDatasets <- function(object){
     }
   ))
   myDS=hdf5DataStore$new(object@serverURL, object@folderPath)
-  myDS
+  myDS$datasets
 }
 
