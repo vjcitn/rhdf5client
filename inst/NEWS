@@ -1,1 +1,3 @@
 Things new in version 0.99.0:
+Functionality to handle multiple datasets in a hdf5 file
+Functionality to access HSDS datasets using rhdf5client

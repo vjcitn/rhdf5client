@@ -4,10 +4,12 @@
 \alias{getHRDF}
 \title{getHRDF from hsds server}
 \usage{
-getHRDF(object)
+getHRDF(object, duid)
 }
 \arguments{
 \item{object}{instance of H5S_source(updated object with path to file set)}
+
+\item{duid}{character string with dataset uuid}
 }
 \value{
 DataFrame of data obtained
@@ -17,6 +19,7 @@ getHRDF from hsds server
 }
 \examples{
 hsdsCon = H5S_source(URL_hsds()) # hsds server
-setPath(hsdsCon, "/home/stvjc/tenx_full.h5")-> hsds
-getHRDF(hsds)
+hsdsCon@folderPath="/home/stvjc/hdf5_mat.h5"
+ds = fetchDatasets(hsdsCon) #Pick the ID of the dataset you are interested in
+getHRDF(hsdsCon, "d-a9e4b71c-8ea2-11e8-9306-0242ac120022")
 }
