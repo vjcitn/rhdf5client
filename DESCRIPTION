@@ -15,7 +15,7 @@ Depends: R (>= 3.5), methods, DelayedArray
 License: Artistic-2.0
 LazyLoad: yes
 BiocViews: infrastructure
-RoxygenNote: 6.0.1.9000
+RoxygenNote: 6.1.0
 Collate: h5serv.R indx.R H5S_Array.R HSDS_Matrix.R
 VignetteBuilder: knitr
 biocViews: DataImport, Software
