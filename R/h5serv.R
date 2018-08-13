@@ -657,7 +657,7 @@ getDatasetAttrs <- function(object, duid) {
 #'@examples
 #'hsdsCon = H5S_source(URL_hsds()) # hsds server
 #'setPath(hsdsCon, "/home/stvjc/hdf5_mat.h5")-> hsds
-#'getDims(hsds)
+#\dontrun{'getDims(hsds)}
 #'@export
 getDims <- function(object) {
   stopifnot(is(object, "H5S_source"))
@@ -715,7 +715,7 @@ H5S_dataset2 = function(object, duid) {
 #'@examples
 #'hsdsCon = H5S_source(URL_hsds()) # hsds server
 #'setPath(hsdsCon, "/home/stvjc/hdf5_mat.h5")-> hsds
-#'getDatasetSlice(hsds,dsindex=1,selectionString="[1:10,1:50]")
+#'getDatasetSlice(hsds,dsindex=1,selectionString="[1:2,1:5]")
 #'@export
 getDatasetSlice <- function(object, dsindex=1, selectionString, ...) {
   requireNamespace("httr")

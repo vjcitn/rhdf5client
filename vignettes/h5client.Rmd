@@ -120,8 +120,8 @@ The string `/home/stvjc` used below reflects a specific
 setup of data on the server, it is not a "user folder" on any system.
 ```{r doos}
 con = H5S_source(URL_hsds())   
-con = setPath(con, "/home/stvjc/tenx_full.h5") # this is as defined in store
-ds2 = H5S_dataset2(con)
+con = setPath(con, "/home/stvjc/assays.h5") # this is as defined in store
+ds2 = H5S_dataset2(con, 'd-42062836-999e-11e8-8212-0242ac120016')
 ds2
 ```
 
@@ -277,11 +277,11 @@ used below.
 ```{r getpd}
 if (.Platform$OS.type != "windows")  {
 Rh5pyd = import("h5pyd", as="h5py", convert=FALSE)
-tenx_remote = Rh5pyd$File("/home/stvjc/tenx_full.h5", "r",
+assays = Rh5pyd$File("/home/stvjc/assays.h5", "r",
      endpoint=URL_hsds())
-tenx_remote
-tenx_remote$keys() # only python
-py_to_r(tenx_remote$keys()) # the strings of interest
+assays
+assays$keys() # only python
+py_to_r(assays$keys()) # the strings of interest
 }
 ```
 
@@ -300,7 +300,7 @@ getslice = function(endpoint, mode, domain, dsname, indexstring="[0,0]") {
    py_run_string(paste0("g = f['", dsname, "']", indexstring))$g
 }
 mr = getslice(URL_hsds(), "r", 
-   "/home/stvjc/tenx_full.h5", "newassay001", "[0:4, 0:27998]")
+   "/home/stvjc/assays.h5", "assay001", "[0:4, 0:27998]")
 apply(mr,1,sum)
 }
 ```
@@ -316,6 +316,7 @@ R session, no problem arises.
 ```{r dosl2, eval=FALSE}
 if (.Platform$OS.type != "windows")  {
 hh = import("h5pyd", as="h5py") # avoid auth problem?
+obsolete server
 mr = getslice(URL_h5serv(), "r",
    "tenx_full.h5s.channingremotedata.org", "newassay001", "[0:4, 0:27998]")
 apply(mr,1,sum)
@@ -402,10 +403,10 @@ nf$create_dataset('irisH5', data=r_to_py(irmat))
 }
 ```
 We can read back with:
-```{r lkrrrr}
+```{r lkrrrr,eval=FALSE}
 if (.Platform$OS.type != "windows")  {
 getslice(URL_hsds(), mode="r",
-   domain="/home/stvjc/iris_demo.h5", "irisH5", "[0:3, 0:3]")
+   domain="/home/stvjc/iris_mat.h5", "irisH5", "[0:3, 0:3]")
 }
 ```
 

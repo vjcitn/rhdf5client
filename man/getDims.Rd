@@ -18,5 +18,4 @@ getDims from hsds server
 \examples{
 hsdsCon = H5S_source(URL_hsds()) # hsds server
 setPath(hsdsCon, "/home/stvjc/hdf5_mat.h5")-> hsds
-getDims(hsds)
 }
