@@ -657,7 +657,7 @@ getDatasetAttrs <- function(object, duid) {
 #'@examples
 #'hsdsCon = H5S_source(URL_hsds()) # hsds server
 #'setPath(hsdsCon, "/home/stvjc/hdf5_mat.h5")-> hsds
-#\dontrun{'getDims(hsds)}
+#'\dontrun{getDims(hsds)}
 #'@export
 getDims <- function(object) {
   stopifnot(is(object, "H5S_source"))
