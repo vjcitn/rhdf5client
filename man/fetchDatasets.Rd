@@ -9,6 +9,9 @@ fetchDatasets(object)
 \arguments{
 \item{object}{instance of H5S_source}
 }
+\value{
+data.frame with information about the datasets in the file
+}
 \description{
 fetch datasets of a hdf5 file from the hsds server
 }
@@ -16,5 +19,5 @@ fetch datasets of a hdf5 file from the hsds server
 hsdsCon = H5S_source(URL_hsds()) # hsds server
 hsdsCon@folderPath="/home/stvjc/hdf5_mat.h5"
 ds = fetchDatasets(hsdsCon)
-ds$datasets
+ds
 }

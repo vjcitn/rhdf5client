@@ -4,10 +4,12 @@
 \alias{getDims}
 \title{getDims from hsds server}
 \usage{
-getDims(object)
+getDims(object, duid)
 }
 \arguments{
 \item{object}{instance of H5S_source(updated object with path to file set)}
+
+\item{duid}{character string with dataset uuid}
 }
 \value{
 numeric content of dimensions
@@ -18,4 +20,5 @@ getDims from hsds server
 \examples{
 hsdsCon = H5S_source(URL_hsds()) # hsds server
 setPath(hsdsCon, "/home/stvjc/hdf5_mat.h5")-> hsds
+getDims(hsds, duid)
 }
