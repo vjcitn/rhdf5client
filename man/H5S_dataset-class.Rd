@@ -4,10 +4,10 @@
 \name{H5S_dataset}
 \alias{H5S_dataset}
 \alias{H5S_dataset-class}
-\alias{[,H5S_dataset,numeric,numeric-method}
+\alias{[,H5S_dataset,numeric,numeric,ANY-method}
 \title{extract elements from H5S_dataset}
 \usage{
-\S4method{[}{H5S_dataset,numeric,numeric}(x, i, j, ..., drop = FALSE)
+\S4method{[}{H5S_dataset,numeric,numeric,ANY}(x, i, j, ..., drop = FALSE)
 }
 \arguments{
 \item{x}{instance of H5S_dataset}

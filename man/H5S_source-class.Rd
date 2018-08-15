@@ -4,7 +4,6 @@
 \name{H5S_source}
 \alias{H5S_source}
 \alias{H5S_source-class}
-\alias{H5S_source}
 \alias{[[,H5S_source,character-method}
 \alias{dataset}
 \title{H5S_source identifies an HDF5/HSDS server and manages some metadata about contents}

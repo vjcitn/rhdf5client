@@ -127,5 +127,6 @@ setMethod("DelayedArray", "H5S_ArraySeed",
 #' #
 #' H5S_Array("http://h5s.channingremotedata.org:5000", "assays")
 #' @export
-H5S_Array = function(filepath, host) 
+H5S_Array = function(filepath, host)   {
   DelayedArray(H5S_ArraySeed(filepath, host))
+}
