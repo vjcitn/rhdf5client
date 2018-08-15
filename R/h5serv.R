@@ -660,6 +660,7 @@ getDatasetAttrs <- function(object, duid) {
 #'@examples
 #'hsdsCon = H5S_source(URL_hsds()) # hsds server
 #'setPath(hsdsCon, "/home/stvjc/hdf5_mat.h5")-> hsds
+#'duid <- 'd-a9e4b71c-8ea2-11e8-9306-0242ac120022'
 #'getDims(hsds, duid)
 #'@export
 getDims <- function(object, duid) {
