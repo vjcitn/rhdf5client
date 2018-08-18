@@ -94,46 +94,6 @@ image here has 'neurons' as 'rows'.
 ```{r getcs}
 apply(tenx_remote[1:4,1:27998],1,sum)
 ```
-
-## Using the DelayedArray infrastructure
-
-(At the moment the DelayedArray code is in restfulSE.)
-The `H5S_Array` constructor takes care of source and
-dataset navigation given the URL of the server and
-the name of the 'host', in HDF server parlance.
-```{r lkdela}
-del10x = H5S_Array(URL_h5serv(), "tenx_full")
-del10x
-```
-
-Here we have defined the R image of the data to be the
-transpose of the image in HDF5.  So neurons are columns.
-```{r lkdela2}
-apply(del10x[,1:4],2,sum)
-```
-
-## Interface to HSDS (HDF Object Store)
-
-The interface here is not mature.  The URL used
-here is a server maintained by John Readey of the HDF Group.
-The string `/home/stvjc` used below reflects a specific
-setup of data on the server, it is not a "user folder" on any system.
-```{r doos}
-con = H5S_source(URL_hsds())   
-con = setPath(con, "/home/stvjc/assays.h5") # this is as defined in store
-ds2 = H5S_dataset2(con, 'd-42062836-999e-11e8-8212-0242ac120016')
-ds2
-```
-
-Again we have DelayedArray capabilities.
-```{r lkdel3}
-library(DelayedArray)
-del10x_hsds = DelayedArray(new("H5S_ArraySeed", filepath = "", domain = "", 
-        host = "", H5S_dataset = ds2))
-del10x_hsds
-apply(del10x_hsds[,1:4], 2, sum)
-```
-
 # Interfacing R to remote or local HDF5 via h5py/h5pyd
 
 The `r CRANpkg("reticulate")` package 

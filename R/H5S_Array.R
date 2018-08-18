@@ -9,32 +9,62 @@
 # with a numeric matrix
 #
 # longrunning jan 2018
-# domain http://54.174.163.77:5000
+
+# (legacy) with h5serv omit filepath and look in dsmeta for dataset
+# endpoint URL_h5serv()
+# filepath ''
 # host tenx_full
+# With hsds pass endpoint, filepath and dataset name
+# endpoint URL_hsls()
+# filepath '/home/spollack/testzero.h5'
+# host 'dsetAA1'
+
+# TODO: 'host' is a misleading name. Change it to 'dsname' or such?
 
 #' H5S_Array for HDF Server content
 #' @import DelayedArray
 setClass("H5S_ArraySeed",
    contains="Array",
    slots = c(
+     endpoint="character",
      filepath="character",
      domain="character",
      host="character",
      H5S_dataset="H5S_dataset"
      ))
 
-H5S_ArraySeed = function(filepath, host) {
+H5S_ArraySeed = function(endpoint, filepath, host) {
   requireNamespace("rhdf5client")
-  dom = try(rhdf5client::H5S_source(filepath))
-  if (!is(dom, "H5S_source")) stop("could not resolve H5S_source request on filepath")
+  con <- try(rhdf5client::H5S_source(endpoint))
+
+  if (!is(con, "H5S_source")) stop("could not resolve H5S_source request on filepath")
 #
 # for HDF Server back end, the following invocation of [[
 # establishes the link to numerical data source
 #
-  ds = try(dom[[host]])
+
+# detect h5serv/hsds by checking for dsmeta as in H5S_source constructor 
+# TODO: revisit this decision
+
+  if (nrow(con@dsmeta)>1)  {  # h5serv
+    ds <- try(con[[host]])
+  } else  {   # hsds
+    con <- setPath(con, filepath)
+    df <- fetchDatasets(con)
+    ids <- df$id[which(df$title==host)]
+    if (length(ids) == 1)  {   
+      uuid <- ids[1]
+      ds <- H5S_dataset2(con, uuid)
+    } else if (length(ids) == 0)  {
+      stop(paste0("no such dataset ",host," in file ",filepath))
+    } else  {
+      stop(paste0("multiple datasets ",host," in file ",filepath))
+    }
+  }
+
   if (!is(ds, "H5S_dataset")) stop("could not resolve H5S_dataset request on filepath[[host]]")
-  new("H5S_ArraySeed", filepath=filepath,
-         domain=filepath, host=host, H5S_dataset=ds)
+  new("H5S_ArraySeed", endpoint=endpoint, 
+       domain=filepath, host=host, H5S_dataset=ds)
   }
 
 #' dimnames not stored with H5S_source as of Jan 2018
@@ -125,8 +155,8 @@ setMethod("DelayedArray", "H5S_ArraySeed",
 #' #
 #' # compare to that delivered by H5S_Array
 #' #
-#' H5S_Array("http://h5s.channingremotedata.org:5000", "assays")
+#' H5S_Array("http://h5s.channingremotedata.org:5000", "", "assays")
 #' @export
-H5S_Array = function(filepath, host)   {
-  DelayedArray(H5S_ArraySeed(filepath, host))
+H5S_Array = function(endpoint, filepath, host)   {
+  DelayedArray(H5S_ArraySeed(endpoint, filepath, host))
 }

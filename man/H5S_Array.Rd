@@ -4,7 +4,7 @@
 \alias{H5S_Array}
 \title{create H5S_Array instance given url (filepath) and entity (host) name}
 \usage{
-H5S_Array(filepath, host)
+H5S_Array(endpoint, filepath, host)
 }
 \arguments{
 \item{filepath}{a character(1) URL to port for HDF Server}
@@ -35,5 +35,5 @@ create H5S_Array instance given url (filepath) and entity (host) name
 #
 # compare to that delivered by H5S_Array
 #
-H5S_Array("http://h5s.channingremotedata.org:5000", "assays")
+H5S_Array("http://h5s.channingremotedata.org:5000", "", "assays")
 }

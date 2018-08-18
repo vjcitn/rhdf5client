@@ -1,0 +1,78 @@
+---
+title: "h5sarray -- DelayedArray backend for Remote HDF5"
+author: "Samuela Pollack, Shweta Gopaulakrishnan, Vincent J. Carey"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{h5client -- notes on Bioconductor and remote HDF5}
+  %\VignetteEncoding{UTF-8}
+output:
+  BiocStyle::html_document:
+    highlight: pygments
+    number_sections: yes
+    theme: united
+    toc: yes
+---
+
+```{r setup,echo=FALSE,results="hide"}
+suppressPackageStartupMessages({
+suppressMessages({
+library(rhdf5client)
+library(BiocStyle)
+library(DT)
+library(DelayedArray)
+})
+})
+```
+# Using the DelayedArray infrastructure
+
+A remote dataset is accessed by giving the URL of the server, the
+path to the HDF5 file and the name of the dataset in the file. 
+
+If the server is an h5serv instance, the filepath will be ignored and
+the dataset name looked for in all files. This is legacy behavior, 
+reflecting the fact that on the `h5s.channingremotedata.org` server 
+each dataset had its own file. 
+
+If the server is an hsds instance, the filepath should have the path and 
+name of the HDF5 file. 
+
+
+# Interface to h5serv (Channing Remote Data Server)
+
+```{r lkdela}
+del10x = H5S_Array(URL_h5serv(), '', "tenx_full")
+del10x
+```
+
+Here we have defined the R image of the data to be the
+transpose of the image in HDF5.  So neurons are columns.
+```{r lkdela2}
+apply(del10x[,1:4],2,sum)
+```
+
+# Interface to HSDS (HDF Object Store)
+```{r lkdela3}
+del10x = H5S_Array(URL_hsds(), '/home/reshg/tenx_full.h5', 'newassay001')
+del10x
+```
+
+Again we have DelayedArray capabilities.
+```{r lkdel3}
+apply(del10x[,1:4],2,sum)
+```
+
+# Comment: file names and dataset names
+
+Note that in both cases, it is possible that multiple datasets with 
+the same name will be found in the filepath. On the h5serv this can 
+happen when multiple HDF5 files have datasets with the same name. 
+On hsds it can happen if multiple datasets with the same name are 
+in the internal group hierarchy. This condition is expected to be
+rare in reality.
+
+Example: multiple datasets named `dsetX`
+```{r lkdela4, eval=FALSE}
+y = H5S_Array(URL_hsds(), '/home/spollack/testzero.h5', 'dsetX')
+```
+
