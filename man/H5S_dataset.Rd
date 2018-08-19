@@ -4,27 +4,9 @@
 \name{H5S_dataset}
 \alias{H5S_dataset}
 \alias{H5S_dataset-class}
-\alias{[,H5S_dataset,numeric,numeric-method}
-\title{extract elements from H5S_dataset}
-\usage{
-\S4method{[}{H5S_dataset,numeric,numeric}(x, i, j, ..., drop = FALSE)
-}
-\arguments{
-\item{x}{instance of H5S_dataset}
-
-\item{i}{character string usable as select option for first matrix index in HDF5 server value API}
-
-\item{j}{character string usable as select option for second matrix index in HDF5 server value API}
-
-\item{\dots}{unused}
-
-\item{drop}{logical defaults to FALSE}
-}
-\value{
-matrix of data obtained
-}
+\title{construct H5S_dataset object}
 \description{
-extract elements from H5S_dataset
+construct H5S_dataset object
 }
 \section{Slots}{
 

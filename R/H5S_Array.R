@@ -70,13 +70,18 @@ H5S_ArraySeed = function(endpoint, filepath, host) {
 #' dimnames not stored with H5S_source as of Jan 2018
 #' @param x instance of H5S_ArraySeed
 #' @return currently returns list(NULL, NULL) as we do not store dimnames in HDF5
+#' @rdname dimnames
+#' @aliases dimnames,H5S_ArraySeed-method
 #' @export
 setMethod("dimnames", "H5S_ArraySeed", function(x) {
   list(NULL, NULL)
 })
+
 #' HDF Server content is assumed transposed relative to R matrix layout
 #' @param x instance of H5S_ArraySeed
 #' @return integer(2) vector of dimensions corresponding to R's layout, assuming 2-d data
+#' @rdname dim
+#' @aliases dim,H5S_ArraySeed-method
 #' @export
 setMethod("dim", "H5S_ArraySeed", function(x) {
   # note that for HDF Server the internal dims are
@@ -115,6 +120,7 @@ setMethod("extract_array", "H5S_ArraySeed", function(x, index) {
 #' extension of DelayedArray for HDF Server content
 #' @exportClass H5S_Array
 setClass("H5S_Array", contains="DelayedArray")
+
 #' extension of DelayedMatrix for HDF Server content
 #' @exportClass H5S_Matrix
 setClass("H5S_Matrix", contains=c("DelayedMatrix", 
@@ -123,6 +129,8 @@ setClass("H5S_Matrix", contains=c("DelayedMatrix",
 setMethod("matrixClass", "H5S_Array", function(x) "H5S_Matrix")
 
 #' coercion for remote array to remote matrix
+#' @name as
+#' @family H5S_Array
 #' @rdname H5S_Array-class
 #' @importFrom DelayedArray new_DelayedArray
 #' @aliases coerce,H5S_Array,H5S_Matrix-method
@@ -134,7 +142,8 @@ setMethod("DelayedArray", "H5S_ArraySeed",
    function(seed) new_DelayedArray(seed, Class="H5S_Array"))
 
 #' create H5S_Array instance given url (filepath) and entity (host) name
-#' @param filepath a character(1) URL to port for HDF Server
+#' @param endpoint a character(1) URL to port for HDF Server
+#' @param filepath path and name of the H5 file
 #' @param host a character(1) name of 'host' in server
 #' @return an instance of \code{\link[DelayedArray]{DelayedArray-class}}
 #' @examples

@@ -19,6 +19,6 @@ provide the full URLs for link members
 }
 \examples{
 bigec2 = H5S_source(URL_h5serv())
-lks <- links(bigec2, 1)    # linkset for first group (Note: first group is the root group, by construction)
+lks <- links(bigec2, 1)    # linkset for root group 
 urls <- targets(lks)       # URLs of datasets in linkset
 }

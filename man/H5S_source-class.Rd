@@ -5,14 +5,11 @@
 \alias{H5S_source}
 \alias{H5S_source-class}
 \alias{[[,H5S_source,character-method}
-\alias{dataset}
 \title{H5S_source identifies an HDF5/HSDS server and manages some metadata about contents}
 \usage{
 H5S_source(serverURL, domain, ...)
 
 \S4method{[[}{H5S_source,character}(x, i, j)
-
-dataset(h5s, tag)
 }
 \arguments{
 \item{serverURL}{a URL for a port for HDF5Server}
@@ -26,10 +23,6 @@ dataset(h5s, tag)
 \item{i}{character string intended to identify dataset on server}
 
 \item{j}{not used}
-
-\item{h5s}{instance of H5S_source}
-
-\item{tag}{character string identifying a dataset}
 }
 \value{
 an initialized object of type H5S_source

@@ -18,4 +18,5 @@ BiocViews: infrastructure
 RoxygenNote: 6.1.0
 Collate: h5serv.R indx.R H5S_Array.R HSDS_Matrix.R
 VignetteBuilder: knitr
+Encoding: UTF-8
 biocViews: DataImport, Software

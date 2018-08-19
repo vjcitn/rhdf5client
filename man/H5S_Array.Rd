@@ -7,7 +7,9 @@
 H5S_Array(endpoint, filepath, host)
 }
 \arguments{
-\item{filepath}{a character(1) URL to port for HDF Server}
+\item{endpoint}{a character(1) URL to port for HDF Server}
+
+\item{filepath}{path and name of the H5 file}
 
 \item{host}{a character(1) name of 'host' in server}
 }

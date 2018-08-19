@@ -6,6 +6,9 @@
 \usage{
 URL_h5serv()
 }
+\value{
+URL of h5serv server
+}
 \description{
 manage h5serv URL
 }

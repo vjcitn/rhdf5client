@@ -1,10 +1,12 @@
 #' manage h5serv URL
+#' @return URL of h5serv server
 #' @examples
 #' URL_h5serv()
 #' @export
 URL_h5serv = function() "http://h5s.channingremotedata.org:5000"
 
 #' manage hsds URL
+#' @return URL of hsds server
 #' @examples
 #' URL_hsds()
 #' @export
@@ -134,20 +136,22 @@ setMethod("[[", c("H5S_source", "character", "ANY"), function(x, i, j) {
 })
 
 #' HDF5 server data groups accessor
+#' @exportMethod groups
+#' @export groups
+#' @docType methods
+#' @rdname groups-methods
+setGeneric("groups", function(object, index, ...) standardGeneric("groups"))
+
 #' @param object H5S_source instance
 #' @param index numeric, if present, extracts metadata about selected group (sequential ordering 
 #' of groups as returned by server) access for group information for HDF5 server
-#' @rdname groups-H5S_source-missing-method
 #' @param \dots not used
 #' @return a data frame with group name and number of links for each group
 #' @examples
 #' bigec2 = H5S_source(URL_h5serv())
 #' groups(bigec2)
-#' @aliases groups,H5S_source,missing-method
-#' @aliases groups
-#' @exportMethod groups
-#' @export groups
-setGeneric("groups", function(object, index, ...) standardGeneric("groups"))
+#' @rdname groups-methods
+#' @aliases groups,H5S_source,missing-method 
 setMethod("groups", c("H5S_source", "missing"), function(object, index, ...) {
   target = paste0(.serverURL(object), "/groups")
   ans = transl(target) # fromJSON(readBin(GET(target)$content, w="character"))
@@ -172,17 +176,13 @@ setMethod("groups", c("H5S_source", "missing"), function(object, index, ...) {
   DataFrame(groups=grps, nlinks=nl)
 })
 
-#' selective group metadata accessor
-#' @rdname groups-H5S_source-numeric-method
 #' @aliases groups,H5S_source,numeric-method
-#' @param object instance of H5S_source
-#' @param index numeric
-#' @return one-row data frame with group name and number of links for the group
-#' @param \dots unused
+#' @rdname groups-methods
 setMethod("groups", c("H5S_source", "numeric"), function(object, index, ...) {
   groups(object)[index,,drop=FALSE]
 })
 
+# TODO: should this be documented?
 setClass("H5S_linkset", representation(links="list", group="character",
                                        source="H5S_source"))
 setMethod("show", "H5S_linkset", function(object) {
@@ -200,9 +200,8 @@ setMethod("show", "H5S_linkset", function(object) {
 #'hsdsCon = H5S_source(URL_hsds()) # hsds server connection
 #'setPath(hsdsCon, "/home/stvjc/hdf5_mat.h5")-> hsds
 #'@docType methods
-#'@rdname setPath-methods
+#'@rdname setPath
 #'@aliases setPath,H5S_source,character-method
-#'@aliases setPath
 #'@export setPath
 #'@exportMethod setPath
 setGeneric("setPath", function(object,folderPath, ...) standardGeneric("setPath"))
@@ -220,8 +219,8 @@ setMethod("setPath", c("H5S_source","character"), function(object, folderPath, .
 #' bigec2 = H5S_source(URL_h5serv())
 #' lks <- links(bigec2, 1)    # linkset for root group 
 #' urls <- targets(lks)       # URLs of datasets in linkset
+#' @rdname links
 #' @aliases links,H5S_source,numeric-method
-#' @aliases links
 #' @export links
 #' @exportMethod links
 setGeneric("links", function(object, index, ...) standardGeneric("links"))
@@ -238,9 +237,10 @@ setMethod("links", c("H5S_source", "numeric"), function(object, index, ...) {
 #' @param h5linkset instance of H5S_linkset
 #' @param index numeric index into link vector - ignored
 #' @return a vector of dataset tags
+#' @rdname targets
 #' @examples
 #' bigec2 = H5S_source(URL_h5serv())
-#' lks <- links(bigec2, 1)    # linkset for first group (Note: first group is the root group, by construction)
+#' lks <- links(bigec2, 1)    # linkset for root group 
 #' urls <- targets(lks)       # URLs of datasets in linkset
 #' @export
 
@@ -262,8 +262,8 @@ hosts = function(h5linkset, index, cleanIP=TRUE) {
   }
 }
 
+#' construct H5S_dataset object
 #' @name H5S_dataset
-#' @rdname H5S_dataset-class
 #' @import S4Vectors
 #' @slot source instance of H5S_source instance
 #' @slot simpleName character string naming dataset 
@@ -272,9 +272,9 @@ hosts = function(h5linkset, index, cleanIP=TRUE) {
 #' @slot allatts list of all attributes
 #' @slot presel string prepared for select operation in GET
 #' @slot transfermode default "JSON" or "binary" for binary transfer
+#' @rdname H5S_dataset
 #' @aliases H5S_dataset-class
 #' @exportClass H5S_dataset
-
 setClass("H5S_dataset", representation(
   source="H5S_source", simpleName="character",
   shapes="list", hrefs="DataFrame", allatts="list", 
@@ -292,9 +292,9 @@ setMethod("show", "H5S_dataset", function(object) {
 #' @param object instance of H5S_linkset
 #' @param value either "JSON" (default) or "binary"
 #' @return updated object of type H5S_dataset
+#' @rdname transfermode
 #' @aliases transfermode<-,H5S_dataset-method
 #' @docType methods
-#' @rdname extract-methods
 #' @export
 setGeneric("transfermode<-", def = function(object, value) { standardGeneric("transfermode<-") })
 setReplaceMethod("transfermode", "H5S_dataset", 
@@ -373,15 +373,17 @@ serverVersion <- function(serverURL = serverURL){
 }
 
 #' extract elements from H5S_dataset
-#' @rdname H5S_dataset-class
+#' @rdname extract-methods
 #' @param x instance of H5S_dataset
-#' @param i character string usable as select option for first matrix index in HDF5 server value API
-#' @param j character string usable as select option for second matrix index in HDF5 server value API
+#' @param i select option for first matrix index in HDF5 server value API
+#' @param j select option for second matrix index in HDF5 server value API
 #' @param \dots unused
 #' @param drop logical defaults to FALSE
+#' @aliases [,H5S_dataset,numeric,numeric-method
 #' @return matrix of data obtained
 #' @exportMethod [
 setMethod("[", c("H5S_dataset", "numeric", "numeric"), function(x, i, j, ..., drop=FALSE) {
+# TODO: provide examples with numeric and string indices
 #
 # bracket selection passed directly to HDF5 server ... row-major
 #
@@ -428,13 +430,8 @@ setMethod("[", c("H5S_dataset", "numeric", "numeric"), function(x, i, j, ..., dr
   
 
 #' extract elements from H5S_dataset
-#' @param x instance of H5S_dataset
-#' @param i character string usable as select option for first matrix index in HDF5 server value API
-#' @param j character string usable as select option for second matrix index in HDF5 server value API
-#' @param \dots unused
-#' @param drop logical defaults to FALSE
-#' @aliases H5S_dataset,[,character,character-method
-#' @return matrix of data obtained
+#' @rdname extract-methods
+#' @aliases [,H5S_dataset,character,character-method
 setMethod("[", c("H5S_dataset", "character", "character"), function(x, i, j, ..., drop=FALSE) {
 
   uu = x@presel
@@ -497,10 +494,11 @@ setMethod("[", c("H5S_dataset", "character", "character"), function(x, i, j, ...
   mat
 })
 
+#' Find a dataset on source from its name
 #' @name dataset
-#' @rdname H5S_source-class
 #' @param h5s instance of H5S_source
 #' @param tag character string identifying a dataset
+#' @return object of type H5S_dataset
 #' @export
 dataset = function(h5s, tag) {
   dsns = dsmeta(h5s)[["dsnames"]] # mcols problem with [,"dsnames"]
@@ -559,10 +557,9 @@ internalDim = function(h5d) {
 #' @examples 
 #' hsdsCon = H5S_source(URL_hsds()) # hsds server connection
 #' hsdsInfo(hsdsCon)
+#' @rdname hsdsInfo
 #' @aliases hsdsInfo,H5S_source-method
-#' @aliases hsdsInfo
 #' @docType methods
-#' @rdname hsdsInfo-method
 #' @export hsdsInfo
 #' @exportMethod hsdsInfo
 setGeneric("hsdsInfo", function(object) standardGeneric("hsdsInfo"))
@@ -592,10 +589,9 @@ setMethod("hsdsInfo", c("H5S_source"), function(object) {
 #' hsdsCon = H5S_source(URL_hsds()) # hsds server connection
 #' setPath(hsdsCon, "/home/stvjc/")-> hsds
 #' domains(hsds)
-#' @docType methods
+#' @rdname domains
 #' @aliases domains,H5S_source-method
-#' @aliases domains
-#' @rdname domains-method
+#' @docType methods
 #' @export domains
 #' @exportMethod domains
 setGeneric("domains", function(object, ...) standardGeneric("domains"))
@@ -624,6 +620,7 @@ setMethod("domains", c("H5S_source"), function(object, ...) {
 #'hsdsCon = H5S_source(URL_hsds()) # hsds server
 #'setPath(hsdsCon, "/home/stvjc/hdf5_mat.h5")-> hsds
 #'getDatasetUUIDs(hsds)
+#'@rdname getDatasetUUIDs
 #'@export
 getDatasetUUIDs <- function(object) {
   query = sprintf("%s/datasets?host=%s", object@serverURL, object@folderPath)
@@ -642,6 +639,7 @@ getDatasetUUIDs <- function(object) {
 #'hsdsCon@folderPath="/home/stvjc/hdf5_mat.h5"
 #'ds = fetchDatasets(hsdsCon)# Pick the ID of the dataset you are interested in
 #'getDatasetAttrs(hsdsCon, "d-a9e4b71c-8ea2-11e8-9306-0242ac120022")
+#'@rdname getDatasetAttrs
 #'@export
 getDatasetAttrs <- function(object, duid) {
   #uu = getDatasetUUIDs(object)
@@ -662,6 +660,7 @@ getDatasetAttrs <- function(object, duid) {
 #'setPath(hsdsCon, "/home/stvjc/hdf5_mat.h5")-> hsds
 #'duid <- 'd-a9e4b71c-8ea2-11e8-9306-0242ac120022'
 #'getDims(hsds, duid)
+#'@rdname getDims
 #'@export
 getDims <- function(object, duid) {
   stopifnot(is(object, "H5S_source"))
@@ -677,6 +676,7 @@ getDims <- function(object, duid) {
 #'hsdsCon@folderPath="/home/stvjc/hdf5_mat.h5"
 #'ds = fetchDatasets(hsdsCon) #Pick the ID of the dataset you are interested in
 #'getHRDF(hsdsCon, "d-a9e4b71c-8ea2-11e8-9306-0242ac120022")
+#'@rdname getHRDF
 #'@export
 getHRDF <- function(object, duid) {
   stopifnot(is(object, "H5S_source"))
@@ -695,6 +695,7 @@ getHRDF <- function(object, duid) {
 #'hsdsCon@folderPath="/home/stvjc/hdf5_mat.h5"
 #'ds = fetchDatasets(hsdsCon) #Pick the dataset id of interest
 #'H5S_dataset2(hsdsCon, "d-a9e4b71c-8ea2-11e8-9306-0242ac120022")
+#'@rdname H5S_dataset2
 #'@export
 H5S_dataset2 = function(object, duid) {
   src = new("H5S_source", serverURL=object@serverURL, dsmeta=DataFrame())

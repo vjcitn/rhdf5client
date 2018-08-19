@@ -6,6 +6,9 @@
 \usage{
 URL_hsds()
 }
+\value{
+URL of hsds server
+}
 \description{
 manage hsds URL
 }
