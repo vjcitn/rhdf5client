@@ -4,12 +4,14 @@
 \alias{HSDS_Matrix}
 \title{simplify construction of DelayedMatrix from url and path in HSDS}
 \usage{
-HSDS_Matrix(url, path)
+HSDS_Matrix(url, path, title)
 }
 \arguments{
 \item{url}{character(1) URL for HSDS object store with port}
 
 \item{path}{character(1) path from root defining HDF Cloud resource}
+
+\item{title}{character(1) name of dataset to use}
 }
 \value{
 instance of DelayedArray
@@ -18,5 +20,5 @@ instance of DelayedArray
 simplify construction of DelayedMatrix from url and path in HSDS
 }
 \examples{
-HSDS_Matrix
+HSDS_Matrix(URL_hsds(), "/shared/bioconductor/darmgcls.h5")
 }
