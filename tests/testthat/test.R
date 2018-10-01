@@ -10,12 +10,12 @@ context("content wrapper structure")
 
 test_that("H5S_source processes", {
  bigec2 = H5S_source(URL_h5serv())
- expect_true(all(dim(groups(bigec2))==c(10,2))) 
+ expect_true(all(dim(groups(bigec2))==c(2,2))) 
  expect_true(is(links(bigec2,1), "H5S_linkset"))
  expect_true(is(dataset(bigec2, "tenx_100k"), "H5S_dataset"))
  expect_true(is(bigec2[["tenx_100k"]], "H5S_dataset"))
  expect_true(is(dsmeta(bigec2), "DataFrame"))
- expect_true(all(dim(dsmeta(bigec2))==c(10,3))) 
+ expect_true(all(dim(dsmeta(bigec2))==c(2,3))) 
 })
 
 context("indexing infrastructure")
