@@ -120,7 +120,7 @@ function(dataset, indices)  {
 
 # private - perform a single fetch; indices is a vector of
 # type character with one slice per dimension.
-#' @useDynLib rhdf5client2
+#' @useDynLib rhdf5client
 getDataVec <- function(dataset, indices, transfermode = 'JSON')  {
 
     indices <- checkSlices(dataset@shape, indices)
@@ -577,7 +577,7 @@ multifetch <- function(LL, dataset)  {
 }
 
 setMethod("show", "HSDSDataset", function(object) {
- cat(paste("rhdf5client2 HSDSDataset instance, with shape "))
+ cat(paste("rhdf5client HSDSDataset instance, with shape "))
  dput(object@shape)
  cat("  use getData(...) or square brackets to retrieve content.\n")
 })

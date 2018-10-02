@@ -16,7 +16,12 @@ License: Artistic-2.0
 LazyLoad: yes
 BiocViews: infrastructure
 RoxygenNote: 6.1.0
-Collate: h5serv.R indx.R H5S_Array.R HSDS_Matrix.R
+Collate: h5serv.R indx.R H5S_Array.R HSDS_Matrix.R 
+  'rhdf5client2.R'
+  'Source.R'
+  'File.R'
+  'Dataset.R'
+  'RHDF5Array.R'
 VignetteBuilder: knitr
 Encoding: UTF-8
 biocViews: DataImport, Software

@@ -28,9 +28,9 @@ setClass("HSDSArraySeed", contains=c("Array"),
 #' @return An initialized object of type HSDSArraySeed
 #' @export 
 HSDSArraySeed <- function(endpoint, svrtype, domain, dsetname)  {
-  src <- rhdf5client2::HSDSSource(endpoint, svrtype)
-  fle <- rhdf5client2::HSDSFile(src, domain)
-  dset <- rhdf5client2::HSDSDataset(fle, dsetname)
+  src <- rhdf5client::HSDSSource(endpoint, svrtype)
+  fle <- rhdf5client::HSDSFile(src, domain)
+  dset <- rhdf5client::HSDSDataset(fle, dsetname)
   new("HSDSArraySeed", endpoint=endpoint, svrtype=svrtype, domain=domain, 
       dsetname=dsetname, dataset=dset)
 }
@@ -116,7 +116,7 @@ setMethod("extract_array", "HSDSArraySeed", function(x, index)  {
   if (nullfetch) { 
     A <- array(numeric(0), dim=rdims)
   } else  {
-    A <- rhdf5client2:::getDataList(x@dataset, idxlist)
+    A <- rhdf5client:::getDataList(x@dataset, idxlist)
     # unflatten vector if necessary: see note at 
     # end of Dataset::getDataVec on flattened result
     # for fetch of single-width dimensioned arrays.

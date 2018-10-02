@@ -82,13 +82,13 @@ findDatasets <- function(src, domain)  {
 
 }
 setMethod("show", "HSDSFile", function(object) {
- cat(paste("rhdf5client2 HSDSFile instance from source", object@src@endpoint, "\n"))
+ cat(paste("rhdf5client HSDSFile instance from source", object@src@endpoint, "\n"))
  cat(paste("  domain: ", object@domain, "\n"))
  cat("  use listDatasets(...) and HSDSDataset(..., [dataset name]) for more content.\n")
 })
 
 #setMethod("show", "HSDSDataset", function(object) {
-# cat(paste("rhdf5client2 HSDSDataset instance, with shape "))
+# cat(paste("rhdf5client HSDSDataset instance, with shape "))
 # dput(object@shape)
 # cat("  use getData(...) or square brackets to retrieve content.\n")
 #})

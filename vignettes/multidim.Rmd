@@ -12,13 +12,13 @@ vignette: >
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 Sys.setenv('RETICULATE_PYTHON'=Sys.getenv("RETICULATE_PYTHON"))
-library(rhdf5client2)
+library(rhdf5client)
 library(reticulate)
 ```
 
 ## Access to multi-dimensional dataset:
 
-### Get result with `rhdf5client2`
+### Get result with `rhdf5client`
 
 ```{r}
 src <- HSDSSource('http://hsdshdflab.hdfgroup.org')

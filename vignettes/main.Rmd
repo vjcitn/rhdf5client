@@ -4,14 +4,14 @@ author: "Sam Pollack"
 date: "9/1/2018"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Development details on rhdf5client2}
+  %\VignetteIndexEntry{Development details on rhdf5client}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(rhdf5client2)
+library(rhdf5client)
 ```
 
 # HSDSSource
@@ -86,7 +86,7 @@ inclusive in increments of 4.)
 
 Note that the slice should be passed in R semantics: 1 signifies
 the first element, and the last element is included in the slice. (Internally,
-rhdf5client2 converts to Python semantics, in which the first index is 0 
+rhdf5client converts to Python semantics, in which the first index is 0 
 and the last element is excluded. But here, as everywhere in the package,
 all Python details should be hidden from the user.)
 
