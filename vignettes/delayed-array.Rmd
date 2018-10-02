@@ -1,0 +1,56 @@
+---
+title: "HSDSArray -- DelayedArray backend for Remote HDF5"
+author: "Samuela Pollack"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{HSDSArray DelayedArray backend}
+  %\VignetteEncoding{UTF-8}
+output:
+  BiocStyle::html_document:
+    highlight: pygments
+    number_sections: yes
+    theme: united
+    toc: yes
+---
+
+```{r setup,echo=FALSE,results="hide"}
+suppressPackageStartupMessages({
+suppressMessages({
+library(rhdf5client2)
+library(DelayedArray)
+})
+})
+```
+# Using the DelayedArray infrastructure
+
+A remote dataset is accessed by giving the URL of the server, the
+type of the server (either `hsds` or `h5serv`), the file domain (path 
+to the HDF5 file) and the full path to the dataset inside the HDF5 file. 
+
+## Interface to h5serv (Channing Remote Data Server)
+
+```{r}
+da <- HSDSArray('http://h5s.channingremotedata.org:5000', 'h5serv', 
+      'tenx_full.h5s.channingremotedata.org', '/newassay001')
+da
+```
+
+Here we have defined the R image of the data to be the
+transpose of the image in HDF5.  So neurons are columns.
+
+```{r}
+apply(da[,1:4],2,sum)
+```
+
+## Interface to HSDS (HDF Object Store)
+```{r lkdela3}
+da <- HSDSArray('http://hsdshdflab.hdfgroup.org', 'hsds', 
+      '/shared/bioconductor/tenx_full.h5', '/newassay001')
+da
+```
+
+Again we have DelayedArray capabilities.
+```{r lkdel3}
+apply(da[,1:4],2,sum)
+```
