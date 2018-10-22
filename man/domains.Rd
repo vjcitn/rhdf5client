@@ -6,7 +6,7 @@
 \alias{domains,H5S_source-method}
 \title{HSDS server domains accessor}
 \usage{
-domains(object, rootdir)
+domains(object, ...)
 }
 \arguments{
 \item{object}{H5S_source instance}

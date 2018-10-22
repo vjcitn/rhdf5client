@@ -26,7 +26,7 @@ src.hsds <- HSDSSource('http://hsdshdflab.hdfgroup.org')
 src.chan <- HSDSSource('http://h5s.channingremotedata.org:5000', 'h5serv')
 ```
 
-The routine `domains` is provided for inspection of the server hierarchy.
+The routine `listDomains` is provided for inspection of the server hierarchy.
 This is the hierarchy that maps approximately to the directory structure of
 the server file system. The purpose of this routine is to assist the user
 in locating HDF5 files. 
@@ -37,16 +37,16 @@ should be published with the endpoint. For an h5serv server, the default
 there is not often a reason to wish to change it. 
 
 ```{r}
-domains(src.chan)
-domains(src.chan, 'public/hdfgroup/org')
+listDomains(src.chan)
+listDomains(src.chan, 'public/hdfgroup/org')
 ```
 
 For an hsds server, the root domain could be anything, so the administrator
 has to publish it.
 
 ```{r}
-domains(src.hsds, '/home/jreadey')
-domains(src.hsds, '/home/jreadey/HDFLabTutorial')
+listDomains(src.hsds, '/home/jreadey')
+listDomains(src.hsds, '/home/jreadey/HDFLabTutorial')
 ```
 
 # HSDSFile

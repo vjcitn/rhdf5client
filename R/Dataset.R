@@ -1,5 +1,5 @@
 #' An S4 class to represent a dataset in a HDF5 file.
-#' @import BiocGenerics httr methods rjson
+#' @import httr methods rjson
 #' @slot file An object of type HSDSFile; the file in which the dataset is resident.
 #' @slot path The dataset's path in the internal HDF5 hiearchy.
 #' @slot uuid The unique unit ID by which the dataset is accessed in the server 

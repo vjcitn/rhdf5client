@@ -39,28 +39,28 @@ HSDSSource <- function(endpoint, type='hsds')  {
 #'
 #' @export
 #' @docType methods
-#' @rdname domains-methods
+#' @rdname listDomains-methods
 #'
 #' @examples
 #' src.hsds <- HSDSSource('http://hsdshdflab.hdfgroup.org')
 #' src.chan <- HSDSSource('http://h5s.channingremotedata.org:5000', 'h5serv')
-#' domains(src.chan)
-#' domains(src.hsds, '/home/jreadey')
-setGeneric('domains', function(object, rootdir) standardGeneric('domains'))
+#' listDomains(src.chan)
+#' listDomains(src.hsds, '/home/jreadey')
+setGeneric('listDomains', function(object, rootdir) standardGeneric('listDomains'))
 
-#' @rdname domains-methods
-#' @aliases domains,HSDSSource,character-method
-setMethod('domains', c("HSDSSource", "character"), 
+#' @rdname listDomains-methods
+#' @aliases listDomains,HSDSSource,character-method
+setMethod('listDomains', c("HSDSSource", "character"), 
   function(object, rootdir)  {
     ll <- domainContents(object, rootdir)
     vapply(ll, function(l) l$filename, character(1))
   })
 
-#' @rdname domains-methods
-#' @aliases domains,HSDSSource,missing-method
-setMethod('domains', c("HSDSSource", "missing"),  
+#' @rdname listDomains-methods
+#' @aliases listDomains,HSDSSource,missing-method
+setMethod('listDomains', c("HSDSSource", "missing"),  
   function(object) { 
-    domains(object, '/hdfgroup/org') 
+    listDomains(object, '/hdfgroup/org') 
   })
 
 # private
