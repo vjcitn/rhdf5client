@@ -11,6 +11,9 @@ HSDSDataset(file, path)
 
 \item{path}{The complete intrafile path to the dataset}
 }
+\value{
+An initialized object of type HSDSDataset
+}
 \description{
 A HSDSDataset is a representation of a dataset in a HDF5 file.
 }

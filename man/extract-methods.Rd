@@ -35,6 +35,8 @@
 }
 \value{
 matrix of data obtained
+
+an array with the elements requested from the HSDSDataset
 }
 \description{
 extract elements from H5S_dataset

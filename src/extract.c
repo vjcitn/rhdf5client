@@ -9,6 +9,7 @@
 // reslst is a list-of-list-of-list-of-vec (for 4-dimensional data) of character
 // (Check that it is character)
 
+
 void rsub4idx(int *D, int *Dcpr, int nd, int idx, int **sbs);
 void csub4idx(int *D, int *Dcpl, int nd, int idx, int **sbs);
 int ridx4sub(int *D, int *Dcpr, int nd, int *sbs);
@@ -156,4 +157,19 @@ int cidx4sub(int *D, int *Dcpl, int nd, int *sbs)  {
     idx = idx + Dcpl[j]*sbs[j];
   return idx;
 }
+
+// Register
+static const R_CallMethodDef callMethods[] = {
+  {"extractJSON", (DL_FUNC) &extractJSON, 3},
+  {"extractBin", (DL_FUNC) &extractBin, 3},
+  {NULL, NULL, 0}
+};
+
+void
+R_init_rhdf5client(DllInfo *info)
+{
+   R_registerRoutines(info, NULL, callMethods, NULL, NULL);
+}
+
+
 

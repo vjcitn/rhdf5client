@@ -15,6 +15,7 @@ setClass("HSDSFile", representation(src="HSDSSource", domain="character", dsetdf
 #' @param src an object of type HSDSSource, the server which exposes the file
 #' @param domain the domain string; the file's location on the server's
 #' file system.
+#' @return an initialized object of type HSDSFile
 #' @examples
 #' src <- HSDSSource('http://hsdshdflab.hdfgroup.org')
 #' f10x <- HSDSFile(src, '/shared/bioconductor/tenx_full.h5')

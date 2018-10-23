@@ -16,6 +16,7 @@ setClass("HSDSDataset", representation(file="HSDSFile", path="character", uuid="
 #' @name HSDSDataset
 #' @param file An object of type HSDSFile which hosts the dataset 
 #' @param path The complete intrafile path to the dataset
+#' @return An initialized object of type HSDSDataset
 #' @examples
 #' src <- HSDSSource('http://hsdshdflab.hdfgroup.org')
 #' f <- HSDSFile(src, '/home/spollack/testzero.h5')
@@ -42,6 +43,7 @@ HSDSDataset <- function(file, path)  {
 #' @name [
 #' @param x object of type HSDSDataset
 #' @param i vector of indices (first dimension)
+#' @return an array with the elements requested from the HSDSDataset
 #' @aliases [,HSDSDataset-method [,HSDSDataset,numeric-method 
 #'  [,HSDSDataset,numeric,numeric-method [,HSDSDataset,numeric,ANY-method 
 #'  [,HSDSDataset,numeric,ANY,ANY-method
@@ -120,7 +122,7 @@ function(dataset, indices)  {
 
 # private - perform a single fetch; indices is a vector of
 # type character with one slice per dimension.
-#' @useDynLib rhdf5client
+#' @useDynLib rhdf5client, .registration = TRUE
 getDataVec <- function(dataset, indices, transfermode = 'JSON')  {
 
     indices <- checkSlices(dataset@shape, indices)

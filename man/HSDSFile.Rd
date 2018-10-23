@@ -12,6 +12,9 @@ HSDSFile(src, domain)
 \item{domain}{the domain string; the file's location on the server's
 file system.}
 }
+\value{
+an initialized object of type HSDSFile
+}
 \description{
 A HSDSFile is a representation of an HDF5 file the contents of which are accessible 
 exposed by a HDF5 server.

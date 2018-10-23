@@ -8,7 +8,7 @@
 #' @slot dataset object of type HSDSDataset for access to the H5 dataset
 #' @aliases HSDSArraySeed-class
 #' @import DelayedArray
-#' @exportClass HSDSArraySeed
+# #' @exportClass HSDSArraySeed
 setClass("HSDSArraySeed", contains=c("Array"), 
   slots = c(endpoint="character",    # URL
             svrtype="character",     # 'h5serv' or 'hsds'
@@ -26,7 +26,7 @@ setClass("HSDSArraySeed", contains=c("Array"),
 #' @param domain HDF5 domain of H5 file on server
 #' @param dsetname complete internal path to dataset in H5 file
 #' @return An initialized object of type HSDSArraySeed
-#' @export 
+# #' @export 
 HSDSArraySeed <- function(endpoint, svrtype, domain, dsetname)  {
   src <- rhdf5client::HSDSSource(endpoint, svrtype)
   fle <- rhdf5client::HSDSFile(src, domain)
@@ -43,7 +43,7 @@ HSDSArraySeed <- function(endpoint, svrtype, domain, dsetname)  {
 #' @param x An object of type HSDSArraySeed
 #' @return A NULL list of length equal to the array dimensionality
 #' @aliases dimnames,HSDSArraySeed-method
-#' @export
+# #' @export
 setMethod("dimnames", "HSDSArraySeed", function(x)  {
   n <- length(x@dataset@shape)
   rt <- vector(mode="list", length=n)   # null list
@@ -62,7 +62,7 @@ setMethod("dimnames", "HSDSArraySeed", function(x)  {
 #' @param x An object of type HSDSArraySeed
 #' @return A numeric vector of the dimensions
 #' @aliases dim,HSDSArraySeed-method
-#' @export
+# #' @export
 setMethod("dim", "HSDSArraySeed", function(x)  {
    as.integer(rev(x@dataset@shape))   # Could be this??? Don't assign?
 })
@@ -82,7 +82,7 @@ setMethod("dim", "HSDSArraySeed", function(x)  {
 #' indices requested
 #' @aliases extract_array,HSDSArraySeed-method
 #' 
-#' @export
+# #' @export
 #'
 # TODO: seed contract requires repeated and descending indices 
 # (e.g., c(1,2,3,3,2,1)) be returned correctly. 
