@@ -26,7 +26,6 @@ setClass("HSDSArraySeed", contains=c("Array"),
 #' @param domain HDF5 domain of H5 file on server
 #' @param dsetname complete internal path to dataset in H5 file
 #' @return An initialized object of type HSDSArraySeed
-# #' @export 
 HSDSArraySeed <- function(endpoint, svrtype, domain, dsetname)  {
   src <- rhdf5client::HSDSSource(endpoint, svrtype)
   fle <- rhdf5client::HSDSFile(src, domain)
@@ -43,7 +42,6 @@ HSDSArraySeed <- function(endpoint, svrtype, domain, dsetname)  {
 #' @param x An object of type HSDSArraySeed
 #' @return A NULL list of length equal to the array dimensionality
 #' @aliases dimnames,HSDSArraySeed-method
-# #' @export
 setMethod("dimnames", "HSDSArraySeed", function(x)  {
   n <- length(x@dataset@shape)
   rt <- vector(mode="list", length=n)   # null list
@@ -62,9 +60,8 @@ setMethod("dimnames", "HSDSArraySeed", function(x)  {
 #' @param x An object of type HSDSArraySeed
 #' @return A numeric vector of the dimensions
 #' @aliases dim,HSDSArraySeed-method
-# #' @export
 setMethod("dim", "HSDSArraySeed", function(x)  {
-   as.integer(rev(x@dataset@shape))   # Could be this??? Don't assign?
+   as.integer(rev(x@dataset@shape))   
 })
 
 #' Access dataset backed by an HSDSArraySeed

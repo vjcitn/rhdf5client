@@ -19,8 +19,6 @@
 # filepath '/home/spollack/testzero.h5'
 # host 'dsetAA1'
 
-# TODO: 'host' is a misleading name. Change it to 'dsname' or such?
-
 #' H5S_Array for HDF Server content
 #' @import DelayedArray
 setClass("H5S_ArraySeed",
@@ -78,9 +76,9 @@ setMethod("dimnames", "H5S_ArraySeed", function(x) {
 })
 
 #' HDF Server content is assumed transposed relative to R matrix layout
+#' @name dim
 #' @param x instance of H5S_ArraySeed
 #' @return integer(2) vector of dimensions corresponding to R's layout, assuming 2-d data
-#' @rdname dim
 #' @aliases dim,H5S_ArraySeed-method
 #' @export
 setMethod("dim", "H5S_ArraySeed", function(x) {
@@ -131,10 +129,7 @@ setMethod("matrixClass", "H5S_Array", function(x) "H5S_Matrix")
 #' coercion for remote array to remote matrix
 #' @name as
 #' @family H5S_Array
-#' @rdname H5S_Array-class
-#' @importFrom DelayedArray new_DelayedArray
-#' @aliases coerce,H5S_Array,H5S_Matrix-method
-#' @export
+
 setAs("H5S_Array", "H5S_Matrix", function(from)
    new("H5S_Matrix", from))
 
