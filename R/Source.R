@@ -83,125 +83,150 @@ domainContents <- function(object, rootdir = '/hdfgroup/org')  {
 #  The h5serv API does not have a GET /domains method, so we need
 #  to descend the tree to the requested domain node by UUID's.
 
-  if (object@type == 'h5serv')  {
-    append_if_h5_file <- function(ll, ff)  {
-      if ('h5domain' %in% names(ll)) {
-        ff <- c(ff, ll[['h5domain']])
-      } 
-      ff
-    }
-
-    # dissect the path. assume the last two elements are the root domain. 
-    s <- .Platform$file.sep
-    if (substr(rootdir, 1, 1) != s) rootdir <- paste0(s, rootdir)
-    pth <- strsplit(rootdir, s)[[1]]
-    pth <- pth[-1]      # empty string before leading '/'
-    n <- length(pth)
-    dstr <- paste0('.', pth[n-1], '.', pth[n])   # root domain
-    if (length(pth) == 2)
-      pth = c()
-    else
-      pth <- pth[1:(n-2)]
-
-    request <- paste0(object@endpoint, "/")
-    response <- submitRequest(request)
-    nextid <- response[['root']]
-    link <- list()
-
-    while (length(pth) > 0)  {
-
-      request <- paste0(object@endpoint, "/groups/", nextid, "/links")
-      response <- submitRequest(request)
-      links <- response[['links']]
-
-      v <- vapply(links, function(lk) { 
-        'title' %in% names(lk) && lk[['title']] == pth[length(pth)] }, 
-        logical(1))
-      if (any(v))  {
-        link <- links[[which(v)]]
-        nextid <- link[['id']]
-        dstr <- paste0(pth[length(pth)], '.', dstr)
-        pth <- pth[-length(pth)]
+  result <- tryCatch({
+    if (object@type == 'h5serv')  {
+      append_if_h5_file <- function(ll, ff)  {
+        if ('h5domain' %in% names(ll)) {
+          ff <- c(ff, ll[['h5domain']])
+        } 
+        ff
       }
-      else  {    # special case: rootdir is a file 
+
+      # dissect the path. assume the last two elements are the root domain. 
+      s <- .Platform$file.sep
+      if (substr(rootdir, 1, 1) != s) rootdir <- paste0(s, rootdir)
+      pth <- strsplit(rootdir, s)[[1]]
+      pth <- pth[-1]      # empty string before leading '/'
+      n <- length(pth)
+      dstr <- paste0('.', pth[n-1], '.', pth[n])   # root domain
+      if (length(pth) == 2)
+        pth = c()
+      else
+        pth <- pth[1:(n-2)]
+
+      request <- paste0(object@endpoint, "/")
+      response <- submitRequest(request)
+      nextid <- response[['root']]
+      link <- list()
+
+      while (length(pth) > 0)  {
+
+        request <- paste0(object@endpoint, "/groups/", nextid, "/links")
+        response <- submitRequest(request)
+        links <- response[['links']]
+
         v <- vapply(links, function(lk) { 
-          'class' %in% names(lk) && lk[['class']] == 'H5L_TYPE_EXTERNAL' && 
-          'h5domain' %in% names(lk) && lk[['h5domain']] == pth[length(pth)] }, 
+          'title' %in% names(lk) && lk[['title']] == pth[length(pth)] }, 
           logical(1))
         if (any(v))  {
           link <- links[[which(v)]]
-          pth <- c()
-        } else  {
-          stop(paste0("domain ",rootdir, " not found"))
+          nextid <- link[['id']]
+          dstr <- paste0(pth[length(pth)], '.', dstr)
+          pth <- pth[-length(pth)]
         }
-      }
-    }
-
-    if (length(link) == 0 || 
-        link[['class']] == 'H5L_TYPE_HARD')  {  # domain is a directory
-      request <- paste0(object@endpoint, "/groups/", nextid, "/links")
-      response <- submitRequest(request)
-      links <- response[['links']]
-      for (lk in links)  {
-        if (lk[['class']] == 'H5L_TYPE_HARD')  {             # a subdirectory
-          append_to_results(paste0(lk[['title']], rootdir), 'directory')
-        } else if (lk[['class']] == 'H5L_TYPE_EXTERNAL')  {  # a file
-          append_to_results(lk[['h5domain']], 'file')
-        }
-      }
-
-    } else  {  # 'self' signals that rootdir *is* a file 
-      append_to_results(rootdir, 'self')
-    }
-  }
-  else  { # 'hsds'
-
-    # no postpended slash gets the type of the object
-    request <- paste0(object@endpoint, "/domains?domain=", rootdir)
-    response <- submitRequest(request)
-
-    if ('domains' %in% names(response) && length(response[['domains']]) > 0)  {
-
-      # with postpended slash gets directory contents
-      if ('root' %in% names(response[['domains']][[1]]) && 
-          response[['domains']][[1]][['root']] != 'None')  {
-        fn <- rootdir
-        ft <- 'self'
-        append_to_results(fn, ft)
-      } else  {
-        request <- paste0(object@endpoint, "/domains?domain=", rootdir, "/")
-        response <- submitRequest(request)
-        domains <- response[['domains']]
-        for (domain in domains)  {
-          if ('class' %in% names(domain) && 'name' %in% names(domain) && 
-             (domain[['class']] == 'domain' || domain[['class']] == 'folder'))  {
-            fn <- domain[['name']]
-            ft <- 'directory'
-            if (domain[['class']] == 'domain') 
-              ft <- 'file'
-            append_to_results(fn, ft)
+        else  {    # special case: rootdir is a file 
+          v <- vapply(links, function(lk) { 
+            'class' %in% names(lk) && lk[['class']] == 'H5L_TYPE_EXTERNAL' && 
+            'h5domain' %in% names(lk) && lk[['h5domain']] == pth[length(pth)] }, 
+            logical(1))
+          if (any(v))  {
+            link <- links[[which(v)]]
+            pth <- c()
+          } else  {
+            stop(paste0("domain ",rootdir, " not found"))
           }
         }
       }
+  
+      if (length(link) == 0 || 
+          link[['class']] == 'H5L_TYPE_HARD')  {  # domain is a directory
+        request <- paste0(object@endpoint, "/groups/", nextid, "/links")
+        response <- submitRequest(request)
+        links <- response[['links']]
+        for (lk in links)  {
+          if (lk[['class']] == 'H5L_TYPE_HARD')  {             # a subdirectory
+            append_to_results(paste0(lk[['title']], rootdir), 'directory')
+          } else if (lk[['class']] == 'H5L_TYPE_EXTERNAL')  {  # a file
+            append_to_results(lk[['h5domain']], 'file')
+          }
+        }
+
+      } else  {  # 'self' signals that rootdir *is* a file 
+        append_to_results(rootdir, 'self')
+      }
+      1
     }
+    else  { # 'hsds'
+
+      # no postpended slash gets the type of the object
+      request <- paste0(object@endpoint, "/domains?domain=", rootdir)
+      response <- submitRequest(request)
+      if ('domains' %in% names(response) && length(response[['domains']]) > 0)  {
+
+        # with postpended slash gets directory contents
+        if ('root' %in% names(response[['domains']][[1]]) && 
+            response[['domains']][[1]][['root']] != 'None')  {
+          fn <- rootdir
+          ft <- 'self'
+          append_to_results(fn, ft)
+        } else  {
+          request <- paste0(object@endpoint, "/domains?domain=", rootdir, "/")
+          response <- submitRequest(request)
+          domains <- response[['domains']]
+          for (domain in domains)  {
+            if ('class' %in% names(domain) && 'name' %in% names(domain) && 
+               (domain[['class']] == 'domain' || domain[['class']] == 'folder'))  {
+              fn <- domain[['name']]
+              ft <- 'directory'
+              if (domain[['class']] == 'domain') 
+                ft <- 'file'
+              append_to_results(fn, ft)
+            }
+          }
+        }
+      }
+      1
+    }
+  }, error=function(e) { -1 })    # catch http request errors
+  if (result == -1)  {
+    warning("bad http request")
   }
+
   rlist[-which(sapply(rlist, is.null))]
 
 }
 
-# private - submit request and handle errors (TODO: more error-checking)
+# private - submit request and handle errors 
 submitRequest <- function(req, transfermode='JSON')  {
+  rsp <- tryCatch({
+      if (transfermode == 'JSON')  {
+        httr::GET(req)
+      } else if (transfermode == 'binary')  {
+        httr::GET(req, add_headers(Accept="application/octet-stream"))
+      }
+    }, error=function(e) { NULL }
+  )
+
+  if (is.null(rsp))  
+    stop("Bad request")
+
+  if ('status_code' %in% names(rsp) && rsp$status_code != 200)  
+    stop("Bad request")
+
   if (transfermode == 'JSON')  {
-    rsp <- httr::GET(req)
-  } else if (transfermode == 'binary')  {
-    rsp <- httr::GET(req, add_headers(Accept="application/octet-stream"))
+    rsp <- tryCatch({
+      rjson::fromJSON(readBin(rsp$content, what="character"))
+    }, error=function(e) { NULL })
   }
 
-  if (rsp$status_code != 200)
-    stop(paste0("bad response, status code ", rsp$status_code))
+  if (is.null(rsp))  
+    stop("Bad request")
 
-  if (transfermode == 'JSON')  {
-    rsp <- rjson::fromJSON(readBin(rsp$content, what="character"))
-  } 
-  rsp 
+  # Note: rsp could be the empty string - not an error
+  # maybe throw a warning condition?
+
+  return(rsp)
+
 }
+
+
