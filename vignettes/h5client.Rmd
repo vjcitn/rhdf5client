@@ -18,6 +18,7 @@ output:
 suppressPackageStartupMessages({
 suppressMessages({
 library(rhdf5client)
+library(reticulate)
 library(BiocStyle)
 library(DT)
 library(DelayedArray)
@@ -27,14 +28,16 @@ library(DelayedArray)
 
 # Overall introduction
 
-This document summarizes work to March 2018 in demonstrating
+This document summarizes work to October 2018 in demonstrating
 the concept of remote HDF5.  There are two main components
 to this document
 
 - A section on Bioconductor-oriented object designs and methods for
 using HDF5 data in server or object store, culminating in
 `DelayedArray` interfaces to remote _HDF5 datasets_ that
-are 2-d arrays of numbers
+are 2-d arrays of numbers.  The HDF5 server can be locally
+deployed by interested users; in
+this vignette, code involving it is not evaluated.
 
 - A section on a more general R interface to the h5py/h5pyd
 APIs for working with remote or local HDF5
@@ -52,48 +55,95 @@ using [HDF Server](https://support.hdfgroup.org/projects/hdfserver/)
 and [HDF Object store](https://www.hdfgroup.org/solutions/hdf-cloud/)
 with R/Bioconductor.
 
-## HDF Server interface
+# Working with HDF Scalable Data Service (HSDS)
 
-As of March 2018, we can use HDF Server with R in several ways.
-With support from an NCI grant, we maintain a server in AWS EC2
-that employs the RESTful API defined for the HDF Server.
-```{r lkserv}
-library(rhdf5client)
-bigec2 = H5S_source(URL_h5serv())
-class(bigec2)
-bigec2
+## HSDS interface with rhdf5client's REST operations
+
+The primary software base for working with the HDF Scalable
+Data Service is the h5pyd Python library.  Below we discuss
+how to use that library with R.  Here we illustrate the
+basic interfaces in rhdf5client.  John Readey of
+the HDF Group has provided a public repository of HDF5
+data in an HSDS folder called /shared/bioconductor
+that
+will be used here.
+
+### Connecting to the server and discovering content
+
+Use `HSDSSource` to create an object that
+can route queries to HSDS.  The resource
+is structured like a file system.  You can
+enumerate available domains using `listDomains`,
+which can be thought of as files that
+contain HDF5 datasets.
+
+```{r lk1}
+URL_hsds() # the 'endpoint' handling queries
+src = HSDSSource( URL_hsds() )
+listDomains(src, "/shared/bioconductor")
 ```
 
-### The internal structure of an HDF Server
+### Working with a dataset in a 'file'
 
-The server defines a hierarchical structure for all server
-contents.  There are groups, linksets, and datasets.
-```{r lkhi}
-groups(bigec2)
-links(bigec2,1)
-datatable(data.frame(targets(links(bigec2,1))))
+The `HSDSFile` method provides focused access.
+When a dataset is selected, square-brackets can
+be used to obtain content.
+```{r lk2}
+f = HSDSFile(src, "/shared/bioconductor/darmgcls.h5")
+f
+d = HSDSDataset(f, "/assay001")
+d
+d[1:3,1:4]
 ```
 
-### Presenting a specific dataset to the R user
+### Working with data through the DelayedArray interface
 
-We use the double-bracket operator to derive
-a reference to an HDF5 dataset from an `H5S_source`
-instance.  We installed an image of the 10x genomics
-1.3 million neuron dataset, that we can refer to
-as:
+The `HSDSArray` method gives a preview of
+'corners' of the dataset.
 
-```{r lkdb}
-tenx_remote = bigec2[["tenx_full"]]
-tenx_remote
+```{r lkarr}
+HSDSArray(URL_hsds(), "hsds", 
+   "/shared/bioconductor/darmgcls.h5", "/assay001")
 ```
 
-This is sufficient to do arithmetic using familiar
-R programming steps.  Note that the data
-image here has 'neurons' as 'rows'.
 
-```{r getcs}
-apply(tenx_remote[1:4,1:27998],1,sum)
+## HSDS operations via h5pyd
+
+The `File` API for the object store is a little different from the one
+for local HDF5.  
+```{r getpd}
+if (.Platform$OS.type != "windows")  {
+library(reticulate)
+Rh5pyd = import("h5pyd", as="h5py", convert=FALSE)
+assays = Rh5pyd$File("/shared/bioconductor/bano_meQTLex.h5", "r",
+     endpoint=URL_hsds())
+assays
+assays$keys() # only python
+py_to_r(assays$keys()) # the strings of interest
+}
 ```
+
+The following function obtains a slice from a dataset
+in the object store.  The index expression must be
+appropriate for the dataset and follows the
+convention for h5pyd: `start:end:stride` for each dimension,
+with `[:end]` and `[:stride]` optional.
+
+```{r lkgs}
+if (.Platform$OS.type != "windows")  {
+getslice = function(endpoint, mode, domain, dsname, indexstring="[0,0]") {
+   py_run_string("import h5pyd", convert=FALSE)
+   py_run_string(paste0("f = h5pyd.File(domain=", sQuote(domain), 
+         ", mode = ", sQuote(mode), ", endpoint=", sQuote(endpoint), ")"))
+   py_run_string(paste0("g = f['", dsname, "']", indexstring))$g
+}
+mr = getslice(URL_hsds(), "r", 
+   "/home/stvjc/assays.h5", "assay001", "[0:4, 0:27998]")
+apply(mr,1,sum)
+}
+```
+
+
 # Interfacing R to remote or local HDF5 via h5py/h5pyd
 
 The `r CRANpkg("reticulate")` package 
@@ -142,8 +192,7 @@ facilitate manipulation of an HDF5 _dataset_ in R via numpy.
 
 ```{r domatr}
 h5file = function( file )
-  Rh5py$files$File( file )
-
+  Rh5py$files$File( file, mode="r" )
 fn = system.file("hdf5/numiris.h5", package="rhdf5client")
 m1 = h5file(fn)
 m1
@@ -227,43 +276,6 @@ we already have plenty of mileage in `r Biocpkg("rhdf5")`.
 Our real interest is in providing a comprehensive interface
 to the HDF Server and Object Store APIs, and we turn to 
 this now.
-
-## Working with HDF Object Store via h5pyd
-
-The `File` API for the object store is a little different from the one
-for local HDF5.  For the following to succeed you would
-need credentials for the HDF Object Store instance noted in the endpoint
-used below.
-```{r getpd}
-if (.Platform$OS.type != "windows")  {
-Rh5pyd = import("h5pyd", as="h5py", convert=FALSE)
-assays = Rh5pyd$File("/home/stvjc/assays.h5", "r",
-     endpoint=URL_hsds())
-assays
-assays$keys() # only python
-py_to_r(assays$keys()) # the strings of interest
-}
-```
-
-The following function obtains a slice from a dataset
-in the object store.  The index expression must be
-appropriate for the dataset and follows the
-convention for h5pyd: `start:end:stride` for each dimension,
-with `[:end]` and `[:stride]` optional.
-
-```{r lkgs}
-if (.Platform$OS.type != "windows")  {
-getslice = function(endpoint, mode, domain, dsname, indexstring="[0,0]") {
-   py_run_string("import h5pyd", convert=FALSE)
-   py_run_string(paste0("f = h5pyd.File(domain=", sQuote(domain), 
-         ", mode = ", sQuote(mode), ", endpoint=", sQuote(endpoint), ")"))
-   py_run_string(paste0("g = f['", dsname, "']", indexstring))$g
-}
-mr = getslice(URL_hsds(), "r", 
-   "/home/stvjc/assays.h5", "assay001", "[0:4, 0:27998]")
-apply(mr,1,sum)
-}
-```
 
 ## Working with HDF Server
 
@@ -375,4 +387,47 @@ We can run `create_group` as well.  See
 if (.Platform$OS.type != "windows")  {
 sort(names(Rh5pyd$File))
 }
+```
+
+## HDF Server interface
+
+As of March 2018, we can use HDF Server with R in several ways.
+With support from an NCI grant, we maintain a server in AWS EC2
+that employs the RESTful API defined for the HDF Server.
+```{r lkserv, eval=FALSE}
+library(rhdf5client)
+bigec2 = H5S_source(URL_h5serv())
+class(bigec2)
+bigec2
+```
+
+### The internal structure of an HDF Server
+
+The server defines a hierarchical structure for all server
+contents.  There are groups, linksets, and datasets.
+```{r lkhi, eval=FALSE}
+groups(bigec2)
+links(bigec2,1)
+datatable(data.frame(targets(links(bigec2,1))))
+```
+
+### Presenting a specific dataset to the R user
+
+We use the double-bracket operator to derive
+a reference to an HDF5 dataset from an `H5S_source`
+instance.  We installed an image of the 10x genomics
+1.3 million neuron dataset, that we can refer to
+as:
+
+```{r lkdb, eval=FALSE}
+tenx_remote = bigec2[["tenx_full"]]
+tenx_remote
+```
+
+This is sufficient to do arithmetic using familiar
+R programming steps.  Note that the data
+image here has 'neurons' as 'rows'.
+
+```{r getcs, eval=FALSE}
+apply(tenx_remote[1:4,1:27998],1,sum)
 ```

@@ -1,10 +1,10 @@
 ---
-title: "Rhdf5client2 Development Vignette"
+title: "rhdf5client Elements"
 author: "Sam Pollack"
 date: "9/1/2018"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Development details on rhdf5client}
+  %\VignetteIndexEntry{Objects and methods in rhdf5client}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
@@ -17,13 +17,12 @@ library(rhdf5client)
 # HSDSSource
 
 An object of type HSDSSource is a HDFGroup server running on a machine. The 
-constructor requires the endpoint and server type, either `h5serv` (for
-the Tornado-based HDF Server) or `hsds` (for the HDF Scalable Data Service).
+constructor requires the endpoint and server type. At present, the only 
+valie value is `hsds` (for the HDF Scalable Data Service).
 If the type is not specified, the server will be assumed to be `hsds`
 
 ```{r}
 src.hsds <- HSDSSource('http://hsdshdflab.hdfgroup.org')
-src.chan <- HSDSSource('http://h5s.channingremotedata.org:5000', 'h5serv')
 ```
 
 The routine `listDomains` is provided for inspection of the server hierarchy.
@@ -31,18 +30,8 @@ This is the hierarchy that maps approximately to the directory structure of
 the server file system. The purpose of this routine is to assist the user
 in locating HDF5 files. 
 
-The user needs to know the root domain of the server. This information 
-should be published with the endpoint. For an h5serv server, the default 
-`hdfgroup.org` is a good guess, because this value is preconfigured and 
-there is not often a reason to wish to change it. 
-
-```{r}
-listDomains(src.chan)
-listDomains(src.chan, 'public/hdfgroup/org')
-```
-
-For an hsds server, the root domain could be anything, so the administrator
-has to publish it.
+The user needs to know the root domain of the server. The data set's
+maintainer should publish this information along with the server endpoint.
 
 ```{r}
 listDomains(src.hsds, '/home/jreadey')
@@ -52,12 +41,11 @@ listDomains(src.hsds, '/home/jreadey/HDFLabTutorial')
 # HSDSFile
 
 An object of class HSDSFile represents a HDF5 file. The object is constructed 
-by providing a source and a file domain. (TODO: if the domain is not a 
-real file domain, this crashes with an unhelpful error message.)
+by providing a source and a file domain. 
 
 ```{r}
 f0 <- HSDSFile(src.hsds, '/home/spollack/testzero.h5')
-f1 <- HSDSFile(src.chan, 'tenx_100k_sorted.h5s.channingremotedata.org')
+f1 <- HSDSFile(src.hsds, '/shared/bioconductor/tenx_full.h5')
 ```
 
 The function `listDatasets` lists the datasets in a file.
@@ -73,12 +61,12 @@ Construct a HSDSDataset object from a HSDSFile and a dataset path.
 
 ```{r}
 d0 <- HSDSDataset(f0, '/grpA/grpAB/dsetX')
-d1 <- HSDSDataset(f1, '/assay001')
+d1 <- HSDSDataset(f1, '/newassay001')
 ```
 
 ## Data Fetch (1)
 
-The fundamental data retrieval method is `getData`. Its argument is a
+The low-level data retrieval method is `getData`. Its argument is a
 vector of slices of type `character`. Valid slices are `:` (all indices), 
 `1:10` (indices 1 through 10 inclusive), `:10` (same as `1:10`), `5:` 
 (from 5 to the maximum value of the index) and `2:14:4` (from 2 to 14 
