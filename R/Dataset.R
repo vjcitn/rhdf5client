@@ -29,8 +29,12 @@ HSDSDataset <- function(file, path)  {
     stop("no such dataset")
   uuid <- file@dsetdf[idx,2]
   request <- paste0(file@src@endpoint, '/datasets/', uuid, '?domain=', file@domain)
-  response <- submitRequest(request)
-
+  response <- tryCatch(submitRequest(request),
+    error=function(e) { NULL })
+  if (is.null(response))  { # this should be almost impossible
+    warning("bad http request", call. = FALSE)
+    return(NULL)
+  }
   shape <- response$shape$dims
   type <- list(class=response$type$class, base=response$type$base)
 

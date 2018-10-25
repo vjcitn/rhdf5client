@@ -22,7 +22,14 @@ setClass("HSDSFile", representation(src="HSDSSource", domain="character", dsetdf
 #' @export 
 HSDSFile <- function(src, domain)  {
   request <- paste0(src@endpoint, '?domain=', domain)
-  try(response <- submitRequest(request))  # crashes if not a file domain
+  response <- tryCatch(
+    submitRequest(request),
+    error=function(e) { NULL }
+  )  
+  if (is.null(request))  {
+    warning("no such file")
+    return(NULL)
+  }
   dsetdf <- findDatasets(src, domain)
   obj <- new("HSDSFile", src=src, domain=domain, dsetdf=dsetdf)
 }
@@ -51,37 +58,44 @@ listDatasets <- function(file)  {
 #  cache often-accessed information in a data.frame for the HSDSFile object.
 findDatasets <- function(src, domain)  {
 
-  request <- paste0(src@endpoint, '?domain=', domain)
-  response <- submitRequest(request)
-  fileroot <- response$root
-
-  # ye olde depth-first search
-  eee <- new.env(parent=emptyenv())
-  eee$results <- c()            # paths to datasets
-  eee$uuids <- c()
-
-  search <- function(uuid, path, ee)  {
-    # ee$results <- c(ee$results, path)
-    request <- paste0(src@endpoint, '/groups/', uuid, '/links?domain=', domain)
+  result <- tryCatch({
+    request <- paste0(src@endpoint, '?domain=', domain)
     response <- submitRequest(request)
-    for (link in response[['links']])  {
-      if ('collection' %in% names(link) && link[['collection']] == 'groups')  {
-        nxtuuid <- link[['id']]
-        nxtpath <- paste0(path, '/', link[['title']])
-        search(nxtuuid, nxtpath, ee)
-      } else if ('collection' %in% names(link) && link[['collection']] == 'datasets')  {
-        nxtuuid <- link[['id']]
-        nxtpath <- paste0(path, '/', link[['title']])
-        ee$results <- c(ee$results, nxtpath)
-        ee$uuids <- c(ee$uuids, nxtuuid)
+    fileroot <- response$root
+
+    # ye olde depth-first search
+    eee <- new.env(parent=emptyenv())
+    eee$results <- c()            # paths to datasets
+    eee$uuids <- c()
+
+    search <- function(uuid, path, ee)  {
+      # ee$results <- c(ee$results, path)
+      request <- paste0(src@endpoint, '/groups/', uuid, '/links?domain=', domain)
+      response <- submitRequest(request)
+      for (link in response[['links']])  {
+        if ('collection' %in% names(link) && link[['collection']] == 'groups')  {
+          nxtuuid <- link[['id']]
+          nxtpath <- paste0(path, '/', link[['title']])
+          search(nxtuuid, nxtpath, ee)
+        } else if ('collection' %in% names(link) && link[['collection']] == 'datasets')  {
+          nxtuuid <- link[['id']]
+          nxtpath <- paste0(path, '/', link[['title']])
+          ee$results <- c(ee$results, nxtpath)
+          ee$uuids <- c(ee$uuids, nxtuuid)
+        }
       }
     }
+    search(fileroot, '', eee)
+    1
+  }, error = function(e) { -1 })
+
+  if (result == -1)  {
+    warning(paste0("no datasets for file ", domain), call. = FALSE)
+    return(data.frame(paths=c(), uuids = c(), stringsAsFactors = FALSE))
   }
-
-  search(fileroot, '', eee)
-  data.frame(paths=eee$results, uuids=eee$uuids, stringsAsFactors = FALSE)
-
+  return(data.frame(paths=eee$results, uuids=eee$uuids, stringsAsFactors = FALSE))
 }
+
 setMethod("show", "HSDSFile", function(object) {
  cat(paste("rhdf5client HSDSFile instance from source", object@src@endpoint, "\n"))
  cat(paste("  domain: ", object@domain, "\n"))

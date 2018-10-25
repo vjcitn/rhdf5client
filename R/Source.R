@@ -189,7 +189,7 @@ domainContents <- function(object, rootdir = '/hdfgroup/org')  {
     }
   }, error=function(e) { -1 })    # catch http request errors
   if (result == -1)  {
-    warning("bad http request")
+    warning("bad http request", call. = FALSE)
   }
 
   rlist[-which(sapply(rlist, is.null))]

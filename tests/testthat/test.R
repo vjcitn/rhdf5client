@@ -78,7 +78,9 @@ test_that("Both servers found", {
   expect_true('neurons100k.h5s.channingremotedata.org' %in% doms) 
   doms <- listDomains(src.chan, 'public/hdfgroup/org')
   expect_true('tall.public.h5s.channingremotedata.org' %in% doms) 
-  
+  src.fake <- HSDSSource('http://hsdshdflab.fdhgroup.org')
+  # catch exception: non-existent source
+  expect_warning(listDomains(src.fake, '/home'), "bad http request")
 })
 
 context("Files")
@@ -91,6 +93,8 @@ test_that("Files can be opened for reading", {
   f2 <- HSDSFile(src.chan, 'tenx_100k_sorted.h5s.channingremotedata.org')
   dsts <- listDatasets(f2)
   expect_true(dsts == c('/assay001'))
+  # catch exception: non-existent or empty file
+  expect_warning(HSDSFile(src.hsds, '/home/spollack/testfake.h5'), "no datasets")
 })
 
 context("Datasets")
