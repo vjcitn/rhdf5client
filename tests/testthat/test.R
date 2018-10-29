@@ -81,14 +81,14 @@ test_that("Higher-dimensional dataset access works correctly",  {
 
 context("Decomposition into slices")
 test_that("Bad slices rejected",  {
-  tf <- rhdf5client2:::checkSlices(c(10, 20, 30), c('5:', ':', ':8'))
+  tf <- rhdf5client:::checkSlices(c(10, 20, 30), c('5:', ':', ':8'))
   ok <- c('4:10:1', '0:20:1', '0:8:1')
   expect_true(all(unlist(tf) == ok))
-  expect_error(rhdf5client2:::checkSlices(c(10, 20, 30), c('5:20', ':', ':8'),
+  expect_error(rhdf5client:::checkSlices(c(10, 20, 30), c('5:20', ':', ':8'),
     regexp='stop out of range'))
-  expect_error(rhdf5client2:::checkSlices(c(10, 20, 30), c('10:5', ':', ':8'),
+  expect_error(rhdf5client:::checkSlices(c(10, 20, 30), c('10:5', ':', ':8'),
     regexp='slice stop less than slice start'))
-  expect_error(rhdf5client2:::checkSlices(c(10, 20, 30), c('5:10,0.5', ':', ':8'),
+  expect_error(rhdf5client:::checkSlices(c(10, 20, 30), c('5:10,0.5', ':', ':8'),
     regexp='malformed slice'))
 })
 
