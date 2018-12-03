@@ -16,7 +16,9 @@ vector with dimensions of dataset
 acquire internal HDF5 dimension information for matrix
 }
 \examples{
+\dontrun{
 bigec2 = H5S_source(URL_h5serv())
 tex <- bigec2[["tenx_100k_sorted"]]
 internalDim(tex)
+}
 }

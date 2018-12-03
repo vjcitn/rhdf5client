@@ -20,5 +20,4 @@ server (either h5serv or hsds.)
 }
 \examples{
 src.hsds <- HSDSSource('http://hsdshdflab.hdfgroup.org')
-src.chan <- HSDSSource('http://h5s.channingremotedata.org:5000', 'h5serv')
 }

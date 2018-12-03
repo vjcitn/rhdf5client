@@ -64,10 +64,12 @@ fixtarget = function(x) sub(".*host=(.*).h5s.channingremotedata.org", "\\1", x)
 #' pass the domain path as a character string along with ther serverURL
 #' @return an initialized object of type H5S_source
 #' @examples
+#' \dontrun{
 #' bigec2 = H5S_source(URL_h5serv()) # h5serv 
 #' bigec2
 #' dsmeta(bigec2)[1:2,]       # two groups
 #' dsmeta(bigec2)[1,2][[1]]   # all dataset candidates in group 1
+#' }
 #' hsdsCon = H5S_source(URL_hsds()) # hsds server connection
 #' hsdsCon
 #' getReq(hsdsCon)
@@ -110,9 +112,11 @@ H5S_source = function(serverURL, domain, ...) {
 #' @return data frame with one row for each group and three columns. The 
 #' second column has the list of datasets in the group.
 #' @examples
+#' \dontrun{
 #' bigec2 = H5S_source(URL_h5serv())
 #' dsm <- dsmeta(bigec2) 
 #' dst <- unlist(dsm[1,2])    # all dataset candidates in group 1
+#' }
 #' @export
 dsmeta = function(src) {
   src@dsmeta
@@ -148,8 +152,10 @@ setGeneric("groups", function(object, index, ...) standardGeneric("groups"))
 #' @param \dots not used
 #' @return a data frame with group name and number of links for each group
 #' @examples
+#' \dontrun{
 #' bigec2 = H5S_source(URL_h5serv())
 #' groups(bigec2)
+#' }
 #' @rdname groups-methods
 #' @aliases groups,H5S_source,missing-method 
 setMethod("groups", c("H5S_source", "missing"), function(object, index, ...) {
@@ -216,9 +222,11 @@ setMethod("setPath", c("H5S_source","character"), function(object, folderPath, .
 #' @param \dots not used
 #' @return an object of type H5S_linkset with the linkset of the group
 #' @examples
+#' \dontrun{
 #' bigec2 = H5S_source(URL_h5serv())
 #' lks <- links(bigec2, 1)    # linkset for root group 
 #' urls <- targets(lks)       # URLs of datasets in linkset
+#' }
 #' @rdname links
 #' @aliases links,H5S_source,numeric-method
 #' @export links
@@ -239,9 +247,11 @@ setMethod("links", c("H5S_source", "numeric"), function(object, index, ...) {
 #' @return a vector of dataset tags
 #' @rdname targets
 #' @examples
+#' \dontrun{
 #' bigec2 = H5S_source(URL_h5serv())
 #' lks <- links(bigec2, 1)    # linkset for root group 
 #' urls <- targets(lks)       # URLs of datasets in linkset
+#' }
 #' @export
 
 targets = function(h5linkset, index) {
@@ -541,9 +551,11 @@ dataset = function(h5s, tag) {
 #' @param h5d instance of H5S_dataset
 #' @return vector with dimensions of dataset
 #' @examples
+#' \dontrun{
 #' bigec2 = H5S_source(URL_h5serv())
 #' tex <- bigec2[["tenx_100k_sorted"]]
 #' internalDim(tex)
+#' }
 #' @export
 internalDim = function(h5d) {
   d = slot(h5d, "shapes")$dims

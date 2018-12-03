@@ -16,7 +16,6 @@ setClass("HSDSSource", representation(endpoint="character", type="character"))
 #' @return An object of type HSDSSource
 #' @examples
 #' src.hsds <- HSDSSource('http://hsdshdflab.hdfgroup.org')
-#' src.chan <- HSDSSource('http://h5s.channingremotedata.org:5000', 'h5serv')
 #' @export
 HSDSSource <- function(endpoint, type='hsds')  {
   if (!(type %in% c('h5serv', 'hsds')))

@@ -29,7 +29,7 @@ sum(A)
 
 ### Get result with `reticulate` and `h5pyd`
 
-```{r}
+```{r, eval=FALSE}
 h5pyd <- import("h5pyd")
 builtins <- import_builtins()
 
@@ -48,7 +48,7 @@ sum(A)
 The dimensionality of the http response from the server is somewhat non-intuitive,
 so we need to test a case in which the single-width slices are dispersed:
 
-```{r}
+```{r, eval=FALSE}
 BR <- getData(rd, list(c(4), 1:11, c(5), 1:3))
 scs <- tuple(builtins$slice(3L, 4L, 1L), builtins$slice(0L, 12L, 1L),
              builtins$slice(4L, 5L, 1L), builtins$slice(0L, 3L, 1L))
@@ -58,7 +58,7 @@ all(BP == BR)
 ```
 
 
-```{r}
+```{r, eval=FALSE}
 BR <- getData(rd, list(c(5), 1:11, 1:7, c(2)))
 scs <- tuple(builtins$slice(4L, 5L, 1L), builtins$slice(0L, 12L, 1L),
              builtins$slice(0L, 7L, 1L), builtins$slice(1L, 2L, 1L))

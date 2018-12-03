@@ -35,7 +35,4 @@ create H5S_Array instance given url (filepath) and entity (host) name
 # ch.9.98989607R -1.80646652  0.4760022  1.4771808  |  0.9479602  0.49921375
 # ch.9.991104F    0.08180195 -0.2434306  1.0281002  | -0.1653721  0.55612215
 #
-# compare to that delivered by H5S_Array
-#
-H5S_Array("http://h5s.channingremotedata.org:5000", "", "assays")
 }

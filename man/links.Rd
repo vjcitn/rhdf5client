@@ -21,7 +21,9 @@ an object of type H5S_linkset with the linkset of the group
 access for link metadata for HDF5 server groups
 }
 \examples{
+\dontrun{
 bigec2 = H5S_source(URL_h5serv())
 lks <- links(bigec2, 1)    # linkset for root group 
 urls <- targets(lks)       # URLs of datasets in linkset
+}
 }

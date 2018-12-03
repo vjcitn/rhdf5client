@@ -28,6 +28,8 @@ a data frame with group name and number of links for each group
 HDF5 server data groups accessor
 }
 \examples{
+\dontrun{
 bigec2 = H5S_source(URL_h5serv())
 groups(bigec2)
+}
 }

@@ -56,10 +56,12 @@ If the domain for the HSDS server is known,
 pass the domain path as a character string along with ther serverURL
 }
 \examples{
+\dontrun{
 bigec2 = H5S_source(URL_h5serv()) # h5serv 
 bigec2
 dsmeta(bigec2)[1:2,]       # two groups
 dsmeta(bigec2)[1,2][[1]]   # all dataset candidates in group 1
+}
 hsdsCon = H5S_source(URL_hsds()) # hsds server connection
 hsdsCon
 getReq(hsdsCon)

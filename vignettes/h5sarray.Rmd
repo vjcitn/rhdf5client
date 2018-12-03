@@ -38,19 +38,6 @@ If the server is an hsds instance, the filepath should have the path and
 name of the HDF5 file. 
 
 
-# Interface to h5serv (Channing Remote Data Server)
-
-```{r lkdela}
-del10x = H5S_Array(URL_h5serv(), '', "tenx_full")
-del10x
-```
-
-Here we have defined the R image of the data to be the
-transpose of the image in HDF5.  So neurons are columns.
-```{r lkdela2}
-apply(del10x[,1:4],2,sum)
-```
-
 # Interface to HSDS (HDF Object Store)
 ```{r lkdela3}
 del10x = H5S_Array(URL_hsds(), '/home/reshg/tenx_full.h5', 'newassay001')

@@ -17,7 +17,9 @@ second column has the list of datasets in the group.
 list information about datasets available in an H5S_source
 }
 \examples{
+\dontrun{
 bigec2 = H5S_source(URL_h5serv())
 dsm <- dsmeta(bigec2) 
 dst <- unlist(dsm[1,2])    # all dataset candidates in group 1
+}
 }
