@@ -10,6 +10,9 @@
 #
 # longrunning jan 2018
 
+deprecate_msg = paste0("This function is deprecated. The new interface to rhdf5client",
+ " is exclusively through its DelayedArray backend HSDSArray")
+
 # (legacy) with h5serv omit filepath and look in dsmeta for dataset
 # endpoint URL_h5serv()
 # filepath ''
@@ -72,6 +75,7 @@ H5S_ArraySeed = function(endpoint, filepath, host) {
 #' @aliases dimnames,H5S_ArraySeed-method
 #' @export
 setMethod("dimnames", "H5S_ArraySeed", function(x) {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   list(NULL, NULL)
 })
 
@@ -84,6 +88,7 @@ setMethod("dimnames", "H5S_ArraySeed", function(x) {
 setMethod("dim", "H5S_ArraySeed", function(x) {
   # note that for HDF Server the internal dims are
   # transposed relative to R expectations
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   rev(as.integer(x@H5S_dataset@shapes$dims))
 })
 
@@ -159,5 +164,6 @@ setMethod("DelayedArray", "H5S_ArraySeed",
 #' #
 #' @export
 H5S_Array = function(endpoint, filepath, host)   {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   DelayedArray(H5S_ArraySeed(endpoint, filepath, host))
 }

@@ -1,3 +1,6 @@
+deprecate_msg = paste0("This function is deprecated. The new interface to rhdf5client",
+ " is exclusively through its DelayedArray backend HSDSArray")
+
 #' An S4 class to represent an HDF5 file accessible from a server.
 #'
 #' @slot HSDSSource an object of type HSDSSource
@@ -19,8 +22,9 @@ setClass("HSDSFile", representation(src="HSDSSource", domain="character", dsetdf
 #' @examples
 #' src <- HSDSSource('http://hsdshdflab.hdfgroup.org')
 #' f10x <- HSDSFile(src, '/shared/bioconductor/tenx_full.h5')
-#' @export 
+#' @export
 HSDSFile <- function(src, domain)  {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   request <- paste0(src@endpoint, '?domain=', domain)
   response <- tryCatch(
     submitRequest(request),
@@ -51,6 +55,7 @@ HSDSFile <- function(src, domain)  {
 #' listDatasets(f)
 #' @export
 listDatasets <- function(file)  {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   file@dsetdf[['paths']]
 }
 

@@ -1,3 +1,6 @@
+deprecate_msg = paste0("This function is deprecated. The new interface to rhdf5client",
+ " is exclusively through its DelayedArray backend HSDSArray")
+
 # utilities for index processing
 # sproc(isplit(vec)) will convert vec representing R integer vector
 # into a list of HDF5server 'select' index candidates
@@ -9,6 +12,7 @@
 #' @return list of vectors of integers which can be expressed as initial/final/stride triplets 
 #' @export
 isplit = function(x)  {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   if (length(x)==1) return(list(`1`=x))
   y <- rep(0,length(x))
   i <- 3
@@ -36,6 +40,7 @@ nosci <- function(x) format(x, scientific=FALSE)
 #' sproc(isplit(inds))
 #' @export
 sproc = function(spl)  {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   ans <- lapply(spl, function(x) {
     if (length(x) == 1) return(paste(nosci(x), ":", nosci(x), ":1", sep=""))
     d <- x[2]-x[1]

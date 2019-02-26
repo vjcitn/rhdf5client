@@ -1,16 +1,25 @@
+deprecate_msg = paste0("This function is deprecated. The new interface to rhdf5client",
+ " is exclusively through its DelayedArray backend HSDSArray")
+
 #' manage h5serv URL
 #' @return URL of h5serv server
 #' @examples
 #' URL_h5serv()
 #' @export
-URL_h5serv = function() "http://h5s.channingremotedata.org:5000"
+URL_h5serv = function() { 
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
+  "http://h5s.channingremotedata.org:5000"
+}
 
 #' manage hsds URL
 #' @return URL of hsds server
 #' @examples
 #' URL_hsds()
 #' @export
-URL_hsds = function() "http://hsdshdflab.hdfgroup.org"
+URL_hsds = function() {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
+  "http://hsdshdflab.hdfgroup.org"
+}
 
 #' @importFrom httr GET
 #' @importFrom httr add_headers
@@ -32,6 +41,7 @@ URL_hsds = function() "http://hsdshdflab.hdfgroup.org"
 
 setClass("H5S_source", representation(serverURL="character", dsmeta="DataFrame", getReq = "DataFrame",dmains= "DataFrame", folderPath = "character"))
 setMethod("show", "H5S_source", function(object) {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   if(nrow(object@dsmeta)>1){
   cat(" H5serv server url : ", object@serverURL, 
       "\n There are", nrow(object@dsmeta), "groups.",
@@ -78,6 +88,7 @@ fixtarget = function(x) sub(".*host=(.*).h5s.channingremotedata.org", "\\1", x)
 #' H5S_dataset2(hsds, "d-a9e4b71c-8ea2-11e8-9306-0242ac120022")
 #' @export
 H5S_source = function(serverURL, domain, ...) {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   if(missing(domain)){
     serverCheck = serverVersion(serverURL)
     if(serverCheck == 1){
@@ -119,6 +130,7 @@ H5S_source = function(serverURL, domain, ...) {
 #' }
 #' @export
 dsmeta = function(src) {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   src@dsmeta
 }
 
@@ -127,6 +139,7 @@ dsmeta = function(src) {
 #' @return data frame with 5 columns for one row for each user's data
 #' @export
 getReq = function(src) {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   src@getReq
 }
 
@@ -136,6 +149,7 @@ getReq = function(src) {
 #' @param j not used
 #' @exportMethod [[
 setMethod("[[", c("H5S_source", "character", "ANY"), function(x, i, j) {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   dataset(x, i)
 })
 
@@ -159,6 +173,7 @@ setGeneric("groups", function(object, index, ...) standardGeneric("groups"))
 #' @rdname groups-methods
 #' @aliases groups,H5S_source,missing-method 
 setMethod("groups", c("H5S_source", "missing"), function(object, index, ...) {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   target = paste0(.serverURL(object), "/groups")
   ans = transl(target) # fromJSON(readBin(GET(target)$content, w="character"))
 
@@ -185,10 +200,10 @@ setMethod("groups", c("H5S_source", "missing"), function(object, index, ...) {
 #' @aliases groups,H5S_source,numeric-method
 #' @rdname groups-methods
 setMethod("groups", c("H5S_source", "numeric"), function(object, index, ...) {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   groups(object)[index,,drop=FALSE]
 })
 
-# TODO: should this be documented?
 setClass("H5S_linkset", representation(links="list", group="character",
                                        source="H5S_source"))
 setMethod("show", "H5S_linkset", function(object) {
@@ -212,6 +227,7 @@ setMethod("show", "H5S_linkset", function(object) {
 #'@exportMethod setPath
 setGeneric("setPath", function(object,folderPath, ...) standardGeneric("setPath"))
 setMethod("setPath", c("H5S_source","character"), function(object, folderPath, ...) {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   object@folderPath = folderPath
   object
 })
@@ -233,6 +249,7 @@ setMethod("setPath", c("H5S_source","character"), function(object, folderPath, .
 #' @exportMethod links
 setGeneric("links", function(object, index, ...) standardGeneric("links"))
 setMethod("links", c("H5S_source", "numeric"), function(object, index, ...) {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   gname = groups(object, index)[["groups"]][1] # skirt mcols bug
   target = paste0(.serverURL(object), "/groups/", gname, "/links" )
   ans = transl(target) # fromJSON(readBin(GET(target)$content, w="character"))
@@ -255,6 +272,7 @@ setMethod("links", c("H5S_source", "numeric"), function(object, index, ...) {
 #' @export
 
 targets = function(h5linkset, index) {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   lks <- .links(h5linkset)
   vapply(h5linkset@links$links, function(lk) lk[["target"]], character(1)) 
 }
@@ -290,6 +308,7 @@ setClass("H5S_dataset", representation(
   shapes="list", hrefs="DataFrame", allatts="list", 
   presel="character", transfermode="character"))
 setMethod("show", "H5S_dataset", function(object) {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   cat("H5S_dataset instance:\n")
   curdim = object@shapes$dims
   print(data.frame(dsname=object@simpleName, intl.dim1=curdim[1], intl.dim2=curdim[2], 
@@ -309,6 +328,7 @@ setMethod("show", "H5S_dataset", function(object) {
 setGeneric("transfermode<-", def = function(object, value) { standardGeneric("transfermode<-") })
 setReplaceMethod("transfermode", "H5S_dataset", 
   function(object, value) {  
+    .Deprecated("HSDSArray", NULL, deprecate_msg)
     if ( value == "JSON" | value == "binary" )  {
       object@transfermode <- value  
     }  else  {
@@ -397,6 +417,7 @@ setMethod("[", c("H5S_dataset", "numeric", "numeric"), function(x, i, j, ..., dr
 #
 # bracket selection passed directly to HDF5 server ... row-major
 #
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   ii <- as.integer(i)
   jj <- as.integer(j)
   if (any(ii != i) | any(jj != j))  {
@@ -511,6 +532,7 @@ setMethod("[", c("H5S_dataset", "character", "character"), function(x, i, j, ...
 #' @return object of type H5S_dataset
 #' @export
 dataset = function(h5s, tag) {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   dsns = dsmeta(h5s)[["dsnames"]] # mcols problem with [,"dsnames"]
   # find row of dsmeta DataFrame where tag is a substring of a dataset name
   # to allow substrings to be used for querying (e.g., "100k" for "neurons100k")
@@ -558,6 +580,7 @@ dataset = function(h5s, tag) {
 #' }
 #' @export
 internalDim = function(h5d) {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   d = slot(h5d, "shapes")$dims
   c(intl.dim1=d[1], intl.dim2=d[2])
 }
@@ -576,6 +599,7 @@ internalDim = function(h5d) {
 #' @exportMethod hsdsInfo
 setGeneric("hsdsInfo", function(object) standardGeneric("hsdsInfo"))
 setMethod("hsdsInfo", c("H5S_source"), function(object) {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   #target = paste0(.serverURL(object))
   target = paste0(.serverURL(object),"/domains")
   ans = transl(target) # fromJSON(readBin(GET(target)$content, w="character"))
@@ -608,6 +632,7 @@ setMethod("hsdsInfo", c("H5S_source"), function(object) {
 #' @exportMethod domains
 setGeneric("domains", function(object, ...) standardGeneric("domains"))
 setMethod("domains", c("H5S_source"), function(object, ...) {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   target = paste0(.serverURL(object, ...),"/domains?domain=", object@folderPath)
   #target = paste0(.serverURL(object))
   ans = transl(target) # fromJSON(readBin(GET(target)$content, w="character"))
@@ -635,6 +660,7 @@ setMethod("domains", c("H5S_source"), function(object, ...) {
 #'@rdname getDatasetUUIDs
 #'@export
 getDatasetUUIDs <- function(object) {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   query = sprintf("%s/datasets?host=%s", object@serverURL, object@folderPath)
   ans = try(GET(query))
   if (inherits(ans, "try-error")) stop("could not resolve datasets query")
@@ -654,6 +680,7 @@ getDatasetUUIDs <- function(object) {
 #'@rdname getDatasetAttrs
 #'@export
 getDatasetAttrs <- function(object, duid) {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   #uu = getDatasetUUIDs(object)
   uu = duid
   query = sprintf("%s/datasets/%s?host=%s", object@serverURL, uu, object@folderPath)
@@ -675,6 +702,7 @@ getDatasetAttrs <- function(object, duid) {
 #'@rdname getDims
 #'@export
 getDims <- function(object, duid) {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   stopifnot(is(object, "H5S_source"))
   getDatasetAttrs(object, duid)$shape$dims
 }
@@ -691,6 +719,7 @@ getDims <- function(object, duid) {
 #'@rdname getHRDF
 #'@export
 getHRDF <- function(object, duid) {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   stopifnot(is(object, "H5S_source"))
   atts = getDatasetAttrs(object, duid)
   nms = sapply(atts$hrefs, "[[", "rel")
@@ -710,6 +739,7 @@ getHRDF <- function(object, duid) {
 #'@rdname H5S_dataset2
 #'@export
 H5S_dataset2 = function(object, duid) {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   src = new("H5S_source", serverURL=object@serverURL, dsmeta=DataFrame())
   atts = getDatasetAttrs(object, duid)
   ans = getHRDF(object, duid)
@@ -735,6 +765,7 @@ H5S_dataset2 = function(object, duid) {
 #'getDatasetSlice(hsds,dsindex=1,selectionString="[1:2,1:5]")
 #'@export
 getDatasetSlice <- function(object, dsindex=1, selectionString, ...) {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   requireNamespace("httr")
   requireNamespace("rjson")
   uuid = getDatasetUUIDs(object)[dsindex]
@@ -756,6 +787,7 @@ getDatasetSlice <- function(object, dsindex=1, selectionString, ...) {
 #'ds
 #'@export
 fetchDatasets <- function(object){
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   hdf5DataStore <- R6Class("hdf5DataStore", list(
     serverURL="",
     domain="",

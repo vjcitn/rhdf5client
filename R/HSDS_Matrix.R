@@ -1,3 +1,6 @@
+deprecate_msg = paste0("This function is deprecated. The new interface to rhdf5client",
+ " is exclusively through its DelayedArray backend HSDSArray")
+
 #' simplify construction of DelayedMatrix from url and path in HSDS
 #' @param url character(1) URL for HSDS object store with port
 #' @param path character(1) path from root defining HDF Cloud resource
@@ -6,6 +9,7 @@
 #' HSDS_Matrix
 #' @export
 HSDS_Matrix_OLD = function(url, path) {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   so = H5S_source(url, path)
   dss = fetchDatasets(so) 
   uu = dss$id
@@ -25,6 +29,7 @@ HSDS_Matrix_OLD = function(url, path) {
 #' HSDS_Matrix(URL_hsds(), "/shared/bioconductor/darmgcls.h5")
 #' @export
 HSDS_Matrix = function(url, path, title) {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   so = H5S_source(url, path)
   dss = fetchDatasets(so)
   uu = dss$id

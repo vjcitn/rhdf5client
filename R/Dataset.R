@@ -1,3 +1,6 @@
+deprecate_msg = paste0("This function is deprecated. The new interface to rhdf5client",
+ " is exclusively through its DelayedArray backend HSDSArray")
+
 #' An S4 class to represent a dataset in a HDF5 file.
 #' @import httr methods rjson
 #' @slot file An object of type HSDSFile; the file in which the dataset is resident.
@@ -23,7 +26,7 @@ setClass("HSDSDataset", representation(file="HSDSFile", path="character", uuid="
 #' d <- HSDSDataset(f, '/grpA/grpAB/dsetX')
 #' @export
 HSDSDataset <- function(file, path)  {
-
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   idx <- which(file@dsetdf[,1] == path)
   if (length(idx) == 0)  
     stop("no such dataset")
@@ -99,6 +102,7 @@ setGeneric("getData", function(dataset, indices, transfermode) standardGeneric("
 #' @aliases getData,HSDSDataset,character,character-method
 setMethod("getData", c("HSDSDataset", "character", "character"),  
   function(dataset, indices, transfermode)  {
+    .Deprecated("HSDSArray", NULL, deprecate_msg)
     getDataVec(dataset, indices, transfermode)
   })
 
@@ -106,6 +110,7 @@ setMethod("getData", c("HSDSDataset", "character", "character"),
 #' @aliases getData,HSDSDataset,character,missing-method
 setMethod("getData", c("HSDSDataset", "character", "missing"),  
   function(dataset, indices)  {
+    .Deprecated("HSDSArray", NULL, deprecate_msg)
     getDataVec(dataset, indices, 'JSON')
   })
 
@@ -113,6 +118,7 @@ setMethod("getData", c("HSDSDataset", "character", "missing"),
 #' @aliases getData,HSDSDataset,list,character-method
 setMethod("getData", c("HSDSDataset", "list", "character"),  
 function(dataset, indices, transfermode)  {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   getDataList(dataset, indices, transfermode)  
   })
 
@@ -120,6 +126,7 @@ function(dataset, indices, transfermode)  {
 #' @aliases getData,HSDSDataset,list,,missing-method
 setMethod("getData", c("HSDSDataset", "list", "missing"),  
 function(dataset, indices)  {
+  .Deprecated("HSDSArray", NULL, deprecate_msg)
   getDataList(dataset, indices, 'JSON')  
   })
 
