@@ -17,7 +17,7 @@ domains(object, ...)
 a data frame with domains name
 }
 \description{
-HSDS server domains accessor
+This function is deprecated and will be defunct in the next release.
 }
 \examples{
 hsdsCon = H5S_source(URL_hsds()) # hsds server connection

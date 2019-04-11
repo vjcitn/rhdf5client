@@ -2,6 +2,9 @@ deprecate_msg = paste0("This function is deprecated. The new interface to rhdf5c
  " is exclusively through its DelayedArray backend HSDSArray")
 
 #' manage h5serv URL
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #' @return URL of h5serv server
 #' @examples
 #' URL_h5serv()
@@ -12,6 +15,9 @@ URL_h5serv = function() {
 }
 
 #' manage hsds URL
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #' @return URL of hsds server
 #' @examples
 #' URL_hsds()
@@ -29,6 +35,9 @@ URL_hsds = function() {
 
 
 #' H5S_source identifies an HDF5/HSDS server and manages some metadata about contents
+#'
+#' This class is deprecated and will be defunct in the next release.
+#'
 #' @name H5S_source
 #' @rdname H5S_source-class
 #' @slot serverURL character string with a URL
@@ -61,6 +70,9 @@ setMethod("show", "H5S_source", function(object) {
 fixtarget = function(x) sub(".*host=(.*).h5s.channingremotedata.org", "\\1", x)
 
 #' construct H5S_source
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #' @name H5S_source
 #' @rdname H5S_source-class
 #' @param serverURL a URL for a port for HDF5Server
@@ -119,6 +131,9 @@ H5S_source = function(serverURL, domain, ...) {
 }
 
 #' list information about datasets available in an H5S_source
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #' @param src H5S_source instance
 #' @return data frame with one row for each group and three columns. The 
 #' second column has the list of datasets in the group.
@@ -135,6 +150,9 @@ dsmeta = function(src) {
 }
 
 #' list information about server content available in an H5S_source hsds instance
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #' @param src H5S_source instance
 #' @return data frame with 5 columns for one row for each user's data
 #' @export
@@ -143,7 +161,12 @@ getReq = function(src) {
   src@getReq
 }
 
-#' @rdname H5S_source-class
+#' Subscript operator
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
+#' @name H5S_source-class
+#' @aliases '[[',H5S_source,character
 #' @param x instance of H5S_source
 #' @param i character string intended to identify dataset on server
 #' @param j not used
@@ -161,6 +184,9 @@ setMethod("[[", c("H5S_source", "character", "ANY"), function(x, i, j) {
 setGeneric("groups", function(object, index, ...) standardGeneric("groups"))
 
 #' @param object H5S_source instance
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #' @param index numeric, if present, extracts metadata about selected group (sequential ordering 
 #' of groups as returned by server) access for group information for HDF5 server
 #' @param \dots not used
@@ -213,6 +239,9 @@ setMethod("show", "H5S_linkset", function(object) {
 })
 
 #'set path for hsds server resource
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #'@param object H5S_source instance
 #'@param folderPath character string with path to user's folder on hsds server
 #'@param \dots not used
@@ -233,6 +262,9 @@ setMethod("setPath", c("H5S_source","character"), function(object, folderPath, .
 })
 
 #' access for link metadata for HDF5 server groups
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #' @param object H5S_source instance
 #' @param index numeric group index
 #' @param \dots not used
@@ -259,6 +291,9 @@ setMethod("links", c("H5S_source", "numeric"), function(object, index, ...) {
 .links <- function(linkset) { linkset@links }    # private accessor
 
 #' provide the full URLs for link members
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #' @param h5linkset instance of H5S_linkset
 #' @param index numeric index into link vector - ignored
 #' @return a vector of dataset tags
@@ -291,6 +326,9 @@ hosts = function(h5linkset, index, cleanIP=TRUE) {
 }
 
 #' construct H5S_dataset object
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #' @name H5S_dataset
 #' @import S4Vectors
 #' @slot source instance of H5S_source instance
@@ -317,6 +355,9 @@ setMethod("show", "H5S_dataset", function(object) {
 })
 
 #' replace transfer mode
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #' @name transfermode<-
 #' @param object instance of H5S_linkset
 #' @param value either "JSON" (default) or "binary"
@@ -403,6 +444,9 @@ serverVersion <- function(serverURL = serverURL){
 }
 
 #' extract elements from H5S_dataset
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #' @rdname extract-methods
 #' @param x instance of H5S_dataset
 #' @param i select option for first matrix index in HDF5 server value API
@@ -413,8 +457,6 @@ serverVersion <- function(serverURL = serverURL){
 #' @return matrix of data obtained
 #' @exportMethod [
 setMethod("[", c("H5S_dataset", "numeric", "numeric"), function(x, i, j, ..., drop=FALSE) {
-# TODO: provide examples with numeric and string indices
-#
 # bracket selection passed directly to HDF5 server ... row-major
 #
   .Deprecated("HSDSArray", NULL, deprecate_msg)
@@ -526,6 +568,9 @@ setMethod("[", c("H5S_dataset", "character", "character"), function(x, i, j, ...
 })
 
 #' Find a dataset on source from its name
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #' @name dataset
 #' @param h5s instance of H5S_source
 #' @param tag character string identifying a dataset
@@ -570,6 +615,9 @@ dataset = function(h5s, tag) {
 }
 
 #' acquire internal HDF5 dimension information for matrix
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #' @param h5d instance of H5S_dataset
 #' @return vector with dimensions of dataset
 #' @examples
@@ -587,6 +635,9 @@ internalDim = function(h5d) {
 
 
 #' HSDS server get request accessor
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #' @param object H5S_source instance
 #' @return a data frame with response
 #' @examples 
@@ -618,6 +669,9 @@ setMethod("hsdsInfo", c("H5S_source"), function(object) {
 })
 
 #' HSDS server domains accessor
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #' @param object H5S_source instance
 #' @param \dots not used
 #' @return a data frame with domains name
@@ -651,6 +705,9 @@ setMethod("domains", c("H5S_source"), function(object, ...) {
 })
 
 #'getDatasetUUIDs from hsds server
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #'@param object instance of H5S_source(updated object with path to file set)
 #'@return character of dataset uuid obtained 
 #'@examples
@@ -669,6 +726,9 @@ getDatasetUUIDs <- function(object) {
 }
 
 #'getDatasetAttrs from hsds server
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #'@param object instance of H5S_source(updated object with path to file set)
 #'@param duid character string with dataset uuid
 #'@return list of data obtained
@@ -691,6 +751,9 @@ getDatasetAttrs <- function(object, duid) {
 }
 
 #'getDims from hsds server
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #'@param object instance of H5S_source(updated object with path to file set)
 #'@param duid character string with dataset uuid
 #'@return numeric content of dimensions
@@ -708,6 +771,9 @@ getDims <- function(object, duid) {
 }
 
 #'getHRDF from hsds server
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #'@param object instance of H5S_source(updated object with path to file set)
 #'@param duid character string with dataset uuid
 #'@return DataFrame of data obtained
@@ -728,6 +794,9 @@ getHRDF <- function(object, duid) {
 }
 
 #'H5S_dataset2 for datasets in hsds server
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #'@param object instance of H5S_source(updated object with path to file set)
 #'@param duid character vector with dataset uuid of interest
 #'@return H5S_dataset object
@@ -754,6 +823,9 @@ H5S_dataset2 = function(object, duid) {
 }
 
 #'getDatasetSlice from hsds server
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #'@param object instance of H5S_source(updated object with path to file set)
 #'@param dsindex dataset index
 #'@param selectionString character with selectionString
@@ -776,6 +848,9 @@ getDatasetSlice <- function(object, dsindex=1, selectionString, ...) {
 }
 
 #'fetch datasets of a hdf5 file from the hsds server
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #'@import R6
 #'@import httr
 #'@param object instance of H5S_source

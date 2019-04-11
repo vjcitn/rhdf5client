@@ -22,5 +22,7 @@ currently returns list(NULL, NULL) as we do not store dimnames in HDF5
 A NULL list of length equal to the array dimensionality
 }
 \description{
+This function is deprecated and will be defunct in the next release.
+
 (required by DelayedArray seed contract, returns NULL list)
 }

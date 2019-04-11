@@ -15,7 +15,7 @@ targets(h5linkset, index)
 a vector of dataset tags
 }
 \description{
-provide the full URLs for link members
+This function is deprecated and will be defunct in the next release.
 }
 \examples{
 \dontrun{

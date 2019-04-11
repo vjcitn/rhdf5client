@@ -19,6 +19,9 @@ an initialized object of type HSDSFile
 A HSDSFile is a representation of an HDF5 file the contents of which are accessible 
 exposed by a HDF5 server.
 }
+\details{
+This function is deprecated and will be defunct in the next release.
+}
 \examples{
 src <- HSDSSource('http://hsdshdflab.hdfgroup.org')
 f10x <- HSDSFile(src, '/shared/bioconductor/tenx_full.h5')

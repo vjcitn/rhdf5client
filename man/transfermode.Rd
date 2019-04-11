@@ -17,5 +17,5 @@ transfermode(object) <- value
 updated object of type H5S_dataset
 }
 \description{
-replace transfer mode
+This function is deprecated and will be defunct in the next release.
 }

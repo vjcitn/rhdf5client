@@ -15,7 +15,7 @@ getDims(object, duid)
 numeric content of dimensions
 }
 \description{
-getDims from hsds server
+This function is deprecated and will be defunct in the next release.
 }
 \examples{
 hsdsCon = H5S_source(URL_hsds()) # hsds server

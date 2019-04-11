@@ -13,5 +13,5 @@ getReq(src)
 data frame with 5 columns for one row for each user's data
 }
 \description{
-list information about server content available in an H5S_source hsds instance
+This function is deprecated and will be defunct in the next release.
 }

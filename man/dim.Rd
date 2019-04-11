@@ -22,6 +22,8 @@ integer(2) vector of dimensions corresponding to R's layout, assuming 2-d data
 A numeric vector of the dimensions
 }
 \description{
+This function is deprecated and will be defunct in the next release.
+
 (required by DelayedArray seed contract)
 HDF server content is assumed transposed relative to R matrix layout.
 This anticipates H5 datasets on the server with rows for 

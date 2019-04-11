@@ -2,6 +2,9 @@ deprecate_msg = paste0("This function is deprecated. The new interface to rhdf5c
  " is exclusively through its DelayedArray backend HSDSArray")
 
 #' simplify construction of DelayedMatrix from url and path in HSDS
+#'
+#' This class is deprecated and will be defunct in the next release.
+#'
 #' @param url character(1) URL for HSDS object store with port
 #' @param path character(1) path from root defining HDF Cloud resource
 #' @return instance of DelayedArray
@@ -21,6 +24,9 @@ HSDS_Matrix_OLD = function(url, path) {
 }
 
 #' simplify construction of DelayedMatrix from url and path in HSDS
+#'
+#' This class is deprecated and will be defunct in the next release.
+#'
 #' @param url character(1) URL for HSDS object store with port
 #' @param path character(1) path from root defining HDF Cloud resource
 #' @param title character(1) name of dataset to use

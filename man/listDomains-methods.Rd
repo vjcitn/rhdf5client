@@ -26,6 +26,9 @@ The user needs to give the domain to start in. The search
 will be non-recursive. I.e., output for domain '/home/jreadey/' will 
 not return the files in '/home/jreadey/HDFLabTutorial/'
 }
+\details{
+This function is deprecated and will be defunct in the next release.
+}
 \examples{
 src.hsds <- HSDSSource('http://hsdshdflab.hdfgroup.org')
 src.chan <- HSDSSource('http://h5s.channingremotedata.org:5000', 'h5serv')

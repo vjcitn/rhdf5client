@@ -18,6 +18,9 @@ An object of type HSDSSource
 A HSDSSource is a representation of a URL which provides access to a HDF5 
 server (either h5serv or hsds.)
 }
+\details{
+This function is deprecated and will be defunct in the next release.
+}
 \examples{
 src.hsds <- HSDSSource('http://hsdshdflab.hdfgroup.org')
 }

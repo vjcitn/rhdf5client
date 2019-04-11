@@ -2,9 +2,8 @@
 % Please edit documentation in R/h5serv.R
 \docType{class}
 \name{H5S_source}
-\alias{H5S_source}
 \alias{H5S_source-class}
-\alias{[[,H5S_source,character-method}
+\alias{H5S_source,character}
 \title{H5S_source identifies an HDF5/HSDS server and manages some metadata about contents}
 \usage{
 H5S_source(serverURL, domain, ...)
@@ -28,9 +27,8 @@ H5S_source(serverURL, domain, ...)
 an initialized object of type H5S_source
 }
 \description{
-H5S_source identifies an HDF5/HSDS server and manages some metadata about contents
+This class is deprecated and will be defunct in the next release.
 
-construct H5S_source
 }
 \section{Slots}{
 

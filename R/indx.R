@@ -2,6 +2,9 @@ deprecate_msg = paste0("This function is deprecated. The new interface to rhdf5c
  " is exclusively through its DelayedArray backend HSDSArray")
 
 # utilities for index processing
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 # sproc(isplit(vec)) will convert vec representing R integer vector
 # into a list of HDF5server 'select' index candidates
 #' isplit converts a numeric vector into a list of sequences for compact reexpression
@@ -31,6 +34,9 @@ isplit = function(x)  {
 nosci <- function(x) format(x, scientific=FALSE)
 
 #' sproc makes vector of type character of triplets initial:final:stride in R-conventions
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #' @name sproc
 #' @rdname sproc
 #' @param spl output of isplit

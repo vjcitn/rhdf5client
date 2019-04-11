@@ -6,7 +6,7 @@
 \alias{H5S_dataset-class}
 \title{construct H5S_dataset object}
 \description{
-construct H5S_dataset object
+This function is deprecated and will be defunct in the next release.
 }
 \section{Slots}{
 

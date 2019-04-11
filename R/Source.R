@@ -3,6 +3,8 @@ deprecate_msg = paste0("This function is deprecated. The new interface to rhdf5c
 
 #' An S4 class to represent a HDF5 server listening on a port.
 #'
+#' This class is deprecated and will be defunct in the next release.
+#'
 #' @slot endpoint URL for server 
 #' @slot type Type of server software at the source; must be 
 #' either 'h5serv' or (default) 'hsds' 
@@ -12,6 +14,8 @@ setClass("HSDSSource", representation(endpoint="character", type="character"))
 #'
 #' A HSDSSource is a representation of a URL which provides access to a HDF5 
 #' server (either h5serv or hsds.) 
+#'
+#' This function is deprecated and will be defunct in the next release.
 #'
 #' @name HSDSSource
 #' @param endpoint URL for server 
@@ -33,6 +37,8 @@ HSDSSource <- function(endpoint, type='hsds')  {
 #' The user needs to give the domain to start in. The search
 #' will be non-recursive. I.e., output for domain '/home/jreadey/' will 
 #' not return the files in '/home/jreadey/HDFLabTutorial/'
+#'
+#' This function is deprecated and will be defunct in the next release.
 #'
 #' @param object An object of type HSDSSource 
 #'

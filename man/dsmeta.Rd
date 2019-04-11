@@ -14,7 +14,7 @@ data frame with one row for each group and three columns. The
 second column has the list of datasets in the group.
 }
 \description{
-list information about datasets available in an H5S_source
+This function is deprecated and will be defunct in the next release.
 }
 \examples{
 \dontrun{

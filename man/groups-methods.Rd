@@ -14,7 +14,9 @@ groups(object, index, ...)
 \S4method{groups}{H5S_source,numeric}(object, index, ...)
 }
 \arguments{
-\item{object}{H5S_source instance}
+\item{object}{H5S_source instance
+
+This function is deprecated and will be defunct in the next release.}
 
 \item{index}{numeric, if present, extracts metadata about selected group (sequential ordering 
 of groups as returned by server) access for group information for HDF5 server}

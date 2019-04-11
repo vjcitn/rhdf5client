@@ -18,7 +18,7 @@ links(object, index, ...)
 an object of type H5S_linkset with the linkset of the group
 }
 \description{
-access for link metadata for HDF5 server groups
+This function is deprecated and will be defunct in the next release.
 }
 \examples{
 \dontrun{

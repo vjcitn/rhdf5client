@@ -17,7 +17,7 @@ H5S_Array(endpoint, filepath, host)
 an instance of \code{\link[DelayedArray]{DelayedArray-class}}
 }
 \description{
-create H5S_Array instance given url (filepath) and entity (host) name
+This function is deprecated and will be defunct in the next release.
 }
 \examples{
 # The true values from yriMulti data element 'banovichSE':

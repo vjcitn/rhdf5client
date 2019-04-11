@@ -3,7 +3,7 @@
 \name{isplit}
 \alias{isplit}
 \alias{sproc}
-\title{isplit converts a numeric vector into a list of sequences for compact reexpression}
+\title{This function is deprecated and will be defunct in the next release.}
 \usage{
 isplit(x)
 
@@ -22,7 +22,7 @@ list of colon-delimited strings each with initial/final/stride triplet
 \description{
 isplit converts a numeric vector into a list of sequences for compact reexpression
 
-sproc makes vector of type character of triplets initial:final:stride in R-conventions
+This function is deprecated and will be defunct in the next release.
 }
 \examples{
 inds = c(1:10, seq(25,50,2), seq(200,150,-2))

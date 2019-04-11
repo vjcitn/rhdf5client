@@ -15,7 +15,7 @@ H5S_dataset2(object, duid)
 H5S_dataset object
 }
 \description{
-H5S_dataset2 for datasets in hsds server
+This function is deprecated and will be defunct in the next release.
 }
 \examples{
 hsdsCon = H5S_source(URL_hsds()) # hsds server

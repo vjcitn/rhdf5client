@@ -13,7 +13,7 @@ internalDim(h5d)
 vector with dimensions of dataset
 }
 \description{
-acquire internal HDF5 dimension information for matrix
+This function is deprecated and will be defunct in the next release.
 }
 \examples{
 \dontrun{

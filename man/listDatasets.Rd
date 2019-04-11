@@ -18,6 +18,9 @@ This routine traverses the internal group hiearchy, locates
 all datasets and prints a list of them. Note that if the 
 file's group hiearchy is complex, this could be time-consuming.
 }
+\details{
+This function is deprecated and will be defunct in the next release.
+}
 \examples{
 src <- HSDSSource('http://hsdshdflab.hdfgroup.org')
 f <- HSDSFile(src, '/home/spollack/testzero.h5')

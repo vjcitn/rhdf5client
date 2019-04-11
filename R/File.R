@@ -14,6 +14,8 @@ setClass("HSDSFile", representation(src="HSDSSource", domain="character", dsetdf
 #' A HSDSFile is a representation of an HDF5 file the contents of which are accessible 
 #' exposed by a HDF5 server. 
 #'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #' @name HSDSFile
 #' @param src an object of type HSDSSource, the server which exposes the file
 #' @param domain the domain string; the file's location on the server's
@@ -44,6 +46,8 @@ HSDSFile <- function(src, domain)  {
 #' This routine traverses the internal group hiearchy, locates
 #' all datasets and prints a list of them. Note that if the 
 #' file's group hiearchy is complex, this could be time-consuming.
+#'
+#' This function is deprecated and will be defunct in the next release.
 #'
 #' @param file an object of type HSDSFile to be searched
 #' 

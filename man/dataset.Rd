@@ -15,5 +15,5 @@ dataset(h5s, tag)
 object of type H5S_dataset
 }
 \description{
-Find a dataset on source from its name
+This function is deprecated and will be defunct in the next release.
 }

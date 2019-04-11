@@ -10,7 +10,7 @@ URL_h5serv()
 URL of h5serv server
 }
 \description{
-manage h5serv URL
+This function is deprecated and will be defunct in the next release.
 }
 \examples{
 URL_h5serv()

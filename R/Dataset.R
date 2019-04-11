@@ -2,6 +2,9 @@ deprecate_msg = paste0("This function is deprecated. The new interface to rhdf5c
  " is exclusively through its DelayedArray backend HSDSArray")
 
 #' An S4 class to represent a dataset in a HDF5 file.
+#'
+#' This class is deprecated and will be defunct in the next release.
+#'
 #' @import httr methods rjson
 #' @slot file An object of type HSDSFile; the file in which the dataset is resident.
 #' @slot path The dataset's path in the internal HDF5 hiearchy.
@@ -15,6 +18,8 @@ setClass("HSDSDataset", representation(file="HSDSFile", path="character", uuid="
 #' Construct an object of type HSDSDataset 
 #' 
 #' A HSDSDataset is a representation of a dataset in a HDF5 file.
+#'
+#' This function is deprecated and will be defunct in the next release.
 #' 
 #' @name HSDSDataset
 #' @param file An object of type HSDSFile which hosts the dataset 
@@ -46,6 +51,8 @@ HSDSDataset <- function(file, path)  {
 }
 
 #' extract elements of a one or two-dimensional HSDSDataset
+#' 
+#' This function is deprecated and will be defunct in the next release.
 #'
 #' @name [
 #' @param x object of type HSDSDataset
@@ -70,6 +77,8 @@ setMethod('[', c("HSDSDataset", "numeric", "numeric"),
   })
 
 #' Fetch data from a remote dataset
+#'
+#' This function is deprecated and will be defunct in the next release.
 #'
 #' The servers require data to be fetched in slices, i.e., in sets of 
 #' for which the indices of each dimension are of the form start:stop:step.

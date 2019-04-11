@@ -69,6 +69,9 @@ H5S_ArraySeed = function(endpoint, filepath, host) {
   }
 
 #' dimnames not stored with H5S_source as of Jan 2018
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #' @param x instance of H5S_ArraySeed
 #' @return currently returns list(NULL, NULL) as we do not store dimnames in HDF5
 #' @rdname dimnames
@@ -80,6 +83,9 @@ setMethod("dimnames", "H5S_ArraySeed", function(x) {
 })
 
 #' HDF Server content is assumed transposed relative to R matrix layout
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #' @name dim
 #' @param x instance of H5S_ArraySeed
 #' @return integer(2) vector of dimensions corresponding to R's layout, assuming 2-d data
@@ -142,6 +148,9 @@ setMethod("DelayedArray", "H5S_ArraySeed",
    function(seed) new_DelayedArray(seed, Class="H5S_Array"))
 
 #' create H5S_Array instance given url (filepath) and entity (host) name
+#'
+#' This function is deprecated and will be defunct in the next release.
+#'
 #' @param endpoint a character(1) URL to port for HDF Server
 #' @param filepath path and name of the H5 file
 #' @param host a character(1) name of 'host' in server

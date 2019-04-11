@@ -13,7 +13,7 @@ fetchDatasets(object)
 data.frame with information about the datasets in the file
 }
 \description{
-fetch datasets of a hdf5 file from the hsds server
+This function is deprecated and will be defunct in the next release.
 }
 \examples{
 hsdsCon = H5S_source(URL_hsds()) # hsds server

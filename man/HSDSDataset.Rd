@@ -17,6 +17,9 @@ An initialized object of type HSDSDataset
 \description{
 A HSDSDataset is a representation of a dataset in a HDF5 file.
 }
+\details{
+This function is deprecated and will be defunct in the next release.
+}
 \examples{
 src <- HSDSSource('http://hsdshdflab.hdfgroup.org')
 f <- HSDSFile(src, '/home/spollack/testzero.h5')

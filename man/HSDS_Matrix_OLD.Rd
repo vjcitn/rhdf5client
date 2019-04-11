@@ -15,7 +15,7 @@ HSDS_Matrix_OLD(url, path)
 instance of DelayedArray
 }
 \description{
-simplify construction of DelayedMatrix from url and path in HSDS
+This class is deprecated and will be defunct in the next release.
 }
 \examples{
 HSDS_Matrix

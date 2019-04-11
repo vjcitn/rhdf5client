@@ -5,7 +5,7 @@
 \alias{HSDSSource-class}
 \title{An S4 class to represent a HDF5 server listening on a port.}
 \description{
-An S4 class to represent a HDF5 server listening on a port.
+This class is deprecated and will be defunct in the next release.
 }
 \section{Slots}{
 

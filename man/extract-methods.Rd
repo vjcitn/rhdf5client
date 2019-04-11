@@ -39,9 +39,7 @@ matrix of data obtained
 an array with the elements requested from the HSDSDataset
 }
 \description{
-extract elements from H5S_dataset
+This function is deprecated and will be defunct in the next release.
 
-extract elements from H5S_dataset
-
-extract elements of a one or two-dimensional HSDSDataset
+This function is deprecated and will be defunct in the next release.
 }

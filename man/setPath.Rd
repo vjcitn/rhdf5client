@@ -19,7 +19,7 @@ setPath(object, folderPath, ...)
 an updated object with folderPath set
 }
 \description{
-set path for hsds server resource
+This function is deprecated and will be defunct in the next release.
 }
 \examples{
 hsdsCon = H5S_source(URL_hsds()) # hsds server connection

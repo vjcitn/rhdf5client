@@ -15,7 +15,7 @@ hsdsInfo(object)
 a data frame with response
 }
 \description{
-HSDS server get request accessor
+This function is deprecated and will be defunct in the next release.
 }
 \examples{
 hsdsCon = H5S_source(URL_hsds()) # hsds server connection
