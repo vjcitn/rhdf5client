@@ -165,12 +165,12 @@ getReq = function(src) {
 #'
 #' This function is deprecated and will be defunct in the next release.
 #'
-#' @name H5S_source-class
-#' @aliases '[[',H5S_source,character
+#' @name [[
+#' @aliases [[,H5S_source,character-method
 #' @param x instance of H5S_source
 #' @param i character string intended to identify dataset on server
 #' @param j not used
-#' @exportMethod [[
+#' @exportMethod '[['
 setMethod("[[", c("H5S_source", "character", "ANY"), function(x, i, j) {
   .Deprecated("HSDSArray", NULL, deprecate_msg)
   dataset(x, i)

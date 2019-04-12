@@ -2,13 +2,11 @@
 % Please edit documentation in R/h5serv.R
 \docType{class}
 \name{H5S_source}
+\alias{H5S_source}
 \alias{H5S_source-class}
-\alias{H5S_source,character}
 \title{H5S_source identifies an HDF5/HSDS server and manages some metadata about contents}
 \usage{
 H5S_source(serverURL, domain, ...)
-
-\S4method{[[}{H5S_source,character}(x, i, j)
 }
 \arguments{
 \item{serverURL}{a URL for a port for HDF5Server}
@@ -16,12 +14,6 @@ H5S_source(serverURL, domain, ...)
 \item{domain}{character string with path to file for HSDS}
 
 \item{\dots}{not used}
-
-\item{x}{instance of H5S_source}
-
-\item{i}{character string intended to identify dataset on server}
-
-\item{j}{not used}
 }
 \value{
 an initialized object of type H5S_source
@@ -29,6 +21,7 @@ an initialized object of type H5S_source
 \description{
 This class is deprecated and will be defunct in the next release.
 
+This function is deprecated and will be defunct in the next release.
 }
 \section{Slots}{
 
