@@ -12,9 +12,7 @@
 \S4method{dim}{HSDSArraySeed}(x)
 }
 \arguments{
-\item{x}{instance of H5S_ArraySeed}
-
-\item{x}{An object of type HSDSArraySeed}
+\item{x}{An object of type HSDSArraySeed or (deprecated) H5S_ArraySeed}
 }
 \value{
 integer(2) vector of dimensions corresponding to R's layout, assuming 2-d data

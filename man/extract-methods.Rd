@@ -19,7 +19,7 @@
 \S4method{[}{HSDSDataset,numeric,ANY}(x, i)
 }
 \arguments{
-\item{x}{instance of H5S_dataset}
+\item{x}{instance of H5S_dataset or HSDSDataset}
 
 \item{i}{select option for first matrix index in HDF5 server value API}
 
@@ -28,10 +28,6 @@
 \item{\dots}{unused}
 
 \item{drop}{logical defaults to FALSE}
-
-\item{x}{object of type HSDSDataset}
-
-\item{i}{vector of indices (first dimension)}
 }
 \value{
 matrix of data obtained

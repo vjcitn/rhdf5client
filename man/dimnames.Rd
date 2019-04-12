@@ -12,9 +12,7 @@
 \S4method{dimnames}{HSDSArraySeed}(x)
 }
 \arguments{
-\item{x}{instance of H5S_ArraySeed}
-
-\item{x}{An object of type HSDSArraySeed}
+\item{x}{An object of type HSDSArraySeed or (deprecated) H5S_ArraySeed}
 }
 \value{
 currently returns list(NULL, NULL) as we do not store dimnames in HDF5
