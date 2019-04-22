@@ -32,6 +32,14 @@ HSDSSource <- function(endpoint, type='hsds')  {
   # member root id also?
 }
 
+
+.HSDSSource <- function(endpoint, type='hsds')  { # after deprecation cycle this private function is used
+  if (!(type %in% c('h5serv', 'hsds')))
+    stop(paste("unknown server type ", type))
+  # obj <- new("HSDSSource", endpoint=endpoint, type=type) # should not use assignment as function value
+  new("HSDSSource", endpoint=endpoint, type=type)
+}
+
 #' List files and subdirectories of a domain
 #'
 #' The user needs to give the domain to start in. The search

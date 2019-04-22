@@ -54,7 +54,7 @@ HSDS_Matrix = function(url, path, title) {
   ds = H5S_dataset2(so, uu)
   if (length(ds@shapes$dims)==1) {
        targ = gsub("&.*", "", ds@presel)
-       gg = fromJSON(readBin(GET(targ)$content,w="character"))$value
+       gg = fromJSON(readBin(GET(targ)$content,what="character"))$value
        message("one dimensional response, returning text")
        return(gg)
        }

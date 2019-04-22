@@ -16,14 +16,12 @@ URL_h5serv = function() {
 
 #' manage hsds URL
 #'
-#' This function is deprecated and will be defunct in the next release.
 #'
 #' @return URL of hsds server
 #' @examples
 #' URL_hsds()
 #' @export
 URL_hsds = function() {
-  .Deprecated("HSDSArray", NULL, deprecate_msg)
   "http://hsdshdflab.hdfgroup.org"
 }
 
@@ -201,7 +199,7 @@ setGeneric("groups", function(object, index, ...) standardGeneric("groups"))
 setMethod("groups", c("H5S_source", "missing"), function(object, index, ...) {
   .Deprecated("HSDSArray", NULL, deprecate_msg)
   target = paste0(.serverURL(object), "/groups")
-  ans = transl(target) # fromJSON(readBin(GET(target)$content, w="character"))
+  ans = transl(target) # fromJSON(readBin(GET(target)$content, what="character"))
 
   # find the root group: hh is a matrix with first column "href" and second "rel"
   # Find the one whose "rel" column is "root" and pull the name out of the "href"
@@ -217,7 +215,7 @@ setMethod("groups", c("H5S_source", "missing"), function(object, index, ...) {
   nl = vapply(1:length(grps), function(x) {
     gname = grps[x]
     target = paste0(.serverURL(object), "/groups/", gname, "/links" )
-    ans = transl(target)  # fromJSON(readBin(GET(target)$content, w="character"))
+    ans = transl(target)  # fromJSON(readBin(GET(target)$content, what="character"))
     length(ans$links)
   }, integer(1))
   DataFrame(groups=grps, nlinks=nl)
@@ -284,7 +282,7 @@ setMethod("links", c("H5S_source", "numeric"), function(object, index, ...) {
   .Deprecated("HSDSArray", NULL, deprecate_msg)
   gname = groups(object, index)[["groups"]][1] # skirt mcols bug
   target = paste0(.serverURL(object), "/groups/", gname, "/links" )
-  ans = transl(target) # fromJSON(readBin(GET(target)$content, w="character"))
+  ans = transl(target) # fromJSON(readBin(GET(target)$content, what="character"))
   new("H5S_linkset", links=ans, source=object, group=gname)
 })
 
@@ -447,16 +445,14 @@ serverVersion <- function(serverURL = serverURL){
 #'
 #' This function is deprecated and will be defunct in the next release.
 #'
-#' @rdname extract-methods
 #' @param x instance of H5S_dataset
 #' @param i select option for first matrix index in HDF5 server value API
 #' @param j select option for second matrix index in HDF5 server value API
 #' @param \dots unused
 #' @param drop logical defaults to FALSE
-#' @aliases [,H5S_dataset,numeric,numeric-method
 #' @return matrix of data obtained
 #' @exportMethod [
-setMethod("[", c("H5S_dataset", "numeric", "numeric"), function(x, i, j, ..., drop=FALSE) {
+setMethod("[", c("H5S_dataset", "numeric", "numeric", "ANY"), function(x, i, j, ..., drop=FALSE) {
 # bracket selection passed directly to HDF5 server ... row-major
 #
   .Deprecated("HSDSArray", NULL, deprecate_msg)
@@ -503,9 +499,13 @@ setMethod("[", c("H5S_dataset", "numeric", "numeric"), function(x, i, j, ..., dr
   
 
 #' extract elements from H5S_dataset
-#' @rdname extract-methods
 #' @aliases [,H5S_dataset,character,character-method
-setMethod("[", c("H5S_dataset", "character", "character"), function(x, i, j, ..., drop=FALSE) {
+#' @param x instance of H5S_dataset
+#' @param i character vector of row selections
+#' @param j character vector of column selections
+#' @param \dots not used
+#' @param drop logical(1) set TRUE to drop array character 
+setMethod("[", c("H5S_dataset", "character", "character", "ANY"), function(x, i, j, ..., drop=FALSE) {
 
   uu = x@presel
   dims = x@shapes$dims
@@ -599,7 +599,7 @@ dataset = function(h5s, tag) {
   }
 
   targ = sub(".host", "datasets?host", targs)
-  uuid = transl(targ)$datasets # fromJSON(readBin(GET(targ)$content, w="character"))$datasets
+  uuid = transl(targ)$datasets # fromJSON(readBin(GET(targ)$content, what="character"))$datasets
   attrs = transl( sub("datasets", paste0("datasets/", uuid), targ ) )
   hrnm = vapply(attrs$hrefs, "[[", character(1), 2)
   hrval = vapply(attrs$hrefs, "[[", character(1), 1)
@@ -653,7 +653,7 @@ setMethod("hsdsInfo", c("H5S_source"), function(object) {
   .Deprecated("HSDSArray", NULL, deprecate_msg)
   #target = paste0(.serverURL(object))
   target = paste0(.serverURL(object),"/domains")
-  ans = transl(target) # fromJSON(readBin(GET(target)$content, w="character"))
+  ans = transl(target) # fromJSON(readBin(GET(target)$content, what="character"))
   
   if (length(ans$domains)<1)  { 
     stop("no domains at server URL")
@@ -689,7 +689,7 @@ setMethod("domains", c("H5S_source"), function(object, ...) {
   .Deprecated("HSDSArray", NULL, deprecate_msg)
   target = paste0(.serverURL(object, ...),"/domains?domain=", object@folderPath)
   #target = paste0(.serverURL(object))
-  ans = transl(target) # fromJSON(readBin(GET(target)$content, w="character"))
+  ans = transl(target) # fromJSON(readBin(GET(target)$content, what="character"))
   
   if (length(ans$domains)<1)  { 
     stop("no domains at server URL")

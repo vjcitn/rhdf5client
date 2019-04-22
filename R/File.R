@@ -40,6 +40,20 @@ HSDSFile <- function(src, domain)  {
   obj <- new("HSDSFile", src=src, domain=domain, dsetdf=dsetdf)
 }
 
+.HSDSFile <- function(src, domain)  {  # after deprecation cycle this private function will be used
+  request <- paste0(src@endpoint, '?domain=', domain)
+  response <- tryCatch(
+    submitRequest(request),
+    error=function(e) { NULL }
+  )  
+  if (is.null(request))  {
+    warning("no such file")
+    return(NULL)
+  }
+  dsetdf <- findDatasets(src, domain)
+  obj <- new("HSDSFile", src=src, domain=domain, dsetdf=dsetdf)
+}
+
 #' Search inner file hierarchy for datasets
 #' 
 #' The datasets in an HDF5 file are organized internally by groups.
