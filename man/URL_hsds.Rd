@@ -10,7 +10,7 @@ URL_hsds()
 URL of hsds server
 }
 \description{
-This function is deprecated and will be defunct in the next release.
+manage hsds URL
 }
 \examples{
 URL_hsds()

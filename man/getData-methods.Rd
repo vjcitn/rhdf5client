@@ -8,7 +8,7 @@
 \alias{getData,HSDSDataset,list,character-method}
 \alias{getData,HSDSDataset,list,missing-method}
 \alias{getData,HSDSDataset,list,,missing-method}
-\title{Fetch data from a remote dataset}
+\title{extract elements of a one or two-dimensional HSDSDataset}
 \usage{
 getData(dataset, indices, transfermode)
 
@@ -33,9 +33,11 @@ getData(dataset, indices, transfermode)
 an Array containing the data fetched from the server
 }
 \description{
-This function is deprecated and will be defunct in the next release.
+Fetch data from a remote dataset
 }
 \details{
+This function is deprecated and will be defunct in the next release.
+
 The servers require data to be fetched in slices, i.e., in sets of 
 for which the indices of each dimension are of the form start:stop:step.
 More complex sets of indices will be split into slices and fetched in

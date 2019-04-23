@@ -74,8 +74,6 @@ H5S_ArraySeed = function(endpoint, filepath, host) {
 #'
 #' @param x instance of H5S_ArraySeed
 #' @return currently returns list(NULL, NULL) as we do not store dimnames in HDF5
-#' @rdname dimnames
-#' @aliases dimnames,H5S_ArraySeed-method
 #' @export
 setMethod("dimnames", "H5S_ArraySeed", function(x) {
   .Deprecated("HSDSArray", NULL, deprecate_msg)
@@ -86,10 +84,8 @@ setMethod("dimnames", "H5S_ArraySeed", function(x) {
 #'
 #' This function is deprecated and will be defunct in the next release.
 #'
-#' @name dim
 #' @param x instance of H5S_ArraySeed
 #' @return integer(2) vector of dimensions corresponding to R's layout, assuming 2-d data
-#' @aliases dim,H5S_ArraySeed-method
 #' @export
 setMethod("dim", "H5S_ArraySeed", function(x) {
   # note that for HDF Server the internal dims are
