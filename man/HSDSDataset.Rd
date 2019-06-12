@@ -2,7 +2,8 @@
 % Please edit documentation in R/Dataset.R
 \name{HSDSDataset}
 \alias{HSDSDataset}
-\title{Construct an object of type HSDSDataset}
+\title{Construct an object of type HSDSDataset 
+A HSDSDataset is a representation of a dataset in a HDF5 file.}
 \usage{
 HSDSDataset(file, path)
 }
@@ -15,10 +16,8 @@ HSDSDataset(file, path)
 An initialized object of type HSDSDataset
 }
 \description{
+Construct an object of type HSDSDataset 
 A HSDSDataset is a representation of a dataset in a HDF5 file.
-}
-\details{
-This function is deprecated and will be defunct in the next release.
 }
 \examples{
 src <- HSDSSource('http://hsdshdflab.hdfgroup.org')

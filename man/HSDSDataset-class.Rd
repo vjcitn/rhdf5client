@@ -5,7 +5,7 @@
 \alias{HSDSDataset-class}
 \title{An S4 class to represent a dataset in a HDF5 file.}
 \description{
-This class is deprecated and will be defunct in the next release.
+An S4 class to represent a dataset in a HDF5 file.
 }
 \section{Slots}{
 

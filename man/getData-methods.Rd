@@ -36,8 +36,6 @@ an Array containing the data fetched from the server
 Fetch data from a remote dataset
 }
 \details{
-This function is deprecated and will be defunct in the next release.
-
 The servers require data to be fetched in slices, i.e., in sets of 
 for which the indices of each dimension are of the form start:stop:step.
 More complex sets of indices will be split into slices and fetched in

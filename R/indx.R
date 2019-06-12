@@ -15,7 +15,7 @@ deprecate_msg = paste0("This function is deprecated. The new interface to rhdf5c
 #' @return list of vectors of integers which can be expressed as initial/final/stride triplets 
 #' @export
 isplit = function(x)  {
-  .Deprecated("HSDSArray", NULL, deprecate_msg)
+  #.Deprecated("HSDSArray", NULL, deprecate_msg)
   if (length(x)==1) return(list(`1`=x))
   y <- rep(0,length(x))
   i <- 3
@@ -34,9 +34,6 @@ isplit = function(x)  {
 nosci <- function(x) format(x, scientific=FALSE)
 
 #' sproc makes vector of type character of triplets initial:final:stride in R-conventions
-#'
-#' This function is deprecated and will be defunct in the next release.
-#'
 #' @name sproc
 #' @rdname sproc
 #' @param spl output of isplit
@@ -46,7 +43,7 @@ nosci <- function(x) format(x, scientific=FALSE)
 #' sproc(isplit(inds))
 #' @export
 sproc = function(spl)  {
-  .Deprecated("HSDSArray", NULL, deprecate_msg)
+  #.Deprecated("HSDSArray", NULL, deprecate_msg)
   ans <- lapply(spl, function(x) {
     if (length(x) == 1) return(paste(nosci(x), ":", nosci(x), ":1", sep=""))
     d <- x[2]-x[1]

@@ -25,7 +25,7 @@ setClass("HSDSSource", representation(endpoint="character", type="character"))
 #' src.hsds <- HSDSSource('http://hsdshdflab.hdfgroup.org')
 #' @export
 HSDSSource <- function(endpoint, type='hsds')  {
-  .Deprecated("HSDSArray", NULL, deprecate_msg)
+  #.Deprecated("HSDSArray", NULL, deprecate_msg)
   if (!(type %in% c('h5serv', 'hsds')))
     stop(paste("unknown server type ", type))
   obj <- new("HSDSSource", endpoint=endpoint, type=type)
@@ -69,7 +69,7 @@ setGeneric('listDomains', function(object, rootdir) standardGeneric('listDomains
 #' @aliases listDomains,HSDSSource,character-method
 setMethod('listDomains', c("HSDSSource", "character"), 
   function(object, rootdir)  {
-    .Deprecated("HSDSArray", NULL, deprecate_msg)
+    #.Deprecated("HSDSArray", NULL, deprecate_msg)
     ll <- domainContents(object, rootdir)
     vapply(ll, function(l) l$filename, character(1))
   })
@@ -78,7 +78,7 @@ setMethod('listDomains', c("HSDSSource", "character"),
 #' @aliases listDomains,HSDSSource,missing-method
 setMethod('listDomains', c("HSDSSource", "missing"),  
   function(object) { 
-    .Deprecated("HSDSArray", NULL, deprecate_msg)
+    #.Deprecated("HSDSArray", NULL, deprecate_msg)
     listDomains(object, '/hdfgroup/org') 
   })
 

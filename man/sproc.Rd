@@ -21,8 +21,6 @@ list of colon-delimited strings each with initial/final/stride triplet
 }
 \description{
 isplit converts a numeric vector into a list of sequences for compact reexpression
-
-This function is deprecated and will be defunct in the next release.
 }
 \examples{
 inds = c(1:10, seq(25,50,2), seq(200,150,-2))

@@ -3,7 +3,7 @@
 \docType{methods}
 \name{[,HSDSDataset,numeric,ANY,ANY-method}
 \alias{[,HSDSDataset,numeric,ANY,ANY-method}
-\title{bracket method for 1d request from HSDSDataset, deprecated}
+\title{bracket method for 1d request from HSDSDataset}
 \usage{
 \S4method{[}{HSDSDataset,numeric,ANY,ANY}(x, i, j, ..., drop = TRUE)
 }
@@ -22,8 +22,5 @@
 an array with the elements requested from the HSDSDataset
 }
 \description{
-bracket method for 1d request from HSDSDataset, deprecated
-}
-\note{
-This function is deprecated and will be defunct in the next release.
+bracket method for 1d request from HSDSDataset
 }

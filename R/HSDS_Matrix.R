@@ -12,7 +12,7 @@ deprecate_msg = paste0("This function is deprecated. The new interface to rhdf5c
 #' HSDS_Matrix
 #' @export
 HSDS_Matrix_OLD = function(url, path) {
-  .Deprecated("HSDSArray", NULL, deprecate_msg)
+  #.Deprecated("HSDSArray", NULL, deprecate_msg)
   so = H5S_source(url, path)
   dss = fetchDatasets(so) 
   uu = dss$id
@@ -35,7 +35,7 @@ HSDS_Matrix_OLD = function(url, path) {
 #' HSDS_Matrix(URL_hsds(), "/shared/bioconductor/darmgcls.h5")
 #' @export
 HSDS_Matrix = function(url, path, title) {
-  .Deprecated("HSDSArray", NULL, deprecate_msg)
+  #.Deprecated("HSDSArray", NULL, deprecate_msg)
   so = H5S_source(url, path)
   dss = fetchDatasets(so)
   uu = dss$id

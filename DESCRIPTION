@@ -2,7 +2,7 @@ Package: rhdf5client
 Title: Access HDF5 content from h5serv 
 Description: Provides functionality for reading data from h5serv server
  from within R.
-Version: 1.7.0
+Version: 1.7.1
 Authors@R: c(
  person("Samuela", "Pollack", role = c("cre", "aut"),email = "spollack@jimmy.harvard.edu"), 
  person("Shweta", "Gopaulakrishnan", role = c("aut"), email = "reshg@channing.harvard.edu"),
@@ -11,11 +11,10 @@ Authors@R: c(
 Suggests: knitr, testthat, BiocStyle, DT, 
 	reticulate
 Imports: S4Vectors, httr, R6, rjson, utils
-Depends: R (>= 3.5), methods, DelayedArray
+Depends: R (>= 3.6), methods, DelayedArray
 License: Artistic-2.0
 LazyLoad: yes
 BiocViews: infrastructure
-RoxygenNote: 6.1.1
 Collate: h5serv.R indx.R H5S_Array.R HSDS_Matrix.R 
   'rhdf5client2.R'
   'Source.R'
@@ -25,3 +24,4 @@ Collate: h5serv.R indx.R H5S_Array.R HSDS_Matrix.R
 VignetteBuilder: knitr
 Encoding: UTF-8
 biocViews: DataImport, Software
+RoxygenNote: 6.1.1

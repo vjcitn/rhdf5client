@@ -2,9 +2,6 @@ deprecate_msg = paste0("This function is deprecated. The new interface to rhdf5c
  " is exclusively through its DelayedArray backend HSDSArray")
 
 #' An S4 class to represent a dataset in a HDF5 file.
-#'
-#' This class is deprecated and will be defunct in the next release.
-#'
 #' @import httr methods rjson
 #' @slot file An object of type HSDSFile; the file in which the dataset is resident.
 #' @slot path The dataset's path in the internal HDF5 hiearchy.
@@ -16,11 +13,7 @@ setClass("HSDSDataset", representation(file="HSDSFile", path="character", uuid="
   shape="numeric", type="list"))
 
 #' Construct an object of type HSDSDataset 
-#' 
 #' A HSDSDataset is a representation of a dataset in a HDF5 file.
-#'
-#' This function is deprecated and will be defunct in the next release.
-#' 
 #' @name HSDSDataset
 #' @param file An object of type HSDSFile which hosts the dataset 
 #' @param path The complete intrafile path to the dataset
@@ -31,7 +24,7 @@ setClass("HSDSDataset", representation(file="HSDSFile", path="character", uuid="
 #' d <- HSDSDataset(f, '/grpA/grpAB/dsetX')
 #' @export
 HSDSDataset <- function(file, path)  {
-  .Deprecated("HSDSArray", NULL, deprecate_msg)
+  #.Deprecated("HSDSArray", NULL, deprecate_msg)
   idx <- which(file@dsetdf[,1] == path)
   if (length(idx) == 0)  
     stop("no such dataset")
@@ -73,7 +66,6 @@ HSDSDataset <- function(file, path)  {
 #' 
 #' Fetch data from a remote dataset
 #'
-#' This function is deprecated and will be defunct in the next release.
 #'
 #' The servers require data to be fetched in slices, i.e., in sets of 
 #' for which the indices of each dimension are of the form start:stop:step.
@@ -110,7 +102,7 @@ setGeneric(".getData", function(dataset, indices, transfermode) standardGeneric(
 #' @aliases getData,HSDSDataset,character,character-method
 setMethod("getData", c("HSDSDataset", "character", "character"),  
   function(dataset, indices, transfermode)  {
-    .Deprecated("HSDSArray", NULL, deprecate_msg)
+    #.Deprecated("HSDSArray", NULL, deprecate_msg)
     getDataVec(dataset, indices, transfermode)
   })
 
@@ -124,7 +116,7 @@ setMethod(".getData", c("HSDSDataset", "character", "character"),
 #' @aliases getData,HSDSDataset,character,missing-method
 setMethod("getData", c("HSDSDataset", "character", "missing"),  
   function(dataset, indices)  {
-    .Deprecated("HSDSArray", NULL, deprecate_msg)
+    #.Deprecated("HSDSArray", NULL, deprecate_msg)
     getDataVec(dataset, indices, 'JSON')
   })
 #private for after cycle
@@ -137,7 +129,7 @@ setMethod(".getData", c("HSDSDataset", "character", "missing"),
 #' @aliases getData,HSDSDataset,list,character-method
 setMethod("getData", c("HSDSDataset", "list", "character"),  
 function(dataset, indices, transfermode)  {
-  .Deprecated("HSDSArray", NULL, deprecate_msg)
+  #.Deprecated("HSDSArray", NULL, deprecate_msg)
   getDataList(dataset, indices, transfermode)  
   })
 
@@ -151,7 +143,7 @@ function(dataset, indices, transfermode)  {
 #' @aliases getData,HSDSDataset,list,,missing-method
 setMethod("getData", c("HSDSDataset", "list", "missing"),  
 function(dataset, indices)  {
-  .Deprecated("HSDSArray", NULL, deprecate_msg)
+  #.Deprecated("HSDSArray", NULL, deprecate_msg)
   getDataList(dataset, indices, 'JSON')  
   })
 
@@ -621,8 +613,7 @@ setMethod("show", "HSDSDataset", function(object) {
 })
 
 
-#' bracket method for 1d request from HSDSDataset, deprecated
-#' @note This function is deprecated and will be defunct in the next release.
+#' bracket method for 1d request from HSDSDataset
 #' @param x object of type HSDSDataset
 #' @param i vector of indices (first dimension)
 #' @param j not used
@@ -633,12 +624,12 @@ setMethod("show", "HSDSDataset", function(object) {
 # special case: one-dimensional arrays
 setMethod('[', c("HSDSDataset", "numeric", "ANY", "ANY"), 
   function(x, i, j, ..., drop) {
-    .Deprecated("HSDSArray", NULL, deprecate_msg)
+    #.Deprecated("HSDSArray", NULL, deprecate_msg)
     getDataList(x, list(i), transfermode='JSON')
   })
 
 # special case: two-dimensional arrays
-#' bracket method for 2d request from HSDSDataset, deprecated
+#' bracket method for 2d request from HSDSDataset
 #' @param x object of type HSDSDataset
 #' @param i vector of indices (first dimension)
 #' @param j vector of indices (second dimension)
@@ -648,7 +639,7 @@ setMethod('[', c("HSDSDataset", "numeric", "ANY", "ANY"),
 #' @docType methods
 setMethod('[', c("HSDSDataset", "numeric", "numeric", "ANY"), 
   function(x, i, j, ..., drop) {
-    .Deprecated("HSDSArray", NULL, deprecate_msg)
+    #.Deprecated("HSDSArray", NULL, deprecate_msg)
     getDataList(x, list(i, j), transfermode='JSON')
   })
 

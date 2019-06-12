@@ -26,7 +26,7 @@ setClass("HSDSFile", representation(src="HSDSSource", domain="character", dsetdf
 #' f10x <- HSDSFile(src, '/shared/bioconductor/tenx_full.h5')
 #' @export
 HSDSFile <- function(src, domain)  {
-  .Deprecated("HSDSArray", NULL, deprecate_msg)
+  #.Deprecated("HSDSArray", NULL, deprecate_msg)
   request <- paste0(src@endpoint, '?domain=', domain)
   response <- tryCatch(
     submitRequest(request),
@@ -73,7 +73,7 @@ HSDSFile <- function(src, domain)  {
 #' listDatasets(f)
 #' @export
 listDatasets <- function(file)  {
-  .Deprecated("HSDSArray", NULL, deprecate_msg)
+  #.Deprecated("HSDSArray", NULL, deprecate_msg)
   file@dsetdf[['paths']]
 }
 
