@@ -167,6 +167,9 @@ setMethod("DelayedArray", "HSDSArraySeed",
 #' @param domain HDF5 domain of H5 file on server
 #' @param dsetname complete internal path to dataset in H5 file
 #' @return An initialized object of type HSDSArray
+#' @examples
+#' HSDSArray(URL_hsds(), 
+#'     "hsds", "/shared/bioconductor/darmgcls.h5", "/assay001")
 #' @export
 HSDSArray <- function(endpoint, svrtype, domain, dsetname)  {
   DelayedArray(HSDSArraySeed(endpoint, svrtype, domain, dsetname))

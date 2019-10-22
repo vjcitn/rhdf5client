@@ -20,7 +20,9 @@ a data frame with domains name
 This function is deprecated and will be defunct in the next release.
 }
 \examples{
+\dontrun{
 hsdsCon = H5S_source(URL_hsds()) # hsds server connection
 setPath(hsdsCon, "/home/stvjc/")-> hsds
 domains(hsds)
+}
 }

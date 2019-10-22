@@ -18,8 +18,10 @@ H5S_dataset object
 This function is deprecated and will be defunct in the next release.
 }
 \examples{
+\dontrun{
 hsdsCon = H5S_source(URL_hsds()) # hsds server
 hsdsCon@folderPath="/home/stvjc/hdf5_mat.h5"
 ds = fetchDatasets(hsdsCon) #Pick the dataset id of interest
 H5S_dataset2(hsdsCon, "d-a9e4b71c-8ea2-11e8-9306-0242ac120022")
+}
 }

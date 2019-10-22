@@ -20,5 +20,7 @@ instance of DelayedArray
 This class is deprecated and will be defunct in the next release.
 }
 \examples{
+\dontrun{
 HSDS_Matrix(URL_hsds(), "/shared/bioconductor/darmgcls.h5")
+}
 }

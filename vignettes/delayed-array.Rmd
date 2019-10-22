@@ -1,6 +1,6 @@
 ---
 title: "HSDSArray -- DelayedArray backend for Remote HDF5"
-author: "Samuela Pollack"
+author: "Samuela Pollack and others"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}

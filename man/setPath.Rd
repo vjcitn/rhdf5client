@@ -22,6 +22,8 @@ an updated object with folderPath set
 This function is deprecated and will be defunct in the next release.
 }
 \examples{
+\dontrun{
 hsdsCon = H5S_source(URL_hsds()) # hsds server connection
 setPath(hsdsCon, "/home/stvjc/hdf5_mat.h5")-> hsds
+}
 }

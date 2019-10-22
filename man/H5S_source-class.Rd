@@ -52,11 +52,11 @@ bigec2 = H5S_source(URL_h5serv()) # h5serv
 bigec2
 dsmeta(bigec2)[1:2,]       # two groups
 dsmeta(bigec2)[1,2][[1]]   # all dataset candidates in group 1
-}
 hsdsCon = H5S_source(URL_hsds()) # hsds server connection
 hsdsCon
 getReq(hsdsCon)
 setPath(hsdsCon,"/home/stvjc/hdf5_mat.h5") -> hsds
 fetchDatasets(hsds)     # grab the dataset id of interest 
 H5S_dataset2(hsds, "d-a9e4b71c-8ea2-11e8-9306-0242ac120022")
+}
 }

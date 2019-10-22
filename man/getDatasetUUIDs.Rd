@@ -16,7 +16,9 @@ character of dataset uuid obtained
 This function is deprecated and will be defunct in the next release.
 }
 \examples{
+\dontrun{
 hsdsCon = H5S_source(URL_hsds()) # hsds server
 setPath(hsdsCon, "/home/stvjc/hdf5_mat.h5")-> hsds
 getDatasetUUIDs(hsds)
+}
 }

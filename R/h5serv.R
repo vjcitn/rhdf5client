@@ -89,13 +89,13 @@ fixtarget = function(x) sub(".*host=(.*).h5s.channingremotedata.org", "\\1", x)
 #' bigec2
 #' dsmeta(bigec2)[1:2,]       # two groups
 #' dsmeta(bigec2)[1,2][[1]]   # all dataset candidates in group 1
-#' }
 #' hsdsCon = H5S_source(URL_hsds()) # hsds server connection
 #' hsdsCon
 #' getReq(hsdsCon)
 #' setPath(hsdsCon,"/home/stvjc/hdf5_mat.h5") -> hsds
 #' fetchDatasets(hsds)     # grab the dataset id of interest 
 #' H5S_dataset2(hsds, "d-a9e4b71c-8ea2-11e8-9306-0242ac120022")
+#' }
 #' @export
 H5S_source = function(serverURL, domain, ...) {
   #.Deprecated("HSDSArray", NULL, deprecate_msg)
@@ -236,22 +236,24 @@ setMethod("show", "H5S_linkset", function(object) {
   cat(" Use targets([linkset]) to extract target URLs.\n")
 })
 
-#'set path for hsds server resource
-#'
-#' This function is deprecated and will be defunct in the next release.
-#'
-#'@param object H5S_source instance
-#'@param folderPath character string with path to user's folder on hsds server
-#'@param \dots not used
-#'@return an updated object with folderPath set
-#'@examples
-#'hsdsCon = H5S_source(URL_hsds()) # hsds server connection
-#'setPath(hsdsCon, "/home/stvjc/hdf5_mat.h5")-> hsds
-#'@docType methods
-#'@rdname setPath
-#'@aliases setPath,H5S_source,character-method
-#'@export setPath
-#'@exportMethod setPath
+#' set path for hsds server resource
+#' 
+#'  This function is deprecated and will be defunct in the next release.
+#' 
+#' @param object H5S_source instance
+#' @param folderPath character string with path to user's folder on hsds server
+#' @param \dots not used
+#' @return an updated object with folderPath set
+#' @examples
+#' \dontrun{
+#' hsdsCon = H5S_source(URL_hsds()) # hsds server connection
+#' setPath(hsdsCon, "/home/stvjc/hdf5_mat.h5")-> hsds
+#' }
+#' @docType methods
+#' @rdname setPath
+#' @aliases setPath,H5S_source,character-method
+#' @export setPath
+#' @exportMethod setPath
 setGeneric("setPath", function(object,folderPath, ...) standardGeneric("setPath"))
 setMethod("setPath", c("H5S_source","character"), function(object, folderPath, ...) {
   #.Deprecated("HSDSArray", NULL, deprecate_msg)
@@ -641,8 +643,10 @@ internalDim = function(h5d) {
 #' @param object H5S_source instance
 #' @return a data frame with response
 #' @examples 
+#' \dontrun{
 #' hsdsCon = H5S_source(URL_hsds()) # hsds server connection
 #' hsdsInfo(hsdsCon)
+#' }
 #' @rdname hsdsInfo
 #' @aliases hsdsInfo,H5S_source-method
 #' @docType methods
@@ -676,9 +680,11 @@ setMethod("hsdsInfo", c("H5S_source"), function(object) {
 #' @param \dots not used
 #' @return a data frame with domains name
 #' @examples 
+#' \dontrun{
 #' hsdsCon = H5S_source(URL_hsds()) # hsds server connection
 #' setPath(hsdsCon, "/home/stvjc/")-> hsds
 #' domains(hsds)
+#' }
 #' @rdname domains
 #' @aliases domains,H5S_source-method
 #' @docType methods
@@ -704,18 +710,20 @@ setMethod("domains", c("H5S_source"), function(object, ...) {
   
 })
 
-#'getDatasetUUIDs from hsds server
-#'
-#' This function is deprecated and will be defunct in the next release.
-#'
-#'@param object instance of H5S_source(updated object with path to file set)
-#'@return character of dataset uuid obtained 
-#'@examples
-#'hsdsCon = H5S_source(URL_hsds()) # hsds server
-#'setPath(hsdsCon, "/home/stvjc/hdf5_mat.h5")-> hsds
-#'getDatasetUUIDs(hsds)
-#'@rdname getDatasetUUIDs
-#'@export
+#'  getDatasetUUIDs from hsds server
+#' 
+#'  This function is deprecated and will be defunct in the next release.
+#' 
+#' @param object instance of H5S_source(updated object with path to file set)
+#' @return character of dataset uuid obtained 
+#' @examples
+#' \dontrun{
+#' hsdsCon = H5S_source(URL_hsds()) # hsds server
+#' setPath(hsdsCon, "/home/stvjc/hdf5_mat.h5")-> hsds
+#' getDatasetUUIDs(hsds)
+#' }
+#' @rdname getDatasetUUIDs
+#' @export
 getDatasetUUIDs <- function(object) {
   #.Deprecated("HSDSArray", NULL, deprecate_msg)
   query = sprintf("%s/datasets?host=%s", object@serverURL, object@folderPath)
@@ -725,20 +733,22 @@ getDatasetUUIDs <- function(object) {
   cont$datasets
 }
 
-#'getDatasetAttrs from hsds server
-#'
-#' This function is deprecated and will be defunct in the next release.
-#'
-#'@param object instance of H5S_source(updated object with path to file set)
-#'@param duid character string with dataset uuid
-#'@return list of data obtained
-#'@examples
-#'hsdsCon = H5S_source(URL_hsds()) # hsds server
-#'hsdsCon@folderPath="/home/stvjc/hdf5_mat.h5"
-#'ds = fetchDatasets(hsdsCon)# Pick the ID of the dataset you are interested in
-#'getDatasetAttrs(hsdsCon, "d-a9e4b71c-8ea2-11e8-9306-0242ac120022")
-#'@rdname getDatasetAttrs
-#'@export
+#' getDatasetAttrs from hsds server
+#' 
+#'  This function is deprecated and will be defunct in the next release.
+#' 
+#' @param object instance of H5S_source(updated object with path to file set)
+#' @param duid character string with dataset uuid
+#' @return list of data obtained
+#' @examples
+#' \dontrun{ 
+#' hsdsCon = H5S_source(URL_hsds()) # hsds server
+#' hsdsCon@folderPath="/home/stvjc/hdf5_mat.h5"
+#' ds = fetchDatasets(hsdsCon)# Pick the ID of the dataset you are interested in
+#' getDatasetAttrs(hsdsCon, "d-a9e4b71c-8ea2-11e8-9306-0242ac120022")
+#' }
+#' @rdname getDatasetAttrs
+#' @export
 getDatasetAttrs <- function(object, duid) {
   #.Deprecated("HSDSArray", NULL, deprecate_msg)
   #uu = getDatasetUUIDs(object)
@@ -750,40 +760,44 @@ getDatasetAttrs <- function(object, duid) {
   cont
 }
 
-#'getDims from hsds server
-#'
-#' This function is deprecated and will be defunct in the next release.
-#'
-#'@param object instance of H5S_source(updated object with path to file set)
-#'@param duid character string with dataset uuid
-#'@return numeric content of dimensions
-#'@examples
-#'hsdsCon = H5S_source(URL_hsds()) # hsds server
-#'setPath(hsdsCon, "/home/stvjc/hdf5_mat.h5")-> hsds
-#'duid <- 'd-a9e4b71c-8ea2-11e8-9306-0242ac120022'
-#'getDims(hsds, duid)
-#'@rdname getDims
-#'@export
+#' getDims from hsds server
+#' 
+#'  This function is deprecated and will be defunct in the next release.
+#' 
+#' @param object instance of H5S_source(updated object with path to file set)
+#' @param duid character string with dataset uuid
+#' @return numeric content of dimensions
+#' @examples
+#' \dontrun{
+#' hsdsCon = H5S_source(URL_hsds()) # hsds server
+#' setPath(hsdsCon, "/home/stvjc/hdf5_mat.h5")-> hsds
+#' duid <- 'd-a9e4b71c-8ea2-11e8-9306-0242ac120022'
+#' getDims(hsds, duid)
+#' }
+#' @rdname getDims
+#' @export
 getDims <- function(object, duid) {
   #.Deprecated("HSDSArray", NULL, deprecate_msg)
   stopifnot(is(object, "H5S_source"))
   getDatasetAttrs(object, duid)$shape$dims
 }
 
-#'getHRDF from hsds server
-#'
-#' This function is deprecated and will be defunct in the next release.
-#'
-#'@param object instance of H5S_source(updated object with path to file set)
-#'@param duid character string with dataset uuid
-#'@return DataFrame of data obtained
-#'@examples
-#'hsdsCon = H5S_source(URL_hsds()) # hsds server
-#'hsdsCon@folderPath="/home/stvjc/hdf5_mat.h5"
-#'ds = fetchDatasets(hsdsCon) #Pick the ID of the dataset you are interested in
-#'getHRDF(hsdsCon, "d-a9e4b71c-8ea2-11e8-9306-0242ac120022")
-#'@rdname getHRDF
-#'@export
+#' getHRDF from hsds server
+#' 
+#'  This function is deprecated and will be defunct in the next release.
+#' 
+#' @param object instance of H5S_source(updated object with path to file set)
+#' @param duid character string with dataset uuid
+#' @return DataFrame of data obtained
+#' @examples
+#' \dontrun{
+#' hsdsCon = H5S_source(URL_hsds()) # hsds server
+#' hsdsCon@folderPath="/home/stvjc/hdf5_mat.h5"
+#' ds = fetchDatasets(hsdsCon) #Pick the ID of the dataset you are interested in
+#' getHRDF(hsdsCon, "d-a9e4b71c-8ea2-11e8-9306-0242ac120022")
+#' }
+#' @rdname getHRDF
+#' @export
 getHRDF <- function(object, duid) {
   #.Deprecated("HSDSArray", NULL, deprecate_msg)
   stopifnot(is(object, "H5S_source"))
@@ -793,20 +807,22 @@ getHRDF <- function(object, duid) {
   DataFrame(hrefName=nms, hrefValue=vals)
 }
 
-#'H5S_dataset2 for datasets in hsds server
-#'
-#' This function is deprecated and will be defunct in the next release.
-#'
-#'@param object instance of H5S_source(updated object with path to file set)
-#'@param duid character vector with dataset uuid of interest
-#'@return H5S_dataset object
-#'@examples
-#'hsdsCon = H5S_source(URL_hsds()) # hsds server
-#'hsdsCon@folderPath="/home/stvjc/hdf5_mat.h5"
-#'ds = fetchDatasets(hsdsCon) #Pick the dataset id of interest
-#'H5S_dataset2(hsdsCon, "d-a9e4b71c-8ea2-11e8-9306-0242ac120022")
-#'@rdname H5S_dataset2
-#'@export
+#' H5S_dataset2 for datasets in hsds server
+#' 
+#'  This function is deprecated and will be defunct in the next release.
+#' 
+#' @param object instance of H5S_source(updated object with path to file set)
+#' @param duid character vector with dataset uuid of interest
+#' @return H5S_dataset object
+#' @examples
+#' \dontrun{
+#' hsdsCon = H5S_source(URL_hsds()) # hsds server
+#' hsdsCon@folderPath="/home/stvjc/hdf5_mat.h5"
+#' ds = fetchDatasets(hsdsCon) #Pick the dataset id of interest
+#' H5S_dataset2(hsdsCon, "d-a9e4b71c-8ea2-11e8-9306-0242ac120022")
+#' }
+#' @rdname H5S_dataset2
+#' @export
 H5S_dataset2 = function(object, duid) {
   #.Deprecated("HSDSArray", NULL, deprecate_msg)
   src = new("H5S_source", serverURL=object@serverURL, dsmeta=DataFrame())
@@ -822,19 +838,21 @@ H5S_dataset2 = function(object, duid) {
       hrefs = ans, allatts=atts, presel=prep, transfermode="JSON")
 }
 
-#'getDatasetSlice from hsds server
-#'
-#' This function is deprecated and will be defunct in the next release.
-#'
-#'@param object instance of H5S_source(updated object with path to file set)
-#'@param dsindex dataset index
-#'@param selectionString character with selectionString
-#'@param \dots unused
-#'@return list of data obtained
-#'@examples
-#'hsdsCon = H5S_source(URL_hsds()) # hsds server
-#'setPath(hsdsCon, "/home/stvjc/hdf5_mat.h5")-> hsds
-#'getDatasetSlice(hsds,dsindex=1,selectionString="[1:2,1:5]")
+#' getDatasetSlice from hsds server
+#' 
+#'  This function is deprecated and will be defunct in the next release.
+#' 
+#' @param object instance of H5S_source(updated object with path to file set)
+#' @param dsindex dataset index
+#' @param selectionString character with selectionString
+#' @param \dots unused
+#' @return list of data obtained
+#' @examples
+#' \dontrun{
+#' hsdsCon = H5S_source(URL_hsds()) # hsds server
+#' setPath(hsdsCon, "/home/stvjc/hdf5_mat.h5")-> hsds
+#' getDatasetSlice(hsds,dsindex=1,selectionString="[1:2,1:5]")
+#' }
 #'@export
 getDatasetSlice <- function(object, dsindex=1, selectionString, ...) {
   #.Deprecated("HSDSArray", NULL, deprecate_msg)
@@ -847,20 +865,22 @@ getDatasetSlice <- function(object, dsindex=1, selectionString, ...) {
   fromJSON(readBin( ans$content, what="character"))
 }
 
-#'fetch datasets of a hdf5 file from the hsds server
-#'
-#' This function is deprecated and will be defunct in the next release.
-#'
-#'@import R6
-#'@import httr
-#'@param object instance of H5S_source
-#'@return data.frame with information about the datasets in the file 
-#'@examples
-#'hsdsCon = H5S_source(URL_hsds()) # hsds server
-#'hsdsCon@folderPath="/home/stvjc/hdf5_mat.h5"
-#'ds = fetchDatasets(hsdsCon)
-#'ds
-#'@export
+#' fetch datasets of a hdf5 file from the hsds server
+#' 
+#'  This function is deprecated and will be defunct in the next release.
+#' 
+#' @import R6
+#' @import httr
+#' @param object instance of H5S_source
+#' @return data.frame with information about the datasets in the file 
+#' @examples
+#' \dontrun{  
+#' hsdsCon = H5S_source(URL_hsds()) # hsds server
+#' hsdsCon@folderPath="/home/stvjc/hdf5_mat.h5"
+#' ds = fetchDatasets(hsdsCon)
+#' ds
+#' }
+#' @export
 fetchDatasets <- function(object){
   #.Deprecated("HSDSArray", NULL, deprecate_msg)
   hdf5DataStore <- R6Class("hdf5DataStore", list(

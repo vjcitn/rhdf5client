@@ -16,8 +16,10 @@ data.frame with information about the datasets in the file
 This function is deprecated and will be defunct in the next release.
 }
 \examples{
+\dontrun{  
 hsdsCon = H5S_source(URL_hsds()) # hsds server
 hsdsCon@folderPath="/home/stvjc/hdf5_mat.h5"
 ds = fetchDatasets(hsdsCon)
 ds
+}
 }
