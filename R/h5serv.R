@@ -381,7 +381,7 @@ setReplaceMethod("transfermode", "H5S_dataset",
 
 # private to deal with distinct behavior of httr::GET on windows
 winpref = function(x, pref="http://") {
-  if (length(grep("^http:", x)==0) & length(grep("^https:", x)==0)) x = paste0(pref,x)
+  if (length(grep("^http:", x))==0 & length(grep("^https:", x))==0) x = paste0(pref,x)
   x
 }
 
