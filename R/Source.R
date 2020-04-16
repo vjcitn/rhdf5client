@@ -219,8 +219,10 @@ domainContents <- function(object, rootdir = '/hdfgroup/org')  {
 submitRequest <- function(req, transfermode='JSON')  {
   rsp <- tryCatch({
       if (transfermode == 'JSON')  {
+        if (.Platform$OS.type == "windows") req = winpref(req)
         httr::GET(req)
       } else if (transfermode == 'binary')  {
+        if (.Platform$OS.type == "windows") req = winpref(req)
         httr::GET(req, add_headers(Accept="application/octet-stream"))
       }
     }, error=function(e) { NULL }

@@ -9,8 +9,9 @@ coercion for remote array to remote matrix
 Coercion method from HSDSMatrix to its superclass HSDSArray
 }
 \seealso{
-Other HSDSArray: \code{\link{HSDSArray}},
-  \code{\link{HSDSMatrix}}
+Other HSDSArray: 
+\code{\link{HSDSArray}},
+\code{\link{HSDSMatrix}}
 }
 \concept{H5S_Array}
 \concept{HSDSArray}

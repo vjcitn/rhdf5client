@@ -9,6 +9,8 @@
 DelayedMatrix subclass for a two-dimensional HSDSArray
 }
 \seealso{
-Other HSDSArray: \code{\link{HSDSArray}}, \code{\link{as}}
+Other HSDSArray: 
+\code{\link{HSDSArray}},
+\code{\link{as}()}
 }
 \concept{HSDSArray}

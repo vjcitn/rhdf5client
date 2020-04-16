@@ -12,13 +12,11 @@
 \usage{
 getData(dataset, indices, transfermode)
 
-\S4method{getData}{HSDSDataset,character,character}(dataset, indices,
-  transfermode)
+\S4method{getData}{HSDSDataset,character,character}(dataset, indices, transfermode)
 
 \S4method{getData}{HSDSDataset,character,missing}(dataset, indices)
 
-\S4method{getData}{HSDSDataset,list,character}(dataset, indices,
-  transfermode)
+\S4method{getData}{HSDSDataset,list,character}(dataset, indices, transfermode)
 
 \S4method{getData}{HSDSDataset,list,missing}(dataset, indices)
 }

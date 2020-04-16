@@ -3,7 +3,6 @@
 \docType{package}
 \name{rhdf5client}
 \alias{rhdf5client}
-\alias{rhdf5client-package}
 \title{rhdf5client: A package for accessing HDFGroup HDF5 servers from R.}
 \description{
 The rhdf5client package provides read-only access to HDF5 files

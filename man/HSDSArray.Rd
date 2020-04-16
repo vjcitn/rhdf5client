@@ -31,6 +31,8 @@ HSDSArray(URL_hsds(),
     "hsds", "/shared/bioconductor/darmgcls.h5", "/assay001")
 }
 \seealso{
-Other HSDSArray: \code{\link{HSDSMatrix}}, \code{\link{as}}
+Other HSDSArray: 
+\code{\link{HSDSMatrix}},
+\code{\link{as}()}
 }
 \concept{HSDSArray}

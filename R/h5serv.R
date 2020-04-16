@@ -199,7 +199,7 @@ setGeneric("groups", function(object, index, ...) standardGeneric("groups"))
 setMethod("groups", c("H5S_source", "missing"), function(object, index, ...) {
   #.Deprecated("HSDSArray", NULL, deprecate_msg)
   target = paste0(.serverURL(object), "/groups")
-  ans = transl(target) # fromJSON(readBin(GET(target)$content, what="character"))
+  ans = transl(target) 
 
   # find the root group: hh is a matrix with first column "href" and second "rel"
   # Find the one whose "rel" column is "root" and pull the name out of the "href"
@@ -215,7 +215,7 @@ setMethod("groups", c("H5S_source", "missing"), function(object, index, ...) {
   nl = vapply(1:length(grps), function(x) {
     gname = grps[x]
     target = paste0(.serverURL(object), "/groups/", gname, "/links" )
-    ans = transl(target)  # fromJSON(readBin(GET(target)$content, what="character"))
+    ans = transl(target)  
     length(ans$links)
   }, integer(1))
   DataFrame(groups=grps, nlinks=nl)
@@ -284,7 +284,7 @@ setMethod("links", c("H5S_source", "numeric"), function(object, index, ...) {
   #.Deprecated("HSDSArray", NULL, deprecate_msg)
   gname = groups(object, index)[["groups"]][1] # skirt mcols bug
   target = paste0(.serverURL(object), "/groups/", gname, "/links" )
-  ans = transl(target) # fromJSON(readBin(GET(target)$content, what="character"))
+  ans = transl(target) 
   new("H5S_linkset", links=ans, source=object, group=gname)
 })
 
@@ -379,10 +379,16 @@ setReplaceMethod("transfermode", "H5S_dataset",
   }
 )
 
+# private to deal with distinct behavior of httr::GET on windows
+winpref = function(x, pref="http://") {
+  if (length(grep("^http:", x)==0) & length(grep("^https:", x)==0)) x = paste0(pref,x)
+  x
+}
 
 # private: get content from host
 # param targ is the URL with query
 transl = function(targ)  {  
+  if (.Platform$OS.type == "windows") targ = winpref(targ)
   rsp <- GET(targ)
   if (rsp$status_code != 200)  
     stop(paste("error: can't read JSON ", targ, sep=""))
@@ -394,6 +400,7 @@ transl = function(targ)  {
 # param targ is the URL with query
 # param nele is the number of numeric elements expected
 bintransl = function(targ, nele, h5typ)  {  
+  if (.Platform$OS.type == "windows") targ = winpref(targ)
   rsp <- GET(targ, add_headers(Accept="application/octet-stream"))
   if (rsp$status_code != 200)  
     stop(paste("error: can't read binary ", targ, sep=""))
@@ -425,6 +432,7 @@ jsontransl = function(uu, nele)  {
 #private : to check if the server being called is hsds or h5serv
 serverVersion <- function(serverURL = serverURL){
   #validURL = url.exists(serverURL)
+  if (.Platform$OS.type == "windows") serverURL = winpref(serverURL)
   if(httr::http_status(GET(serverURL))$reason == "OK"){
     serverResponse = fromJSON(file=serverURL)
     if("root" %in% attributes(serverResponse)$names){
@@ -601,7 +609,7 @@ dataset = function(h5s, tag) {
   }
 
   targ = sub(".host", "datasets?host", targs)
-  uuid = transl(targ)$datasets # fromJSON(readBin(GET(targ)$content, what="character"))$datasets
+  uuid = transl(targ)$datasets 
   attrs = transl( sub("datasets", paste0("datasets/", uuid), targ ) )
   hrnm = vapply(attrs$hrefs, "[[", character(1), 2)
   hrval = vapply(attrs$hrefs, "[[", character(1), 1)
@@ -657,7 +665,7 @@ setMethod("hsdsInfo", c("H5S_source"), function(object) {
   #.Deprecated("HSDSArray", NULL, deprecate_msg)
   #target = paste0(.serverURL(object))
   target = paste0(.serverURL(object),"/domains")
-  ans = transl(target) # fromJSON(readBin(GET(target)$content, what="character"))
+  ans = transl(target) 
   
   if (length(ans$domains)<1)  { 
     stop("no domains at server URL")
@@ -695,7 +703,7 @@ setMethod("domains", c("H5S_source"), function(object, ...) {
   #.Deprecated("HSDSArray", NULL, deprecate_msg)
   target = paste0(.serverURL(object, ...),"/domains?domain=", object@folderPath)
   #target = paste0(.serverURL(object))
-  ans = transl(target) # fromJSON(readBin(GET(target)$content, what="character"))
+  ans = transl(target) 
   
   if (length(ans$domains)<1)  { 
     stop("no domains at server URL")
@@ -727,6 +735,7 @@ setMethod("domains", c("H5S_source"), function(object, ...) {
 getDatasetUUIDs <- function(object) {
   #.Deprecated("HSDSArray", NULL, deprecate_msg)
   query = sprintf("%s/datasets?host=%s", object@serverURL, object@folderPath)
+  if (.Platform$OS.type == "windows") query = winpref(query)
   ans = try(GET(query))
   if (inherits(ans, "try-error")) stop("could not resolve datasets query")
   cont = fromJSON(readBin( ans$content, what="character"))
@@ -754,6 +763,7 @@ getDatasetAttrs <- function(object, duid) {
   #uu = getDatasetUUIDs(object)
   uu = duid
   query = sprintf("%s/datasets/%s?host=%s", object@serverURL, uu, object@folderPath)
+  if (.Platform$OS.type == "windows") query = winpref(query)
   ans = try(GET(query))   ## is this going to do GET request only for one url? what if the there are multiple datasets in the file?
   if (inherits(ans, "try-error")) stop("could not resolve datasets query")
   cont = fromJSON(readBin( ans$content, what="character"))
@@ -833,6 +843,7 @@ H5S_dataset2 = function(object, duid) {
   prep = sub("\\?host=", "/value?host=", self)
   prep = paste0(prep, "&select=[%%SEL1%%,%%SEL2%%]")
   url = paste0(object@serverURL,"/datasets/",duid,"?host=",object@folderPath)
+  if (.Platform$OS.type == "windows") url = winpref(url)
   res = fromJSON(content(GET(url),"text"))
   new("H5S_dataset", source=src, simpleName=object@folderPath, shapes=res$shape,
       hrefs = ans, allatts=atts, presel=prep, transfermode="JSON")
@@ -860,6 +871,7 @@ getDatasetSlice <- function(object, dsindex=1, selectionString, ...) {
   requireNamespace("rjson")
   uuid = getDatasetUUIDs(object)[dsindex]
   query = sprintf("%s/datasets/%s/value?host=%s&select=%s", object@serverURL, uuid, object@folderPath, selectionString)
+  if (.Platform$OS.type == "windows") query = winpref(query)
   ans = try(GET(query, add_headers(Accept="application/json")))
   if (inherits(ans, "try-error")) stop("could not resolve select query")
   fromJSON(readBin( ans$content, what="character"))
@@ -890,6 +902,7 @@ fetchDatasets <- function(object){
     initialize=function(serverURL=NA, domain=NA){
       self$serverURL=serverURL;
       self$domain=domain;
+      if (.Platform$OS.type == "windows") serverURL = winpref(serverURL)
       temp=fromJSON(content(GET(paste0(serverURL,"/domains?domain=",domain)),"text"))
       self$rootgroup=temp$domains[[1]]$root
       self$updateDatasets(temp$domains[[1]]$root, domain)
@@ -897,6 +910,7 @@ fetchDatasets <- function(object){
     datasets=data.frame(),
     updateDatasets=function(group, domain){
       url=paste0(self$serverURL,"/groups/",group,"/links?domain=",domain)
+      if (.Platform$OS.type == "windows") url = winpref(url)
       a=fromJSON(content(GET(url),"text"))$links
       for(i in 1:length(a)){
         a[[i]]$domain=domain
