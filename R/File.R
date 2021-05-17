@@ -22,8 +22,10 @@ setClass("HSDSFile", representation(src="HSDSSource", domain="character", dsetdf
 #' file system.
 #' @return an initialized object of type HSDSFile
 #' @examples
-#' src <- HSDSSource('http://hsdshdflab.hdfgroup.org')
-#' f10x <- HSDSFile(src, '/shared/bioconductor/tenx_full.h5')
+#' if (check_hsds()) {
+#'  src <- HSDSSource('http://hsdshdflab.hdfgroup.org')
+#'  f10x <- HSDSFile(src, '/shared/bioconductor/tenx_full.h5')
+#' }
 #' @export
 HSDSFile <- function(src, domain)  {
   #.Deprecated("HSDSArray", NULL, deprecate_msg)
@@ -68,9 +70,11 @@ HSDSFile <- function(src, domain)  {
 #' @return a list of inner-paths 
 #' 
 #' @examples
-#' src <- HSDSSource('http://hsdshdflab.hdfgroup.org')
-#' f <- HSDSFile(src, '/home/spollack/testzero.h5')
-#' listDatasets(f)
+#' if (check_hsds()) {
+#'  src <- HSDSSource('http://hsdshdflab.hdfgroup.org')
+#'  f <- HSDSFile(src, '/home/spollack/testzero.h5')
+#'  listDatasets(f)
+#' }
 #' @export
 listDatasets <- function(file)  {
   #.Deprecated("HSDSArray", NULL, deprecate_msg)

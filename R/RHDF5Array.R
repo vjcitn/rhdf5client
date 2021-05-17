@@ -159,6 +159,14 @@ setMethod("DelayedArray", "HSDSArraySeed",
     new_DelayedArray(seed, Class="HSDSArray") 
 )
 
+#' a test request
+#' @export
+check_hsds = function() {
+ tst = "http://hsdshdflab.hdfgroup.org?domain=/shared/bioconductor/darmgcls.h5"
+ ans = httr::GET(tst)
+ ans$status_code == 200
+}
+
 #' Construct an object of type HSDSArray directly from the data
 #' members of its seed
 #'
@@ -168,8 +176,10 @@ setMethod("DelayedArray", "HSDSArraySeed",
 #' @param dsetname complete internal path to dataset in H5 file
 #' @return An initialized object of type HSDSArray
 #' @examples
-#' HSDSArray(URL_hsds(), 
+#' if (check_hsds()) {
+#'  HSDSArray(URL_hsds(), 
 #'     "hsds", "/shared/bioconductor/darmgcls.h5", "/assay001")
+#' }
 #' @export
 HSDSArray <- function(endpoint, svrtype, domain, dsetname)  {
   DelayedArray(HSDSArraySeed(endpoint, svrtype, domain, dsetname))

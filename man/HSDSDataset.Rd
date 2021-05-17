@@ -20,7 +20,9 @@ Construct an object of type HSDSDataset
 A HSDSDataset is a representation of a dataset in a HDF5 file.
 }
 \examples{
-src <- HSDSSource('http://hsdshdflab.hdfgroup.org')
-f <- HSDSFile(src, '/home/spollack/testzero.h5')
-d <- HSDSDataset(f, '/grpA/grpAB/dsetX')
+if (check_hsds()) {
+ src <- HSDSSource('http://hsdshdflab.hdfgroup.org')
+ f <- HSDSFile(src, '/home/spollack/testzero.h5')
+ d <- HSDSDataset(f, '/grpA/grpAB/dsetX')
+}
 }

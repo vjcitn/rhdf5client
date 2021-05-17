@@ -27,8 +27,10 @@ Construct an object of type HSDSArray directly from the data
 members of its seed
 }
 \examples{
-HSDSArray(URL_hsds(), 
+if (check_hsds()) {
+ HSDSArray(URL_hsds(), 
     "hsds", "/shared/bioconductor/darmgcls.h5", "/assay001")
+}
 }
 \seealso{
 Other HSDSArray: 

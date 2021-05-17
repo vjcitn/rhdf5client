@@ -22,5 +22,7 @@ server (either h5serv or hsds.)
 This function is deprecated and will be defunct in the next release.
 }
 \examples{
-src.hsds <- HSDSSource('http://hsdshdflab.hdfgroup.org')
+if (check_hsds()) {
+ src.hsds <- HSDSSource('http://hsdshdflab.hdfgroup.org')
+}
 }

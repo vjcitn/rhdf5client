@@ -22,7 +22,9 @@ setClass("HSDSSource", representation(endpoint="character", type="character"))
 #' @param type Type of server software at the source; must be 
 #' @return An object of type HSDSSource
 #' @examples
-#' src.hsds <- HSDSSource('http://hsdshdflab.hdfgroup.org')
+#' if (check_hsds()) {
+#'  src.hsds <- HSDSSource('http://hsdshdflab.hdfgroup.org')
+#' }
 #' @export
 HSDSSource <- function(endpoint, type='hsds')  {
   #.Deprecated("HSDSArray", NULL, deprecate_msg)

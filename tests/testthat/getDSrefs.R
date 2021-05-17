@@ -57,50 +57,55 @@ retrieveDataset = function(url=rhdf5client::URL_hsds(), dompath =
 context("H5S_dataset2 exercises")
 
 test_that("darmgcls.h5 can be retrieved from kitalab", {
- url = URL_hsds()
- dompath = "/shared/bioconductor/darmgcls.h5"
- title = "assay001"
- s1 = try(getDSrefs(url = url, dompath = dompath))
- if (inherits(s1, "try-error")) {
-   print(s1)
-   fail(paste("getDSrefs fails on", dompath))
- }
- uu = s1[which(s1$title == title), "id"]
- expect_true(length(uu)==1)
- so = rhdf5client::H5S_source(url, dompath)
- suppressMessages({  # encoding message
- ds = rhdf5client::H5S_dataset2(so, uu)
- })
- expect_true(is(ds, "H5S_dataset"))
- ans = DelayedArray::DelayedArray(new("H5S_ArraySeed", 
-         filepath = "", domain = "", 
-         host = "", H5S_dataset = ds))
- expect_true(all(dim(ans) == c(65218, 3584)))
-
-# compute indices of corners of matrix
-
-corn = function(m, siz=3) {
- r = nrow(m)
- c = ncol(m)
- rr = unlist(lapply(list(head,tail), function(f) f(1:r, siz)))
- cc = unlist(lapply(list(head,tail), function(f) f(1:c, siz)))
- list(rr, cc)
-}
-
-mcorn = function(m, siz=4) { 
-  cc = corn(m, siz=siz)
-  m[cc[[1]], cc[[2]]]
-}
-
-expect_equal(sum(mcorn(ans)), 55928.6253033)
+  if (check_hsds()) { 
+    url = URL_hsds()
+    dompath = "/shared/bioconductor/darmgcls.h5"
+    title = "assay001"
+    s1 = try(getDSrefs(url = url, dompath = dompath))
+    if (inherits(s1, "try-error")) {
+      print(s1)
+      fail(paste("getDSrefs fails on", dompath))
+    }
+    uu = s1[which(s1$title == title), "id"]
+    expect_true(length(uu)==1)
+    so = rhdf5client::H5S_source(url, dompath)
+    suppressMessages({  # encoding message
+    ds = rhdf5client::H5S_dataset2(so, uu)
+    })
+    expect_true(is(ds, "H5S_dataset"))
+    ans = DelayedArray::DelayedArray(new("H5S_ArraySeed", 
+            filepath = "", domain = "", 
+            host = "", H5S_dataset = ds))
+    expect_true(all(dim(ans) == c(65218, 3584)))
+   
+   # compute indices of corners of matrix
+   
+   corn = function(m, siz=3) {
+    r = nrow(m)
+    c = ncol(m)
+    rr = unlist(lapply(list(head,tail), function(f) f(1:r, siz)))
+    cc = unlist(lapply(list(head,tail), function(f) f(1:c, siz)))
+    list(rr, cc)
+   }
+   
+   mcorn = function(m, siz=4) { 
+     cc = corn(m, siz=siz)
+     m[cc[[1]], cc[[2]]]
+   }
+   
+   expect_equal(sum(mcorn(ans)), 55928.6253033)
+   }
+  else TRUE
 })
 
 context("use retrieveDataset to get rownames")
 
 test_that("retrieveDataset gets rownames", {
+  if (check_hsds()) {
    rn = retrieveDataset(url=rhdf5client::URL_hsds(), dompath =
        "/shared/bioconductor/htxcomp_genes.h5", title="rownames") 
    expect_equal(length(rn), 58288)
    expect_true(all.equal(head(rn), c("ENSG00000000003.14", "ENSG00000000005.5", 	"ENSG00000000419.12", "ENSG00000000457.13", 
         "ENSG00000000460.16", "ENSG00000000938.12")))
+  } else TRUE
 })

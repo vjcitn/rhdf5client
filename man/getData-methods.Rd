@@ -41,10 +41,12 @@ multiple requests. This is opaque to the user, but may enter into
 considerations of data access patterns, e.g., for performance-tuning.
 }
 \examples{
-s <- HSDSSource('http://hsdshdflab.hdfgroup.org')
-f <- HSDSFile(s, '/shared/bioconductor/tenx_full.h5')
-d <- HSDSDataset(f, '/newassay001')
-x <- getData(d, c('1:4', '1:27998'), transfermode='JSON')
-# x <- getData(d, c(1:4, 1:27998), transfermode='JSON') # method missing?
-x <- d[1:4,1:27998]
+if (check_hsds()) {
+ s <- HSDSSource('http://hsdshdflab.hdfgroup.org')
+ f <- HSDSFile(s, '/shared/bioconductor/tenx_full.h5')
+ d <- HSDSDataset(f, '/newassay001')
+ x <- getData(d, c('1:4', '1:27998'), transfermode='JSON')
+ # x <- getData(d, c(1:4, 1:27998), transfermode='JSON') # method missing?
+ x <- d[1:4,1:27998]
+}
 }

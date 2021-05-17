@@ -23,6 +23,8 @@ exposed by a HDF5 server.
 This function is deprecated and will be defunct in the next release.
 }
 \examples{
-src <- HSDSSource('http://hsdshdflab.hdfgroup.org')
-f10x <- HSDSFile(src, '/shared/bioconductor/tenx_full.h5')
+if (check_hsds()) {
+ src <- HSDSSource('http://hsdshdflab.hdfgroup.org')
+ f10x <- HSDSFile(src, '/shared/bioconductor/tenx_full.h5')
+}
 }

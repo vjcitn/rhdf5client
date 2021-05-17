@@ -30,12 +30,16 @@ to the HDF5 file) and the full path to the dataset inside the HDF5 file.
 
 ## Interface to HSDS (HDF Object Store)
 ```{r lkdela3}
-da <- HSDSArray('http://hsdshdflab.hdfgroup.org', 'hsds', 
+if (check_hsds()) {
+ da <- HSDSArray('http://hsdshdflab.hdfgroup.org', 'hsds', 
       '/shared/bioconductor/tenx_full.h5', '/newassay001')
-da
+ da
+}
 ```
 
 Again we have DelayedArray capabilities.
 ```{r lkdel3}
-apply(da[,1:4],2,sum)
+if (check_hsds()) {
+ apply(da[,1:4],2,sum)
+}
 ```

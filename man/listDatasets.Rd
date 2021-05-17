@@ -22,7 +22,9 @@ file's group hiearchy is complex, this could be time-consuming.
 This function is deprecated and will be defunct in the next release.
 }
 \examples{
-src <- HSDSSource('http://hsdshdflab.hdfgroup.org')
-f <- HSDSFile(src, '/home/spollack/testzero.h5')
-listDatasets(f)
+if (check_hsds()) {
+ src <- HSDSSource('http://hsdshdflab.hdfgroup.org')
+ f <- HSDSFile(src, '/home/spollack/testzero.h5')
+ listDatasets(f)
+}
 }
