@@ -46,7 +46,7 @@ retrieveDataset = function(url=rhdf5client::URL_hsds(), dompath =
  })
  if (length(ds@shapes$dims) == 1) {
         targ = gsub("&.*", "", ds@presel)
-        gg = rjson::fromJSON(readBin(GET(targ)$content, w = "character"))$value
+        gg = rjson::fromJSON(readBin(httr::GET(targ)$content, w = "character"))$value
         message("one dimensional response, returning text")
         return(gg)
     }
