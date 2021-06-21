@@ -26,11 +26,11 @@ context("HSDSSource")
 test_that("Server found", {
  if (check_hsds()) {
   src.hsds <- HSDSSource('http://hsdshdflab.hdfgroup.org')
-  doms <- listDomains(src.hsds, '/home/spollack')
-  expect_true('/home/spollack/testzero.h5' %in% doms) 
+  doms <- listDomains(src.hsds, '/shared/bioconductor')
+  expect_true('/shared/bioconductor/tenx_full.h5' %in% doms) 
   # catch exception: non-existent source
   src.fake <- HSDSSource('http://hsdshdflab.fdhgroup.org')
-  expect_warning(listDomains(src.fake, '/home'), "bad http request")
+  expect_warning(listDomains(src.fake, '/shared/bioconductor/'), "bad http request")
  } else TRUE
 })
 
@@ -38,11 +38,11 @@ context("HSDSFile")
 test_that("Files can be opened for reading", {
  if (check_hsds()) {
   src.hsds <- HSDSSource('http://hsdshdflab.hdfgroup.org')
-  f1 <- HSDSFile(src.hsds, '/home/spollack/testzero.h5')
+  f1 <- HSDSFile(src.hsds, '/shared/bioconductor/tenx_full.h5')
   dsts <- listDatasets(f1)
-  expect_true('/grpB/grpBA/dsetX' %in% dsts)
+  expect_true('/newassay001' %in% dsts)
   # catch exception: non-existent or empty file
-  expect_warning(HSDSFile(src.hsds, '/home/spollack/testfake.h5'), "no datasets")
+  expect_warning(HSDSFile(src.hsds, '/shared/bioconductor/tenx_nonex.h5'), "no datasets")
   } else TRUE
 })
 
@@ -50,8 +50,6 @@ context("HSDSDataset")
 test_that("Data can be retrieved from Datasets", {
  if (!check_hsds()) return(TRUE) else {
   src.hsds <- HSDSSource('http://hsdshdflab.hdfgroup.org')
-  f1 <- HSDSFile(src.hsds, '/home/spollack/testone.h5')
-  d1 <- HSDSDataset(f1, '/group0/dset1d')
   f2 <- HSDSFile(src.hsds, '/shared/bioconductor/tenx_full.h5')
   d2 <- HSDSDataset(f2, '/newassay001')
   R <- c(4046,2087,4654,3193)
@@ -62,7 +60,6 @@ test_that("Data can be retrieved from Datasets", {
   expect_true(all(R == A))
   A <- apply(d2[1:4, 1:27998], 1, sum)
   expect_true(all(R == A))
-  expect_true(sum(d1[1:20]) == 937)
  }
 })
 
@@ -77,20 +74,20 @@ test_that("DelayedArray can be instantiated and accessed",  {
  }
 })
 
-context("Four-dimensional datasets")
-test_that("Higher-dimensional dataset access works correctly",  {
- if (!check_hsds()) return(TRUE) else {
-  src <- HSDSSource('http://hsdshdflab.hdfgroup.org')
-  rd <- HSDSDataset(HSDSFile(src, '/home/spollack/testone.h5'), '/group0/group1/group2/data4d')
-  A <- getData(rd, list(3:4, 8:9, 5:6, 2:3))
-  expect_true(sum(A) == 697)
-  dt <- HSDSDataset(HSDSFile(src, '/home/spollack/testone.h5'), '/group0/group1/dataR')
-  B <- getData(dt, list(c(4), c(2, 3, 5, 6), c(5), 1:3))
-  R <- array(c(3140, 3240, 3440, 3540, 3141, 3241, 3441, 3541, 3142, 
-      3242, 3442, 3542), dim=c(4,3))
-  expect_true(all(B == R))
- }
-})
+#context("Four-dimensional datasets")
+#test_that("Higher-dimensional dataset access works correctly",  {
+# if (!check_hsds()) return(TRUE) else {
+#  src <- HSDSSource('http://hsdshdflab.hdfgroup.org')
+#  rd <- HSDSDataset(HSDSFile(src, '/home/spollack/testone.h5'), '/group0/group1/group2/data4d')
+#  A <- getData(rd, list(3:4, 8:9, 5:6, 2:3))
+#  expect_true(sum(A) == 697)
+#  dt <- HSDSDataset(HSDSFile(src, '/home/spollack/testone.h5'), '/group0/group1/dataR')
+#  B <- getData(dt, list(c(4), c(2, 3, 5, 6), c(5), 1:3))
+#  R <- array(c(3140, 3240, 3440, 3540, 3141, 3241, 3441, 3541, 3142, 
+#      3242, 3442, 3542), dim=c(4,3))
+#  expect_true(all(B == R))
+# }
+#})
 
 context("Decomposition into slices")
 test_that("Bad slices rejected",  {
