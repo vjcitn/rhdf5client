@@ -24,7 +24,7 @@ This function is deprecated and will be defunct in the next release.
 \examples{
 if (check_hsds()) {
  src <- HSDSSource('http://hsdshdflab.hdfgroup.org')
- f <- HSDSFile(src, '/home/spollack/testzero.h5')
+ f <- HSDSFile(src, '/shared/bioconductor/tenx_full.h5')
  listDatasets(f)
 }
 }

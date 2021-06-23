@@ -21,8 +21,8 @@ setClass("HSDSDataset", representation(file="HSDSFile", path="character", uuid="
 #' @examples
 #' if (check_hsds()) {
 #'  src <- HSDSSource('http://hsdshdflab.hdfgroup.org')
-#'  f <- HSDSFile(src, '/home/spollack/testzero.h5')
-#'  d <- HSDSDataset(f, '/grpA/grpAB/dsetX')
+#'  f <- HSDSFile(src, '/shared/bioconductor/tenx_full.h5')
+#'  d <- HSDSDataset(f, '/newassay001')
 #' }
 #' @export
 HSDSDataset <- function(file, path)  {
