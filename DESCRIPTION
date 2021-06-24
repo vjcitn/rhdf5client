@@ -9,7 +9,7 @@ Authors@R: c(
  person("Vincent", "Carey", role = c("cre", "aut"), email = "stvjc@channing.harvard.edu")
  )
 Suggests: knitr, testthat, BiocStyle, DT, 
-	reticulate, rmarkdown
+	rmarkdown
 Imports: S4Vectors, httr, R6, rjson, utils
 Depends: R (>= 3.6), methods, DelayedArray
 License: Artistic-2.0
