@@ -1,3 +1,9 @@
+# private to deal with distinct behavior of httr::GET on windows
+winpref = function(x, pref="http://") {
+  if (length(grep("^http:", x))==0 & length(grep("^https:", x))==0) x = paste0(pref,x)
+  x
+}
+
 deprecate_msg = paste0("This function is deprecated. The new interface to rhdf5client",
  " is exclusively through its DelayedArray backend HSDSArray")
 

@@ -1,8 +1,10 @@
 Package: rhdf5client
 Title: Access HDF5 content from h5serv 
-Description: Provides functionality for reading data from h5serv server
- from within R.
-Version: 1.21.0
+Description: This package provides functionality for reading data from HDF Scalable Data Service
+	from within R.  The HSDSArray function bridges from HSDS to the user via the DelayedArray
+	interface.  Bioconductor manages an open HSDS instance graciously provided by John
+	Readey of the HDF Group.
+Version: 1.21.1
 Authors@R: c(
  person("Samuela", "Pollack", role = c("aut"),email = "spollack@jimmy.harvard.edu"), 
  person("Shweta", "Gopaulakrishnan", role = c("aut"), email = "reshg@channing.harvard.edu"),
@@ -11,12 +13,12 @@ Authors@R: c(
  )
 Suggests: knitr, testthat, BiocStyle, DT, 
 	rmarkdown
-Imports: S4Vectors, httr, R6, rjson, utils
+Imports: httr, rjson, utils
 Depends: R (>= 3.6), methods, DelayedArray
 License: Artistic-2.0
 LazyLoad: yes
 BiocViews: infrastructure
-Collate: h5serv.R indx.R H5S_Array.R HSDS_Matrix.R 
+Collate: URL_hsds.R indx.R 
   'rhdf5client2.R'
   'Source.R'
   'File.R'
@@ -25,4 +27,4 @@ Collate: h5serv.R indx.R H5S_Array.R HSDS_Matrix.R
 VignetteBuilder: knitr
 Encoding: UTF-8
 biocViews: DataImport, Software
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3

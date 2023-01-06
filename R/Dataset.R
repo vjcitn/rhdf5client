@@ -79,7 +79,7 @@ HSDSDataset <- function(file, path)  {
 #'
 #' @param indices The indices of the data to fetch
 #'
-#' @param transfermode Either (default) 'JSON' or 'binary'
+#' @param transfermode Either 'JSON' or 'binary' (default)
 #'
 #' @return an Array containing the data fetched from the server
 #'
@@ -92,8 +92,10 @@ HSDSDataset <- function(file, path)  {
 #'  f <- HSDSFile(s, '/shared/bioconductor/tenx_full.h5')
 #'  d <- HSDSDataset(f, '/newassay001')
 #'  x <- getData(d, c('1:4', '1:27998'), transfermode='JSON')
+#'  xb <- getData(d, c('1:4', '1:27998'), transfermode='binary')
 #'  # x <- getData(d, c(1:4, 1:27998), transfermode='JSON') # method missing?
-#'  x <- d[1:4,1:27998]
+#'  x 
+#'  xb
 #' }
 #' @export 
 setGeneric("getData", function(dataset, indices, transfermode) standardGeneric("getData"))
@@ -121,12 +123,12 @@ setMethod(".getData", c("HSDSDataset", "character", "character"),
 setMethod("getData", c("HSDSDataset", "character", "missing"),  
   function(dataset, indices)  {
     #.Deprecated("HSDSArray", NULL, deprecate_msg)
-    getDataVec(dataset, indices, 'JSON')
+    getDataVec(dataset, indices, 'binary')
   })
 #private for after cycle
 setMethod(".getData", c("HSDSDataset", "character", "missing"),  
   function(dataset, indices)  {
-    getDataVec(dataset, indices, 'JSON')
+    getDataVec(dataset, indices, 'binary')
   })
 
 #' @rdname getData-methods
@@ -148,7 +150,7 @@ function(dataset, indices, transfermode)  {
 setMethod("getData", c("HSDSDataset", "list", "missing"),  
 function(dataset, indices)  {
   #.Deprecated("HSDSArray", NULL, deprecate_msg)
-  getDataList(dataset, indices, 'JSON')  
+  getDataList(dataset, indices, 'binary')  
   })
 
 
@@ -247,7 +249,7 @@ getDataVec <- function(dataset, indices, transfermode = 'JSON')  {
 
 # private - split numeric vectors into slices and fetch
 # data in one or more requests.
-getDataList <- function(dataset, indices, transfermode = 'JSON')  {
+getDataList <- function(dataset, indices, transfermode = 'binary')  {
     if (length(dataset@shape) != length(indices))
       stop("wrong length of indexlist")
 
@@ -629,7 +631,7 @@ setMethod("show", "HSDSDataset", function(object) {
 setMethod('[', c("HSDSDataset", "numeric", "ANY", "ANY"), 
   function(x, i, j, ..., drop) {
     #.Deprecated("HSDSArray", NULL, deprecate_msg)
-    getDataList(x, list(i), transfermode='JSON')
+    getDataList(x, list(i), transfermode='binary')
   })
 
 # special case: two-dimensional arrays
@@ -644,7 +646,7 @@ setMethod('[', c("HSDSDataset", "numeric", "ANY", "ANY"),
 setMethod('[', c("HSDSDataset", "numeric", "numeric", "ANY"), 
   function(x, i, j, ..., drop) {
     #.Deprecated("HSDSArray", NULL, deprecate_msg)
-    getDataList(x, list(i, j), transfermode='JSON')
+    getDataList(x, list(i, j), transfermode='binary')
   })
 
 

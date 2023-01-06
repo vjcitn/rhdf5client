@@ -6,6 +6,12 @@
 \usage{
 check_hsds()
 }
+\value{
+logical, TRUE if hsds behaving as expected
+}
 \description{
 a test request
+}
+\examples{
+check_hsds()
 }

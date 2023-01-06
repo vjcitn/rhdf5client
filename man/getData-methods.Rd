@@ -25,7 +25,7 @@ getData(dataset, indices, transfermode)
 
 \item{indices}{The indices of the data to fetch}
 
-\item{transfermode}{Either (default) 'JSON' or 'binary'}
+\item{transfermode}{Either 'JSON' or 'binary' (default)}
 }
 \value{
 an Array containing the data fetched from the server
@@ -46,7 +46,9 @@ if (check_hsds()) {
  f <- HSDSFile(s, '/shared/bioconductor/tenx_full.h5')
  d <- HSDSDataset(f, '/newassay001')
  x <- getData(d, c('1:4', '1:27998'), transfermode='JSON')
+ xb <- getData(d, c('1:4', '1:27998'), transfermode='binary')
  # x <- getData(d, c(1:4, 1:27998), transfermode='JSON') # method missing?
- x <- d[1:4,1:27998]
+ x 
+ xb
 }
 }

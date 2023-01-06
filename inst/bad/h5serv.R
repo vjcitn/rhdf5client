@@ -1,18 +1,3 @@
-deprecate_msg = paste0("This function is deprecated. The new interface to rhdf5client",
- " is exclusively through its DelayedArray backend HSDSArray")
-
-#' manage h5serv URL
-#'
-#' This function is deprecated and will be defunct in the next release.
-#'
-#' @return URL of h5serv server
-#' @examples
-#' URL_h5serv()
-#' @export
-URL_h5serv = function() { 
-#  .Deprecated("HSDSArray", NULL, deprecate_msg)
-  "http://h5s.channingremotedata.org:5000"
-}
 
 #' manage hsds URL
 #'
@@ -24,12 +9,6 @@ URL_h5serv = function() {
 URL_hsds = function() {
   "http://hsdshdflab.hdfgroup.org"
 }
-
-#' @importFrom httr GET
-#' @importFrom httr add_headers
-#' @importFrom rjson fromJSON
-#' @importFrom utils capture.output
-.serverURL = function(x) x@serverURL
 
 
 #' H5S_source identifies an HDF5/HSDS server and manages some metadata about contents

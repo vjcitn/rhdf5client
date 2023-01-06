@@ -160,6 +160,9 @@ setMethod("DelayedArray", "HSDSArraySeed",
 )
 
 #' a test request
+#' @return logical, TRUE if hsds behaving as expected
+#' @examples
+#' check_hsds()
 #' @export
 check_hsds = function() {
  tst = "http://hsdshdflab.hdfgroup.org?domain=/shared/bioconductor/darmgcls.h5"
