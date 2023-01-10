@@ -552,6 +552,10 @@ slicify <- function(v)  {
 }
 
 # private - fetch and assemble dataset blocks 
+# there is a bug
+# if blk involves missing data in HDF5, NAs don't come back
+# and there is a 0 length list element.
+# need a test and fix
 multifetch <- function(LL, dataset)  { 
   slicelen <- function(slc)  {
     ss <- as.numeric(strsplit(slc, ':')[[1]])
