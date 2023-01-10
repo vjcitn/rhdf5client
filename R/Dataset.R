@@ -192,12 +192,19 @@ getDataVec <- function(dataset, indices, transfermode = 'JSON')  {
       '/value?domain=', domain, '&select=', sel)
     response <- submitRequest(request, transfermode=transfermode)
 
+#Browse[2]> response$headers$`content-type`
+#[1] "application/octet-stream"
+
     if (singlefetch)  {  
-      return(as.numeric(response$value))
+      if (response$headers$`content-type` == "application/octet-stream")
+        return(extractBinary(dataset@type, prod(rdims), response))
+      return(as.numeric(response$value))  # this seems to assume JSON noted 2023.01.10
     }
 
     if (length(rdims) == 1 && length(sdims) == 1)  {    # 1D array quick bypass
-      return(as.numeric(response$value))
+      if (response$headers$`content-type` == "application/octet-stream")
+        return(extractBinary(dataset@type, prod(rdims), response))
+      return(as.numeric(response$value))  # loses array character, is that OK? 2023.01.10
     }
 
     if (length(rdims) == 2 && length(sdims) == 2)  {    # 2D array quick bypass
