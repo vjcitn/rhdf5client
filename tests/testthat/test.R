@@ -105,3 +105,17 @@ test_that("Bad slices rejected",  {
 })
 
 
+context("String support")
+test_that("Basic string support",  {
+    src.hsds <- HSDSSource('http://hsdshdflab.hdfgroup.org')
+    f <- HSDSFile(src.hsds, "/shared/NREL/sample/windspeed_z5.h5")
+    d <- HSDSDataset(f, "/datetime")
+    expect_true(d@type$class == "H5T_STRING")
+    
+    v1 <- d[1:10]
+    expect_equal(class(v1), "character")
+    
+    v2 <- d[1]
+    expect_equal(class(d[1]), "character")
+    expect_equal(v1[1], v2)
+})
