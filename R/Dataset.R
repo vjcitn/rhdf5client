@@ -196,14 +196,26 @@ getDataVec <- function(dataset, indices, transfermode = 'JSON')  {
 #[1] "application/octet-stream"
 
     if (singlefetch)  {  
-      if (response$headers$`content-type` == "application/octet-stream")
+      if (identical(response$headers$`content-type`, "application/octet-stream"))
         return(extractBinary(dataset@type, prod(rdims), response))
+      
+      if (dataset@type$class == "H5T_STRING") {
+        # returning value as is
+        return(response$value)
+      }
+      
       return(as.numeric(response$value))  # this seems to assume JSON noted 2023.01.10
     }
 
     if (length(rdims) == 1 && length(sdims) == 1)  {    # 1D array quick bypass
-      if (response$headers$`content-type` == "application/octet-stream")
+      if (identical(response$headers$`content-type`, "application/octet-stream"))
         return(extractBinary(dataset@type, prod(rdims), response))
+      
+      if (dataset@type$class == "H5T_STRING") {
+        # returning value as is
+        return(response$value)
+      }
+      
       return(as.numeric(response$value))  # loses array character, is that OK? 2023.01.10
     }
 
@@ -642,7 +654,11 @@ setMethod("show", "HSDSDataset", function(object) {
 setMethod('[', c("HSDSDataset", "numeric", "ANY", "ANY"), 
   function(x, i, j, ..., drop) {
     #.Deprecated("HSDSArray", NULL, deprecate_msg)
-    getDataList(x, list(i), transfermode='binary')
+    transfermode <- "binary"
+    if (x@type$class %in% "H5T_STRING") {
+      transfermode <- "JSON"
+    } 
+    getDataList(x, list(i), transfermode=transfermode)
   })
 
 # special case: two-dimensional arrays
