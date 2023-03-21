@@ -39,7 +39,7 @@ HSDSDataset <- function(file, path)  {
     return(NULL)
   }
   shape <- response$shape$dims
-  type <- list(class=response$type$class, base=response$type$base)
+  type <- response$type
 
   new("HSDSDataset", file=file, path=path, uuid=uuid,
     shape=shape, type=type)
@@ -58,7 +58,7 @@ HSDSDataset <- function(file, path)  {
     return(NULL)
   }
   shape <- response$shape$dims
-  type <- list(class=response$type$class, base=response$type$base)
+  type <- response$type
 
   new("HSDSDataset", file=file, path=path, uuid=uuid,
     shape=shape, type=type)
@@ -157,7 +157,7 @@ function(dataset, indices)  {
 # private - perform a single fetch; indices is a vector of
 # type character with one slice per dimension.
 #' @useDynLib rhdf5client, .registration = TRUE
-getDataVec <- function(dataset, indices, transfermode = 'JSON')  {
+getDataVec <- function(dataset, indices, transfermode = 'JSON', returnRaw=FALSE)  {
 
     indices <- checkSlices(dataset@shape, indices)
     if (length(indices) == 0)
@@ -191,6 +191,10 @@ getDataVec <- function(dataset, indices, transfermode = 'JSON')  {
     request <- paste0(endpoint, '/datasets/', dataset@uuid, 
       '/value?domain=', domain, '&select=', sel)
     response <- submitRequest(request, transfermode=transfermode)
+    
+    if (returnRaw) {
+      return(response$value)
+    }
 
 #Browse[2]> response$headers$`content-type`
 #[1] "application/octet-stream"
@@ -202,6 +206,8 @@ getDataVec <- function(dataset, indices, transfermode = 'JSON')  {
       if (dataset@type$class == "H5T_STRING") {
         # returning value as is
         return(response$value)
+      } else if (dataset@type$class == "H5T_COMPOUND") {
+        return(extractCompoundJSON(dataset@type, response$value))
       }
       
       return(as.numeric(response$value))  # this seems to assume JSON noted 2023.01.10
@@ -214,6 +220,8 @@ getDataVec <- function(dataset, indices, transfermode = 'JSON')  {
       if (dataset@type$class == "H5T_STRING") {
         # returning value as is
         return(response$value)
+      } else if (dataset@type$class == "H5T_COMPOUND") {
+        return(extractCompoundJSON(dataset@type, response$value))
       }
       
       return(as.numeric(response$value))  # loses array character, is that OK? 2023.01.10
@@ -655,7 +663,7 @@ setMethod('[', c("HSDSDataset", "numeric", "ANY", "ANY"),
   function(x, i, j, ..., drop) {
     #.Deprecated("HSDSArray", NULL, deprecate_msg)
     transfermode <- "binary"
-    if (x@type$class %in% "H5T_STRING") {
+    if (x@type$class %in% c("H5T_STRING", "H5T_COMPOUND")) {
       transfermode <- "JSON"
     } 
     getDataList(x, list(i), transfermode=transfermode)
@@ -681,3 +689,21 @@ setMethod('[', c("HSDSDataset", "numeric", "numeric", "ANY"),
 #  generic '[' and siglist 'HSDSDataset,numeric,ANY,ANY'
 #  generic '[' and siglist 'HSDSDataset,numeric,numeric,ANY'
 
+
+#' @importFrom data.table rbindlist as.data.table
+extractCompoundJSON <- function(type, value) {
+  stopifnot(type$class == "H5T_COMPOUND")
+  
+  header <- as.data.table(unlist(lapply(type$fields, function(field) {
+    res <- list(switch(field$type$class,
+                       "H5T_STRING"=character(0),
+                       "H5T_INTEGER"=numeric(0),
+                       "H5T_FLOAT"=numeric(0),
+                       stop("Unsupported type in H5T_COMPOUND")))
+    names(res) <- field$name
+    res
+  }), recursive = FALSE))
+  
+  res <- rbindlist(c(list(header), value))
+  res
+}
