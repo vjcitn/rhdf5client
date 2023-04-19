@@ -38,7 +38,13 @@ HSDSDataset <- function(file, path)  {
     warning("bad http request", call. = FALSE)
     return(NULL)
   }
-  shape <- response$shape$dims
+  
+  if (response$shape$class == "H5S_SCALAR") {
+    shape <- 1
+  } else {
+    shape <- response$shape$dims
+  }
+  
   type <- response$type
 
   new("HSDSDataset", file=file, path=path, uuid=uuid,

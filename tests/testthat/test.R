@@ -141,3 +141,13 @@ test_that("Basic compound support", {
   expect_equal(v2$year[1], v1$year)
   expect_equal(v2$loadstart[1], v1$loadstart)
 })
+
+context("Scalar support")
+test_that("Support of scalar values", {
+  src.hsds <- HSDSSource('http://hsdshdflab.hdfgroup.org')
+  f <- HSDSFile(src.hsds, "/shared/NASA/NCEP3/ncep3.h5")
+  d <- HSDSDataset(f, "/HDFEOS INFORMATION/StructMetadata.0")
+  v <- d[1] 
+  expect_true(is(v, "character"))
+  expect_true(startsWith(v, "GROUP"))
+})
