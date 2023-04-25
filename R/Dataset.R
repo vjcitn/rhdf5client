@@ -710,6 +710,6 @@ extractCompoundJSON <- function(type, value) {
     res
   }), recursive = FALSE))
   
-  res <- rbindlist(c(list(header), value))
+  res <- rbindlist(c(list(header), lapply(value, as.list)))
   res
 }

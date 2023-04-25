@@ -140,6 +140,17 @@ test_that("Basic compound support", {
   expect_equal(nrow(v2), 2)
   expect_equal(v2$year[1], v1$year)
   expect_equal(v2$loadstart[1], v1$loadstart)
+  
+  typ <- list(class="H5T_COMPOUND", 
+              fields=list(
+                list(name="f1", type=list(class="H5T_STRING")),
+                list(name="f2", type=list(class="H5T_STRING")),
+                list(name="f3", type=list(class="H5T_STRING"))
+              ))
+  # JSON arrays are used when all columns are strings
+  str <- c('[["asd", "qwe", "zxc"], ["a", "b", "c"]]')
+  dt <- extractCompoundJSON(type = typ, rjson::fromJSON(str))
+  expect_true(is(dt, "data.frame"))
 })
 
 context("Scalar support")
