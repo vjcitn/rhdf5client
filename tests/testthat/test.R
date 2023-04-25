@@ -42,7 +42,7 @@ test_that("Files can be opened for reading", {
   dsts <- listDatasets(f1)
   expect_true('/newassay001' %in% dsts)
   # catch exception: non-existent or empty file
-  expect_warning(HSDSFile(src.hsds, '/shared/bioconductor/tenx_nonex.h5'), "no datasets")
+  expect_error(HSDSFile(src.hsds, '/shared/bioconductor/tenx_nonex.h5'), "Not Found")
   } else TRUE
 })
 
@@ -151,3 +151,11 @@ test_that("Support of scalar values", {
   expect_true(is(v, "character"))
   expect_true(startsWith(v, "GROUP"))
 })
+
+test_that("Request errors are reported", {
+  if (!check_hsds()) return(TRUE) else {
+    src.hsds <- HSDSSource("https://developer.nrel.gov/api/hsds")
+    expect_error(HSDSFile(src.hsds, "/shared/NASA/NCEP3/ncep3.h5"), "api_key")
+  }
+})
+
