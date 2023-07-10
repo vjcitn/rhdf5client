@@ -165,7 +165,7 @@ setMethod("DelayedArray", "HSDSArraySeed",
 #' check_hsds()
 #' @export
 check_hsds = function() {
- tst = "http://hsdshdflab.hdfgroup.org?domain=/shared/bioconductor/darmgcls.h5"
+ tst = paste0(URL_hsds(), "?domain=/shared/bioconductor/darmgcls.h5")
  ans = httr::GET(tst)
  ans$status_code == 200
 }

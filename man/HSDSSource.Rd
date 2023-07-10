@@ -23,6 +23,6 @@ This function is deprecated and will be defunct in the next release.
 }
 \examples{
 if (check_hsds()) {
- src.hsds <- HSDSSource('http://hsdshdflab.hdfgroup.org')
+ src.hsds <- HSDSSource(URL_hsds())
 }
 }

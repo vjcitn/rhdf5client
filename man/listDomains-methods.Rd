@@ -30,8 +30,6 @@ not return the files in '/home/jreadey/HDFLabTutorial/'
 This function is deprecated and will be defunct in the next release.
 }
 \examples{
-src.hsds <- HSDSSource('http://hsdshdflab.hdfgroup.org')
-src.chan <- HSDSSource('http://h5s.channingremotedata.org:5000', 'h5serv')
-listDomains(src.chan)
-listDomains(src.hsds, '/home/jreadey')
+src.hsds <- HSDSSource(URL_hsds())
+listDomains(src.hsds, '/shared')
 }
