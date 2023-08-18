@@ -40,7 +40,7 @@ test_that("Files can be opened for reading", {
   src.hsds <- HSDSSource('https://hsdsdev.bioconductor.org')
   f1 <- HSDSFile(src.hsds, '/shared/bioconductor/tenx_full.h5')
   dsts <- listDatasets(f1)
-  expect_true('/assay001' %in% dsts)
+  expect_true('/newassay001' %in% dsts)
   # catch exception: non-existent or empty file
   expect_error(HSDSFile(src.hsds, '/shared/bioconductor/tenx_nonex.h5'), "Not Found")
   } else TRUE
