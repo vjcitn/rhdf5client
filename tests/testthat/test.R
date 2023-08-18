@@ -42,7 +42,7 @@ test_that("Files can be opened for reading", {
   dsts <- listDatasets(f1)
   expect_true('/newassay001' %in% dsts)
   # catch exception: non-existent or empty file
-  expect_warning(HSDSFile(src.hsds, '/shared/bioconductor/tenx_nonex.h5'), "no datasets")
+  expect_error(HSDSFile(src.hsds, '/shared/bioconductor/tenx_nonex.h5'), "Not Found")
   } else TRUE
 })
 
@@ -108,8 +108,8 @@ test_that("Bad slices rejected",  {
 context("String support")
 test_that("Basic string support",  {
     src.hsds <- HSDSSource('http://hsdshdflab.hdfgroup.org')
-    f <- HSDSFile(src.hsds, "/shared/NREL/sample/windspeed_z5.h5")
-    d <- HSDSDataset(f, "/datetime")
+    f <- HSDSFile(src.hsds, "/shared/test_string.h5")
+    d <- HSDSDataset(f, "/d")
     expect_true(d@type$class == "H5T_STRING")
     
     v1 <- d[1:10]
@@ -123,31 +123,52 @@ test_that("Basic string support",  {
 context("Compound support")
 test_that("Basic compound support", {
   src.hsds <- HSDSSource('http://hsdshdflab.hdfgroup.org')
-  f <- HSDSFile(src.hsds, "/shared/ghcn/year/inventory.h5")
-  d <- HSDSDataset(f, "/inventory")
+  f <- HSDSFile(src.hsds, "/shared/test_compound.h5")
+  d <- HSDSDataset(f, "/d")
   
   expect_equal(d@type$class, "H5T_COMPOUND")
-  expect_equal(d@type$fields[[1]]$name, "year")
-  expect_equal(d@type$fields[[1]]$type$class, "H5T_STRING")
+  expect_equal(d@type$fields[[1]]$name, "intCol")
+  expect_equal(d@type$fields[[1]]$type$class, "H5T_INTEGER")
+  expect_equal(d@type$fields[[2]]$name, "strCol")
+  expect_equal(d@type$fields[[2]]$type$class, "H5T_STRING")
 
   v1 <- d[1]  
   expect_true(is(v1, "data.frame")) # data.table inherits data.frame
   expect_equal(nrow(v1), 1)
-  expect_equal(v1$year, "1763")
-  expect_equal(v1$loadstart, 1636742475)
+  expect_equal(v1$intCol, 1)
+  expect_equal(v1$strCol, "a")
   
   v2 <- d[1:2]  
   expect_equal(nrow(v2), 2)
-  expect_equal(v2$year[1], v1$year)
-  expect_equal(v2$loadstart[1], v1$loadstart)
+  expect_equal(v2$intCol[1], v1$intCol)
+  expect_equal(v2$strCol[1], v1$strCol)
+  
+  typ <- list(class="H5T_COMPOUND", 
+              fields=list(
+                list(name="f1", type=list(class="H5T_STRING")),
+                list(name="f2", type=list(class="H5T_STRING")),
+                list(name="f3", type=list(class="H5T_STRING"))
+              ))
+  # JSON arrays are used when all columns are strings
+  str <- c('[["asd", "qwe", "zxc"], ["a", "b", "c"]]')
+  dt <- extractCompoundJSON(type = typ, rjson::fromJSON(str))
+  expect_true(is(dt, "data.frame"))
 })
 
 context("Scalar support")
 test_that("Support of scalar values", {
   src.hsds <- HSDSSource('http://hsdshdflab.hdfgroup.org')
-  f <- HSDSFile(src.hsds, "/shared/NASA/NCEP3/ncep3.h5")
-  d <- HSDSDataset(f, "/HDFEOS INFORMATION/StructMetadata.0")
+  f <- HSDSFile(src.hsds, "/shared/test_scalar.h5")
+  d <- HSDSDataset(f, "/d")
   v <- d[1] 
   expect_true(is(v, "character"))
-  expect_true(startsWith(v, "GROUP"))
+  expect_identical(v, "I'm scalar")
 })
+
+test_that("Request errors are reported", {
+  if (!check_hsds()) return(TRUE) else {
+    src.hsds <- HSDSSource("https://developer.nrel.gov/api/hsds")
+    expect_error(HSDSFile(src.hsds, "/shared/NASA/NCEP3/ncep3.h5"), "api_key")
+  }
+})
+
