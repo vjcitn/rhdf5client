@@ -25,37 +25,34 @@ test_that("sproc/isplit work", {
 context("HSDSSource")
 test_that("Server found", {
  if (check_hsds()) {
-  src.hsds <- HSDSSource(URL_hsds())
+  src.hsds <- HSDSSource('https://hsdsdev.bioconductor.org')
   doms <- listDomains(src.hsds, '/shared/bioconductor')
   expect_true('/shared/bioconductor/patelGBMSC.h5' %in% doms) 
   # catch exception: non-existent source
-  #src.fake <- HSDSSource(URL_hsds())
-  #expect_warning(listDomains(src.fake, '/shared/bioconductor/'), "bad http request")
+  src.fake <- HSDSSource('https://hsdsdev.bioconductor2.org')
+  expect_warning(listDomains(src.fake, '/shared/bioconductor/'), "bad http request")
  } else TRUE
 })
 
 context("HSDSFile")
 test_that("Files can be opened for reading", {
  if (check_hsds()) {
-  src.hsds <- HSDSSource(URL_hsds())
-  f1 <- HSDSFile(src.hsds, '/shared/bioconductor/patelGBMSC.h5')
+  src.hsds <- HSDSSource('https://hsdsdev.bioconductor.org')
+  f1 <- HSDSFile(src.hsds, '/shared/bioconductor/tenx_full.h5')
   dsts <- listDatasets(f1)
   expect_true('/assay001' %in% dsts)
   # catch exception: non-existent or empty file
-  expect_warning(HSDSFile(src.hsds, '/shared/bioconductor/tenx_nonex.h5'), "no datasets")
+  expect_error(HSDSFile(src.hsds, '/shared/bioconductor/tenx_nonex.h5'), "Not Found")
   } else TRUE
 })
 
 context("HSDSDataset")
 test_that("Data can be retrieved from Datasets", {
  if (!check_hsds()) return(TRUE) else {
-  src.hsds <- HSDSSource(URL_hsds())
-  f2 <- HSDSFile(src.hsds, '/shared/bioconductor/patelGBMSC.h5')
-  d2 <- HSDSDataset(f2, '/assay001')
-#  R <- c(4046,2087,4654,3193)
-  R <- c(1566459.51656964, 989588.912121646, 1247006.06405722, 1061847.89477033)
-
-
+  src.hsds <- HSDSSource('https://hsdsdev.bioconductor.org')
+  f2 <- HSDSFile(src.hsds, '/shared/bioconductor/tenx_full.h5')
+  d2 <- HSDSDataset(f2, '/newassay001')
+  R <- c(4046,2087,4654,3193)
   A <- apply(getData(d2, c('1:4', '1:27998'), transfermode='JSON'), 1, sum)
   clRA = function(R,A) max(abs(R-A))<1e-6
   expect_true(clRA(R,A))
@@ -69,11 +66,9 @@ test_that("Data can be retrieved from Datasets", {
 context("DelayedArray subclass HSDSArray")
 test_that("DelayedArray can be instantiated and accessed",  {
  if (!check_hsds()) return(TRUE) else {
-#  R <- c(4046,2087,4654,3193)
-  R <- c(1965027.82493435, 1267166.06960898, 1627511.94926196, 1338411.18299368
-)
-  da <- HSDSArray(URL_hsds(), 'hsds', 
-        '/shared/bioconductor/patelGBMSC.h5', '/assay001')
+  R <- c(4046,2087,4654,3193)
+  da <- HSDSArray('https://hsdsdev.bioconductor.org', 'hsds', 
+        '/shared/bioconductor/tenx_full.h5', '/newassay001')
   A <- apply(da[,1:4],2,sum)
   clRA = function(R,A) max(abs(R-A))<1e-6
   expect_true(clRA(R,A))
@@ -107,6 +102,74 @@ test_that("Bad slices rejected",  {
     regexp='slice stop less than slice start'))
   expect_error(rhdf5client:::checkSlices(c(10, 20, 30), c('5:10,0.5', ':', ':8'),
     regexp='malformed slice'))
+  }
+})
+
+
+context("String support")
+test_that("Basic string support",  {
+    src.hsds <- HSDSSource('https://hsdsdev.bioconductor.org')
+    f <- HSDSFile(src.hsds, "/shared/bioconductor/test_string.h5")
+    d <- HSDSDataset(f, "/d")
+    expect_true(d@type$class == "H5T_STRING")
+    
+    v1 <- d[1:10]
+    expect_equal(class(v1), "character")
+    
+    v2 <- d[1]
+    expect_equal(class(d[1]), "character")
+    expect_equal(v1[1], v2)
+})
+
+context("Compound support")
+test_that("Basic compound support", {
+  src.hsds <- HSDSSource('https://hsdsdev.bioconductor.org')
+  f <- HSDSFile(src.hsds, "/shared/bioconductor/test_compound.h5")
+  d <- HSDSDataset(f, "/d")
+  
+  expect_equal(d@type$class, "H5T_COMPOUND")
+  expect_equal(d@type$fields[[1]]$name, "intCol")
+  expect_equal(d@type$fields[[1]]$type$class, "H5T_INTEGER")
+  expect_equal(d@type$fields[[2]]$name, "strCol")
+  expect_equal(d@type$fields[[2]]$type$class, "H5T_STRING")
+
+  v1 <- d[1]  
+  expect_true(is(v1, "data.frame")) # data.table inherits data.frame
+  expect_equal(nrow(v1), 1)
+  expect_equal(v1$intCol, 1)
+  expect_equal(v1$strCol, "a")
+  
+  v2 <- d[1:2]  
+  expect_equal(nrow(v2), 2)
+  expect_equal(v2$intCol[1], v1$intCol)
+  expect_equal(v2$strCol[1], v1$strCol)
+  
+  typ <- list(class="H5T_COMPOUND", 
+              fields=list(
+                list(name="f1", type=list(class="H5T_STRING")),
+                list(name="f2", type=list(class="H5T_STRING")),
+                list(name="f3", type=list(class="H5T_STRING"))
+              ))
+  # JSON arrays are used when all columns are strings
+  str <- c('[["asd", "qwe", "zxc"], ["a", "b", "c"]]')
+  dt <- extractCompoundJSON(type = typ, rjson::fromJSON(str))
+  expect_true(is(dt, "data.frame"))
+})
+
+context("Scalar support")
+test_that("Support of scalar values", {
+  src.hsds <- HSDSSource('https://hsdsdev.bioconductor.org')
+  f <- HSDSFile(src.hsds, "/shared/bioconductor/test_scalar.h5")
+  d <- HSDSDataset(f, "/d")
+  v <- d[1] 
+  expect_true(is(v, "character"))
+  expect_identical(v, "I'm scalar")
+})
+
+test_that("Request errors are reported", {
+  if (!check_hsds()) return(TRUE) else {
+    src.hsds <- HSDSSource("https://developer.nrel.gov/api/hsds")
+    expect_error(HSDSFile(src.hsds, "/shared/NASA/NCEP3/ncep3.h5"), "api_key")
   }
 })
 

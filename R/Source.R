@@ -235,10 +235,11 @@ submitRequest <- function(req, transfermode='JSON')  {
   )
 
   if (is.null(rsp))  
-    stop("Bad request")
+    stop("Bad request (no response)")
 
   if ('status_code' %in% names(rsp) && rsp$status_code != 200)  
-    stop("Bad request")
+    stop("Request failed:\nrequest: ", req, "\n",
+    "error message: ", readBin(rsp$content, what="character"))
 
   if (transfermode == 'JSON')  {
     rsp <- tryCatch({

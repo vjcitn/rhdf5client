@@ -30,10 +30,8 @@ setClass("HSDSFile", representation(src="HSDSSource", domain="character", dsetdf
 HSDSFile <- function(src, domain)  {
   #.Deprecated("HSDSArray", NULL, deprecate_msg)
   request <- paste0(src@endpoint, '?domain=', domain)
-  response <- tryCatch(
-    submitRequest(request),
-    error=function(e) { NULL }
-  )  
+  response <- submitRequest(request)
+
   if (is.null(request))  {
     warning("no such file")
     return(NULL)

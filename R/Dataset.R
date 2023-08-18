@@ -696,7 +696,11 @@ setMethod('[', c("HSDSDataset", "numeric", "numeric", "ANY"),
 #  generic '[' and siglist 'HSDSDataset,numeric,numeric,ANY'
 
 
+#' compound operation
 #' @importFrom data.table rbindlist as.data.table
+#' @param type type
+#' @param value value
+#' @export
 extractCompoundJSON <- function(type, value) {
   stopifnot(type$class == "H5T_COMPOUND")
   
@@ -710,6 +714,6 @@ extractCompoundJSON <- function(type, value) {
     res
   }), recursive = FALSE))
   
-  res <- rbindlist(c(list(header), value))
+  res <- rbindlist(c(list(header), lapply(value, as.list)))
   res
 }
