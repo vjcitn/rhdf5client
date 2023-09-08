@@ -512,6 +512,14 @@ extractBinary <- function(typ, nele, rsp)  {
   } else if (df[1,2] == 'I' && df[1,3] == '64')  {
     what <- 'integer'
     size <- 8
+  } else if (df[1,2] == 'U' && df[1,3] == '32')  {
+    what <- 'integer'
+    size <- 4
+    # not setting signed as it's ignored by readBin for this size
+  } else if (df[1,2] == 'U' && df[1,3] == '64')  {
+    what <- 'integer'
+    size <- 8
+    # not setting signed as it's ignored by readBin for this size
   } else if (df[1,2] == 'F' && df[1,3] == '64')  {
     what <- 'double'
     size <- 8
