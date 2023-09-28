@@ -20,9 +20,9 @@ setClass("HSDSDataset", representation(file="HSDSFile", path="character", uuid="
 #' @return An initialized object of type HSDSDataset
 #' @examples
 #' if (check_hsds()) {
-#'  src <- HSDSSource('http://hsdshdflab.hdfgroup.org')
-#'  f <- HSDSFile(src, '/shared/bioconductor/tenx_full.h5')
-#'  d <- HSDSDataset(f, '/newassay001')
+#'  src <- HSDSSource(URL_hsds())
+#'  f <- HSDSFile(src, '/shared/bioconductor/patelGBMSC.h5')
+#'  d <- HSDSDataset(f, '/assay001')
 #' }
 #' @export
 HSDSDataset <- function(file, path)  {
@@ -94,9 +94,9 @@ HSDSDataset <- function(file, path)  {
 #'
 #' @examples
 #' if (check_hsds()) {
-#'  s <- HSDSSource('http://hsdshdflab.hdfgroup.org')
-#'  f <- HSDSFile(s, '/shared/bioconductor/tenx_full.h5')
-#'  d <- HSDSDataset(f, '/newassay001')
+#'  s <- HSDSSource(URL_hsds())
+#'  f <- HSDSFile(s, '/shared/bioconductor/patelGBMSC.h5')
+#'  d <- HSDSDataset(f, '/assay001')
 #'  x <- getData(d, c('1:4', '1:27998'), transfermode='JSON')
 #'  xb <- getData(d, c('1:4', '1:27998'), transfermode='binary')
 #'  # x <- getData(d, c(1:4, 1:27998), transfermode='JSON') # method missing?

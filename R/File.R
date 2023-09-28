@@ -23,8 +23,8 @@ setClass("HSDSFile", representation(src="HSDSSource", domain="character", dsetdf
 #' @return an initialized object of type HSDSFile
 #' @examples
 #' if (check_hsds()) {
-#'  src <- HSDSSource('http://hsdshdflab.hdfgroup.org')
-#'  f10x <- HSDSFile(src, '/shared/bioconductor/tenx_full.h5')
+#'  src <- HSDSSource(URL_hsds())
+#'  f10x <- HSDSFile(src, '/shared/bioconductor/patelGBMSC.h5')
 #' }
 #' @export
 HSDSFile <- function(src, domain)  {
@@ -69,8 +69,8 @@ HSDSFile <- function(src, domain)  {
 #' 
 #' @examples
 #' if (check_hsds()) {
-#'  src <- HSDSSource('http://hsdshdflab.hdfgroup.org')
-#'  f <- HSDSFile(src, '/shared/bioconductor/tenx_full.h5')
+#'  src <- HSDSSource(URL_hsds())
+#'  f <- HSDSFile(src, '/shared/bioconductor/patelGBMSC.h5')
 #'  listDatasets(f)
 #' }
 #' @export

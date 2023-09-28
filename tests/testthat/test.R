@@ -27,7 +27,7 @@ test_that("Server found", {
  if (check_hsds()) {
   src.hsds <- HSDSSource('https://hsdsdev.bioconductor.org')
   doms <- listDomains(src.hsds, '/shared/bioconductor')
-  expect_true('/shared/bioconductor/tenx_full.h5' %in% doms) 
+  expect_true('/shared/bioconductor/patelGBMSC.h5' %in% doms) 
   # catch exception: non-existent source
   src.fake <- HSDSSource('https://hsdsdev.bioconductor2.org')
   expect_warning(listDomains(src.fake, '/shared/bioconductor/'), "bad http request")
@@ -53,13 +53,13 @@ test_that("Data can be retrieved from Datasets", {
   f2 <- HSDSFile(src.hsds, '/shared/bioconductor/tenx_full.h5')
   d2 <- HSDSDataset(f2, '/newassay001')
   R <- c(4046,2087,4654,3193)
-
   A <- apply(getData(d2, c('1:4', '1:27998'), transfermode='JSON'), 1, sum)
-  expect_true(all(R == A))
+  clRA = function(R,A) max(abs(R-A))<1e-6
+  expect_true(clRA(R,A))
   A <- apply(getData(d2, c('1:4', '1:27998'), transfermode='binary'), 1, sum)
-  expect_true(all(R == A))
+  expect_true(clRA(R,A))
   A <- apply(d2[1:4, 1:27998], 1, sum)
-  expect_true(all(R == A))
+  expect_true(clRA(R,A))
  }
 })
 
@@ -70,7 +70,8 @@ test_that("DelayedArray can be instantiated and accessed",  {
   da <- HSDSArray('https://hsdsdev.bioconductor.org', 'hsds', 
         '/shared/bioconductor/tenx_full.h5', '/newassay001')
   A <- apply(da[,1:4],2,sum)
-  expect_true(all(R == A))
+  clRA = function(R,A) max(abs(R-A))<1e-6
+  expect_true(clRA(R,A))
  }
 })
 

@@ -21,8 +21,8 @@ A HSDSDataset is a representation of a dataset in a HDF5 file.
 }
 \examples{
 if (check_hsds()) {
- src <- HSDSSource('http://hsdshdflab.hdfgroup.org')
- f <- HSDSFile(src, '/shared/bioconductor/tenx_full.h5')
- d <- HSDSDataset(f, '/newassay001')
+ src <- HSDSSource(URL_hsds())
+ f <- HSDSFile(src, '/shared/bioconductor/patelGBMSC.h5')
+ d <- HSDSDataset(f, '/assay001')
 }
 }

@@ -23,8 +23,8 @@ This function is deprecated and will be defunct in the next release.
 }
 \examples{
 if (check_hsds()) {
- src <- HSDSSource('http://hsdshdflab.hdfgroup.org')
- f <- HSDSFile(src, '/shared/bioconductor/tenx_full.h5')
+ src <- HSDSSource(URL_hsds())
+ f <- HSDSFile(src, '/shared/bioconductor/patelGBMSC.h5')
  listDatasets(f)
 }
 }
