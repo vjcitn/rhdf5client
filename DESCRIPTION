@@ -4,7 +4,7 @@ Description: This package provides functionality for reading data from HDF Scala
 	from within R.  The HSDSArray function bridges from HSDS to the user via the DelayedArray
 	interface.  Bioconductor manages an open HSDS instance graciously provided by John
 	Readey of the HDF Group.
-Version: 1.23.4
+Version: 1.23.5
 Authors@R: c(
  person("Samuela", "Pollack", role = c("aut"),email = "spollack@jimmy.harvard.edu"), 
  person("Shweta", "Gopaulakrishnan", role = c("aut"), email = "reshg@channing.harvard.edu"),
@@ -18,7 +18,6 @@ Imports: httr, rjson, utils, data.table
 Depends: R (>= 3.6), methods, DelayedArray
 License: Artistic-2.0
 LazyLoad: yes
-BiocViews: infrastructure
 Collate: URL_hsds.R indx.R 
   'rhdf5client2.R'
   'Source.R'
@@ -27,5 +26,5 @@ Collate: URL_hsds.R indx.R
   'RHDF5Array.R'
 VignetteBuilder: knitr
 Encoding: UTF-8
-biocViews: DataImport, Software
+biocViews: DataImport, Software, Infrastructure
 RoxygenNote: 7.2.3
