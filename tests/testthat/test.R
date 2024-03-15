@@ -166,6 +166,30 @@ test_that("Support of scalar values", {
   expect_identical(v, "I'm scalar")
 })
 
+context("Integer type support")
+test_that("Integer types are supported properly", {
+  src.hsds <- HSDSSource('https://hsdsdev.bioconductor.org')
+  f <- HSDSFile(src.hsds, "/shared/bioconductor/test_numbers.h5")
+  # not checking the actual values!
+  
+  d <- HSDSDataset(f, "/d_u32")
+  v <- d[1:d@shape] 
+  expect_equal(length(v), 4)
+  expect_equal(v[2], 2**31 - 1)
+  
+  d <- HSDSDataset(f, "/d_i64")
+  v <- d[1:d@shape] 
+  expect_equal(length(v), 5)
+  expect_equal(v[2], 2**31 - 1)
+  
+  d <- HSDSDataset(f, "/d_u64")
+  v <- d[1:d@shape] 
+  expect_equal(length(v), 6)
+  expect_equal(v[2], 2**31 - 1)
+  
+})
+
+
 test_that("Request errors are reported", {
   if (!check_hsds()) return(TRUE) else {
     src.hsds <- HSDSSource("https://developer.nrel.gov/api/hsds")
