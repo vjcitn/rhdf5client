@@ -7,7 +7,8 @@ deprecate_msg = paste0("This function is deprecated. The new interface to rhdf5c
 #' @slot domain the file's domain on the server; more or less, an alias for its 
 #' location in the external server file system
 #' @slot dsetdf a data.frame that caches often-used information about the file
-setClass("HSDSFile", representation(src="HSDSSource", domain="character", dsetdf="data.frame"))
+#' @slot type string representing type of the file: "domain" for file and "folder" for directory
+setClass("HSDSFile", representation(src="HSDSSource", domain="character", dsetdf="data.frame", type="character"))
 
 #' Construct an object of type HSDSFile
 #'
@@ -36,8 +37,16 @@ HSDSFile <- function(src, domain)  {
     warning("no such file")
     return(NULL)
   }
-  dsetdf <- findDatasets(src, domain)
-  obj <- new("HSDSFile", src=src, domain=domain, dsetdf=dsetdf)
+  type <- response$class
+  
+  if (type == "domain") {
+    dsetdf <- findDatasets(src, domain)  
+  } else {
+    dsetdf <- data.frame(paths=c(), uuids = c(), stringsAsFactors = FALSE)
+  }
+  
+  
+  obj <- new("HSDSFile", src=src, domain=domain, dsetdf=dsetdf, type=type)
 }
 
 .HSDSFile <- function(src, domain)  {  # after deprecation cycle this private function will be used
@@ -50,8 +59,15 @@ HSDSFile <- function(src, domain)  {
     warning("no such file")
     return(NULL)
   }
-  dsetdf <- findDatasets(src, domain)
-  obj <- new("HSDSFile", src=src, domain=domain, dsetdf=dsetdf)
+  type <- response$class
+  
+  if (type == "domain") {
+    dsetdf <- findDatasets(src, domain)  
+  } else {
+    dsetdf <- data.frame(paths=c(), uuids = c(), stringsAsFactors = FALSE)
+  }
+  
+  obj <- new("HSDSFile", src=src, domain=domain, dsetdf=dsetdf, type=type)
 }
 
 #' Search inner file hierarchy for datasets
