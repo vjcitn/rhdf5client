@@ -39,10 +39,21 @@ test_that("Files can be opened for reading", {
  if (check_hsds()) {
   src.hsds <- HSDSSource('https://hsdsdev.bioconductor.org')
   f1 <- HSDSFile(src.hsds, '/shared/bioconductor/tenx_full.h5')
+  expect_equal(f1@type, "domain")
   dsts <- listDatasets(f1)
   expect_true('/newassay001' %in% dsts)
   # catch exception: non-existent or empty file
   expect_error(HSDSFile(src.hsds, '/shared/bioconductor/tenx_nonex.h5'), "Not Found")
+  } else TRUE
+})
+
+test_that("HSDSFile can be a directory", {
+  if (check_hsds()) {
+    src.hsds <- HSDSSource('https://hsdsdev.bioconductor.org')
+    expect_no_warning(f1 <- HSDSFile(src.hsds, '/shared/bioconductor'))
+    expect_equal(f1@type, "folder")
+    subdomains <- listDomains(f1@src, f1@domain)
+    expect_true("/shared/bioconductor/tenx_full.h5" %in% subdomains)
   } else TRUE
 })
 
